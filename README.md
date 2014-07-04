@@ -1,0 +1,4 @@
+odoo-notes
+==========
+
+Odoo Notes
