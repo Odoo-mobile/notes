@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Odoo</string>
+    <string name="app_name">Notes</string>
     <string name="label_odoo">Odoo</string>
     <!-- Account -->
     <string name="account_user_dp">Account User Display Picture</string>
