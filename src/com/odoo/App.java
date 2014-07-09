@@ -22,10 +22,12 @@ import odoo.Odoo;
 import odoo.OdooInstance;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.odoo.addons.note.services.NotificationService;
 import com.odoo.support.OUser;
 
 public class App extends Application {
@@ -37,6 +39,8 @@ public class App extends Application {
 	public void onCreate() {
 		Log.d(TAG, "App->onCreate()");
 		super.onCreate();
+		Intent intent = new Intent(this, NotificationService.class);
+		startService(intent);
 	}
 
 	public Odoo createInstance() {
