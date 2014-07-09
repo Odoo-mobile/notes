@@ -5,10 +5,13 @@ import java.util.List;
 
 import odoo.controls.OForm;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
@@ -23,11 +26,14 @@ import android.widget.TimePicker;
 
 import com.odoo.addons.note.Note.Keys;
 import com.odoo.addons.note.models.NoteNote;
+import com.odoo.base.ir.Attachment;
+import com.odoo.base.ir.Attachment.Types;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.support.BaseFragment;
 import com.odoo.util.OControls;
+import com.odoo.util.controls.ExpandableHeightGridView;
 import com.odoo.util.drawer.DrawerItem;
 
 public class NoteDetail extends BaseFragment {
@@ -40,6 +46,10 @@ public class NoteDetail extends BaseFragment {
 	private ODataRow mRecord = null;
 	private Menu mMenu = null;
 	String str = null;
+	Attachment mAttachment = null;
+	PackageManager mPackageManager = null;
+	Context mContext = null;
+	ExpandableHeightGridView mNoteAttachmentGrid = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,12 +57,15 @@ public class NoteDetail extends BaseFragment {
 		initArgs();
 		setHasOptionsMenu(true);
 		mView = inflater.inflate(R.layout.note_detail, container, false);
+		mContext = getActivity();
+
 		return mView;
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		mAttachment = new Attachment(mContext);
 		init();
 	}
 
@@ -74,7 +87,9 @@ public class NoteDetail extends BaseFragment {
 			}
 			break;
 		}
-
+		mNoteAttachmentGrid = (ExpandableHeightGridView) mView
+				.findViewById(R.id.noteAttachmentGrid);
+		mNoteAttachmentGrid.setExpanded(true);
 	}
 
 	private void initArgs() {
@@ -123,6 +138,15 @@ public class NoteDetail extends BaseFragment {
 			FrgDate.show(getFragmentManager(), "Date");
 			setTime();
 			break;
+		case R.id.menu_note_audio:
+			mAttachment.requestAttachment(Types.AUDIO);
+			break;
+		case R.id.menu_note_image:
+			mAttachment.requestAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
+			break;
+		case R.id.menu_note_file:
+			mAttachment.requestAttachment(Types.FILE);
+			break;
 		case R.id.menu_note_mark_asread:
 			// OValues values = mForm.getFormValues();
 			// if(mId!=null)
@@ -165,6 +189,22 @@ public class NoteDetail extends BaseFragment {
 		inflater.inflate(R.menu.menu_note_detail, menu);
 		mMenu = menu;
 		updateMenu(mEditMode);
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (resultCode == Activity.RESULT_OK) {
+
+			ODataRow newAttachment = mAttachment
+					.handleResult(requestCode, data);
+			if (newAttachment.getString("content").equals("false")) {
+				// mNoteAttachmentList.add(newAttachment);
+				// mNoteListAdapterAttach
+				// .notifiyDataChange(mNoteAttachmentList);
+			}
+		}
 	}
 
 	@SuppressLint("ValidFragment")

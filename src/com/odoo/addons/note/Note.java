@@ -139,7 +139,7 @@ public class Note extends BaseFragment implements OnPullListener,
 						// mListRecords.addAll(db().select());
 						list = db().select(
 								"stage_ids = ? and open = ? and reminder = ?",
-								new Object[] { "1", true, false }, null, null,
+								new Object[] { 1, true, "" }, null, null,
 								"sequence");
 						mListRecords.addAll(list);
 						updateMenu(list.size());
@@ -150,7 +150,7 @@ public class Note extends BaseFragment implements OnPullListener,
 						// new Object[] { "1", false }, null, null,
 						// "sequence"));
 						list = db().select("stage_ids = ? and open = ?",
-								new Object[] { "1", false }, null, null,
+								new Object[] { 1, false }, null, null,
 								"sequence");
 						mListRecords.addAll(list);
 						updateMenu(list.size());
@@ -161,7 +161,7 @@ public class Note extends BaseFragment implements OnPullListener,
 						// new Object[] { "1", false }, null, null,
 						// "sequence"));
 						list = db().select("stage_ids = ? and reminder != ?",
-								new Object[] { "1", false }, null, null,
+								new Object[] { 1, "" }, null, null,
 								"sequence");
 						mListRecords.addAll(list);
 						updateMenu(list.size());
@@ -230,7 +230,7 @@ public class Note extends BaseFragment implements OnPullListener,
 			break;
 		case Reminders:
 			count = new NoteNote(context).select("reminder != ?",
-					new Object[] { false }).size();
+					new Object[] { "" }).size();
 			break;
 		default:
 			break;

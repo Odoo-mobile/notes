@@ -19,6 +19,26 @@
         android:title="Delete">
     </item>
     <item
+        android:id="@+id/menu_note_attach"
+        android:icon="@drawable/ic_menu_action_content_new_attachment"
+        android:showAsAction="always"
+        android:title="Attachement">
+        <menu>
+            <item
+                android:id="@+id/menu_note_audio"
+                android:title="Audio">
+            </item>
+            <item
+                android:id="@+id/menu_note_image"
+                android:title="Image">
+            </item>
+            <item
+                android:id="@+id/menu_note_file"
+                android:title="File">
+            </item>
+        </menu>
+    </item>
+    <item
         android:id="@+id/menu_note_operation"
         android:icon="@drawable/ic_action_overflow"
         android:showAsAction="always"

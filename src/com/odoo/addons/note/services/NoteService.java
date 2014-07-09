@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.addons.note.models.NoteNote;
+import com.odoo.base.ir.IrAttachment;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.service.OService;
@@ -34,6 +35,11 @@ public class NoteService extends OService {
 			NoteNote db = new NoteNote(context);
 			OSyncHelper sync = db.getSyncHelper();
 			if (sync.syncWithServer())
+				context.sendBroadcast(intent);
+
+			IrAttachment attch = new IrAttachment(context);
+			OSyncHelper syncAttch = attch.getSyncHelper();
+			if (syncAttch.syncWithServer())
 				context.sendBroadcast(intent);
 
 		} catch (Exception e) {

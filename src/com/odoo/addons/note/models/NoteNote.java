@@ -23,8 +23,8 @@ public class NoteNote extends OModel {
 	OColumn date_done = new OColumn("Date", OVarchar.class, 64)
 			.setDefault(false);
 	// OColumn note_pad_url = new OColumn("Note Pad Url", OText.class);
-	OColumn reminder = new OColumn("Reminder", OVarchar.class, 64).setDefault(
-			false).setLocalColumn();
+	OColumn reminder = new OColumn("Reminder", OVarchar.class, 64)
+			.setLocalColumn().setDefault("");
 	OColumn color = new OColumn("Color", OInteger.class).setDefault(0);
 	OColumn tag_ids = new OColumn("Tags", NoteTag.class,
 			RelationType.ManyToMany);

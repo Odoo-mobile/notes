@@ -56,6 +56,14 @@
                 odoo:label_color="@color/odoo_purple"
                 odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
         </odoo.controls.OForm>
+
+        <com.odoo.util.controls.ExpandableHeightGridView
+            android:id="@+id/noteAttachmentGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:horizontalSpacing="5dp"
+            android:numColumns="2"
+            android:verticalSpacing="5dp" />
     </LinearLayout>
 
 </ScrollView>
