@@ -131,12 +131,12 @@ public class NoteDetail extends BaseFragment {
 			mForm.setEditable(mEditMode);
 			break;
 		case R.id.menu_note_detail_delete:
-			// if(mId!=null)
-			// new NoteNote(getActivity()).;
-			// getActivity().getSupportFragmentManager().popBackStack();
-			DialogFragment FrgDate = new DatePickerFragment();
-			FrgDate.show(getFragmentManager(), "Date");
-			setTime();
+			 if(mId!=null)
+				 new NoteNote(getActivity()).delete(mId);
+			 getActivity().getSupportFragmentManager().popBackStack();
+//			DialogFragment FrgDate = new DatePickerFragment();
+//			FrgDate.show(getFragmentManager(), "Date");
+//			setTime();
 			break;
 		case R.id.menu_note_audio:
 			mAttachment.requestAttachment(Types.AUDIO);

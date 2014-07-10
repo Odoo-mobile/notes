@@ -23,36 +23,36 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                odoo:bottom_border_height="0"
                 odoo:field_name="name"
                 odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_bottom_border_height="0"
                 odoo:label_color="@color/odoo_purple"
                 odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                odoo:bottom_border_height="0"
                 odoo:field_name="memo"
                 odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_bottom_border_height="0"
                 odoo:label_color="@color/odoo_purple"
                 odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                odoo:bottom_border_height="0"
                 odoo:field_name="stage_ids"
                 odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_bottom_border_height="0"
                 odoo:label_color="@color/odoo_purple"
                 odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                odoo:bottom_border_height="0"
                 odoo:field_name="reminder"
                 odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_bottom_border_height="0"
                 odoo:label_color="@color/odoo_purple"
                 odoo:label_textAppearance="?android:attr/textAppearanceSmall" />
         </odoo.controls.OForm>
