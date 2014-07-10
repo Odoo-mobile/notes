@@ -275,6 +275,7 @@ public class OSyncHelper {
 				Integer newId = 0;
 				JSONObject values = createJSONValues(model, row);
 				if (values != null) {
+					values.remove("id");
 					JSONObject result = mOdoo.createNew(model.getModelName(),
 							values);
 					newId = result.getInt("result");
@@ -295,7 +296,11 @@ public class OSyncHelper {
 			values = new JSONObject();
 			for (OColumn col : model.getColumns(false)) {
 				if (col.getRelationType() == null) {
-					values.put(col.getName(), row.get(col.getName()));
+					Object val = row.get(col.getName());
+					if (val.toString().equals("false") || val == null
+							|| TextUtils.isEmpty(val.toString()))
+						val = false;
+					values.put(col.getName(), val);
 				} else {
 					// Relation columns
 					switch (col.getRelationType()) {
