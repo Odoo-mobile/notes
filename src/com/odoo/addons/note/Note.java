@@ -136,7 +136,7 @@ public class Note extends BaseFragment implements OnPullListener,
 					case Note:
 						// mListRecords.addAll(db().select());
 						list = db().select(
-								"stage_ids = ? and open = ? and reminder = ?",
+								"stage_id = ? and open = ? and reminder = ?",
 								new Object[] { 1, true, "" }, null, null,
 								"sequence");
 						mListRecords.addAll(list);
@@ -144,10 +144,10 @@ public class Note extends BaseFragment implements OnPullListener,
 						break;
 					case Archive:
 						// mListRecords.addAll(db().select(
-						// "stage_ids = ? and open = ?",
+						// "stage_id = ? and open = ?",
 						// new Object[] { "1", false }, null, null,
 						// "sequence"));
-						list = db().select("stage_ids = ? and open = ?",
+						list = db().select("stage_id = ? and open = ?",
 								new Object[] { 1, false }, null, null,
 								"sequence");
 						mListRecords.addAll(list);
@@ -155,10 +155,10 @@ public class Note extends BaseFragment implements OnPullListener,
 						break;
 					case Reminders:
 						// mListRecords.addAll(db().select(
-						// "stage_ids = ? and reminder != ?",
+						// "stage_id = ? and reminder != ?",
 						// new Object[] { "1", false }, null, null,
 						// "sequence"));
-						list = db().select("stage_ids = ? and reminder != ?",
+						list = db().select("stage_id = ? and reminder != ?",
 								new Object[] { 1, "" }, null, null,
 								"sequence");
 						mListRecords.addAll(list);
