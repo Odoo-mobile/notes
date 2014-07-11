@@ -43,10 +43,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:background="#d5d5d5"
         android:orientation="horizontal"
-        android:paddingBottom="1.5dp" >
+        android:paddingBottom="0.5dp" >
 
         <ImageView
             android:id="@+id/imgCreateQuickNote"
@@ -97,13 +96,23 @@
         android:id="@+id/loadingProgress"
         layout="@layout/listview_data_loading_progress"
         android:paddingBottom="5dp"
-        android:paddingTop="5dp" />
+        android:paddingTop="5dp"
+        android:visibility="gone" />
 
-    <odoo.controls.OList
-        android:id="@+id/listRecords"
+    <odoo.controls.OViewPager
+        android:id="@+id/viewPagger"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:custom_layout="@layout/note_custom_view_note" >
-    </odoo.controls.OList>
+        android:layout_height="wrap_content"
+        app:pager_model="note.stage"
+        app:view_column_name="name" >
+
+        <android.support.v4.view.PagerTitleStrip
+            style="?android:attr/textAppearanceSmallInverse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/odoo_purple"
+            android:padding="5dp" />
+    </odoo.controls.OViewPager>
 
 </LinearLayout>
