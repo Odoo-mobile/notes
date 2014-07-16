@@ -33,11 +33,13 @@ import android.widget.Toast;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.base.ir.Attachment;
+import com.odoo.base.ir.Attachment.Types;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
+import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
@@ -202,11 +204,7 @@ public class Note extends BaseFragment implements OnPullListener,
 			// case Note:
 			// }
 			mListControl.initListControl(mListRecords);
-			// OControls.setGone(mView, R.id.loadingProgress);
-			// if (mSearchView != null)
-			// mSearchView
-			// .setOnQueryTextListener(getQueryListener((ArrayAdapter<Object>)
-			// mListRecords));
+			OControls.setGone(mView, R.id.loadingProgress);
 		}
 
 	}
@@ -333,33 +331,24 @@ public class Note extends BaseFragment implements OnPullListener,
 		bundle.putString("key", mCurrentKey.toString());
 		switch (v.getId()) {
 		case R.id.imgCreateQuickNote:
-			// bundle.putString("type", "imgCreateQuickNote");
-			Log.d(TAG, "[QuickNote create] Note->onClick()");
-			// FragmentManager fm = getFragmentManager();
-			// NotePopupDialog dialog = new NotePopupDialog();
-			// dialog.setRetainInstance(true);
-			// dialog.show(fm, "fragment");
+			note.setArguments(bundle);
+			startFragment(note, true);
 			break;
 		case R.id.imgShowQuickNote:
-			Log.d(TAG, "[QuickNote create] Note->onClick()");
-			// bundle.putString("type", "imgShowQuickNote");
+			note.setArguments(bundle);
+			startFragment(note, true);
 			break;
 		case R.id.imgAttachImage:
-			Log.d(TAG, "[QuickNote create] Note->onClick()");
-			// bundle.putString("type", "imgAttachImage");
+			mAttachment.requestAttachment(Types.CAPTURE_IMAGE);
 			break;
 		case R.id.imgAttachAudio:
-			Log.d(TAG, "[QuickNote create] Note->onClick()");
-			// bundle.putString("type", "imgAttachAudio");
+			mAttachment.requestAttachment(Types.AUDIO);
 			break;
 		case R.id.imgAttachSpeechToText:
-			Log.d(TAG, "[QuickNote create] Note->onClick()");
-			// bundle.putString("type", "imgAttachSpeechToText");
 			requestSpeechToText();
 			break;
 		}
-		// note.setArguments(bundle);
-		// startFragment(note, true);
+
 	}
 
 	private void requestSpeechToText() {
@@ -381,24 +370,21 @@ public class Note extends BaseFragment implements OnPullListener,
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		Log.e("Result", resultCode + "");
 		if (resultCode == Activity.RESULT_OK) {
-			// if (requestCode != REQUEST_SPEECH_TO_TEXT) {
-			// ODataRow newAttachment = mAttachment.handleResult(requestCode,
-			// data);
-			// if (newAttachment.getString("content").equals("false")) {
-			// mNoteAttachmentList.add(newAttachment);
-			// mNoteListAdapterAttach
-			// .notifiyDataChange(mNoteAttachmentList);
-			// }
-			// } else {
-			// String noteText = (edtNoteDescription.getText().length() > 0) ?
-			// edtNoteDescription
-			// .getText().toString() + "\n"
-			// : "";
+			Log.e("OnActivity", "ResultOK");
 			if (requestCode == REQUEST_SPEECH_TO_TEXT) {
 				ArrayList<String> matches = data
 						.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 				Log.e("Speech TO test", matches.get(0) + "");
+			} else {
+				ODataRow newAttachment = mAttachment.handleResult(requestCode,
+						data);
+				if (newAttachment.getString("content").equals("false")) {
+					// mNoteAttachmentList.add(newAttachment);
+					// mNoteListAdapterAttach.notifiyDataChange(mNoteAttachmentList);
+					Log.e("Attachment", newAttachment + "");
+				}
 			}
 		}
 	}
@@ -432,19 +418,4 @@ public class Note extends BaseFragment implements OnPullListener,
 	public void onItemDragEnd(View drop_view, int position, Object data) {
 
 	}
-
-	// @Override
-	// public View paggerGetView(Context context, View view, ODataRow object,
-	// int position) {
-	// OList mList = (OList) LayoutInflater.from(context).inflate(
-	// R.layout.note_list_layout, null);
-	// Log.e("HI", "Hi");
-	// init(mList, context, object.getInt("id"));
-	// return mList;
-	// }
-	//
-	// @Override
-	// public FragmentManager getPaggerFragmentManager() {
-	// return getActivity().getSupportFragmentManager();
-	// }
 }

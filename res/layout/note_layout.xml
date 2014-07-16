@@ -77,7 +77,7 @@
             android:background="@drawable/oe_background_selector"
             android:clickable="true"
             android:padding="5dp"
-            android:src="@drawable/ic_action_device_access_mic"
+            android:src="@drawable/ic_action_device_access_volume_on"
             android:tint="@color/dark_icon" />
 
         <ImageView

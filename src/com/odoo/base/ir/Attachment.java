@@ -91,6 +91,7 @@ public class Attachment implements OnClickListener {
 	public void requestAttachment(Types type) {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_GET_CONTENT);
+		Log.e("Type", type + "");
 		switch (type) {
 		case IMAGE_OR_CAPTURE_IMAGE:
 			// createDialog(type);
@@ -165,6 +166,7 @@ public class Attachment implements OnClickListener {
 	public ODataRow handleResult(int requestCode, Intent data) {
 		Uri uri = null;
 		Bitmap bitmap = null;
+		Log.e("handle", requestCode + "");
 		switch (requestCode) {
 		case REQUEST_AUDIO:
 			uri = data.getData();
@@ -429,35 +431,24 @@ public class Attachment implements OnClickListener {
 			if (!mAttachmentInfo.getString("file_uri").equals("false")) {
 				return null;
 			} else {
-				//FIXME: replaced OEHelper with OdooHelper ??
-			/*	if (mOdoo.odoo() != null) {
-					try {
-						OEFieldsHelper fields = new OEFieldsHelper(
-								new String[] { "name", "datas", "file_type",
-										"res_model", "res_id" });
-						OEDomain domain = new OEDomain();
-						domain.add("id", "=", mAttachmentInfo.getInt("id"));
-						JSONObject result = mOdoo.odoo().search_read(
-								mDb.getModelName(), fields.get(), domain.get());
-						if (result.getJSONArray("records").length() > 0) {
-							JSONObject row = result.getJSONArray("records")
-									.getJSONObject(0);
-							String file_path = createFile(
-									row.getString("name"),
-									row.getString("datas"),
-									row.getString("file_type"));
-							Uri uri = Uri.fromFile(new File(file_path));
-							mNotification = setFileIntent(uri);
-							OEValues values = new OEValues();
-							values.put("file_uri", uri.toString());
-							// mDb.update(values, mAttachmentInfo.getInt("id"));
-						} else {
-							error = true;
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}*/
+				// FIXME: replaced OEHelper with OdooHelper ??
+				/*
+				 * if (mOdoo.odoo() != null) { try { OEFieldsHelper fields = new
+				 * OEFieldsHelper( new String[] { "name", "datas", "file_type",
+				 * "res_model", "res_id" }); OEDomain domain = new OEDomain();
+				 * domain.add("id", "=", mAttachmentInfo.getInt("id"));
+				 * JSONObject result = mOdoo.odoo().search_read(
+				 * mDb.getModelName(), fields.get(), domain.get()); if
+				 * (result.getJSONArray("records").length() > 0) { JSONObject
+				 * row = result.getJSONArray("records") .getJSONObject(0);
+				 * String file_path = createFile( row.getString("name"),
+				 * row.getString("datas"), row.getString("file_type")); Uri uri
+				 * = Uri.fromFile(new File(file_path)); mNotification =
+				 * setFileIntent(uri); OEValues values = new OEValues();
+				 * values.put("file_uri", uri.toString()); // mDb.update(values,
+				 * mAttachmentInfo.getInt("id")); } else { error = true; } }
+				 * catch (Exception e) { e.printStackTrace(); } }
+				 */
 			}
 			return null;
 		}

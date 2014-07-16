@@ -16,7 +16,7 @@ public class NoteNote extends OModel {
 			RelationType.ManyToMany);
 	OColumn memo = new OColumn("Desription", OText.class);
 	OColumn sequence = new OColumn("Sequence", OInteger.class).setDefault(0);
-	OColumn stage_id = new OColumn("Name", NoteStage.class,
+	OColumn stage_id = new OColumn("Select Stage", NoteStage.class,
 			RelationType.ManyToOne);
 	OColumn open = new OColumn("Open", OVarchar.class, 64).setDefault(true);
 	OColumn date_done = new OColumn("Date", OVarchar.class, 64)

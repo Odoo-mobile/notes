@@ -197,7 +197,7 @@ public class NoteDetail extends BaseFragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-
+		Log.e("Result Detail", "" + resultCode);
 		if (resultCode == Activity.RESULT_OK) {
 
 			ODataRow newAttachment = mAttachment
