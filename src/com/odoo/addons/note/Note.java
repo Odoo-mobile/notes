@@ -5,6 +5,7 @@ import java.util.List;
 
 import odoo.controls.OList;
 import odoo.controls.OList.OnRowClickListener;
+import odoo.controls.OListDragDropListener;
 import odoo.controls.OViewPager;
 import odoo.controls.OViewPager.OnPaggerGetView;
 import android.app.Activity;
@@ -22,14 +23,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.odoo.addons.note.models.NoteNote;
@@ -45,7 +43,8 @@ import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
 public class Note extends BaseFragment implements OnPullListener,
-		OnRowClickListener, OnClickListener, OnPaggerGetView {
+		OnRowClickListener, OnClickListener, OnPaggerGetView,
+		OListDragDropListener {
 
 	public static final String TAG = Note.class.getSimpleName();
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
@@ -61,8 +60,8 @@ public class Note extends BaseFragment implements OnPullListener,
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
 	EditText edtTitle = null;
 	ImageView mImgBtnShowQuickNote = null;
-	private Menu mMenu = null;
-	SearchView mSearchView = null;
+	// private Menu mMenu = null;
+	// SearchView mSearchView = null;
 	PackageManager mPackageManager = null;
 	Context mContext = null;
 	Attachment mAttachment = null;
@@ -79,13 +78,16 @@ public class Note extends BaseFragment implements OnPullListener,
 		mViewPagger = (OViewPager) mView.findViewById(R.id.viewPagger);
 		mViewPagger.setOnPaggerGetView(this);
 		initControl();
+		if (db().isEmptyTable()) {
+			scope.main().requestSync(NoteProvider.AUTHORITY);
+		}
 		return mView;
 	}
 
 	void init(OList mListControl, Context context, int stage_id) {
 		scope = new AppScope(context);
 		checkArguments();
-		//mListControl = (OList) mView.findViewById(R.id.listRecords);
+		// mListControl = (OList) mView.findViewById(R.id.listRecords);
 		mTouchListener = scope.main().getTouchAttacher();
 		mListControl.setOnRowClickListener(this);
 		mListControl.setRowDraggable(true);
@@ -130,6 +132,7 @@ public class Note extends BaseFragment implements OnPullListener,
 		OList mListControl = null;
 		Context mContext = null;
 		int mStageId = 0;
+		List<ODataRow> list = null;
 
 		public DataLoader(OList listControl, Context context, int stage_id) {
 			mListControl = listControl;
@@ -144,45 +147,43 @@ public class Note extends BaseFragment implements OnPullListener,
 
 				@Override
 				public void run() {
-					NoteNote db = new NoteNote(mContext);
-					if (db.isEmptyTable()) {
+					// NoteNote db = new NoteNote(mContext);
+					if (db().isEmptyTable()) {
 						scope.main().requestSync(NoteProvider.AUTHORITY);
 					}
 					mListRecords.clear();
-					List<ODataRow> list = null;
+
 					switch (mCurrentKey) {
 					case Note:
 						// mListRecords.addAll(db().select());
-						list = db.select(
+						list = db().select(
 								"stage_id = ? and open = ? and reminder = ?",
 								new Object[] { mStageId, true, "" }, null,
 								null, "sequence");
 						mListRecords.addAll(list);
-						updateMenu(list.size());
 						break;
 					case Archive:
 						// mListRecords.addAll(db().select(
 						// "stage_id = ? and open = ?",
 						// new Object[] { "1", false }, null, null,
 						// "sequence"));
-						list = db.select("stage_id = ? and open = ?",
+						list = db().select("stage_id = ? and open = ?",
 								new Object[] { mStageId, false }, null, null,
 								"sequence");
 						mListRecords.addAll(list);
-						updateMenu(list.size());
 						break;
 					case Reminders:
 						// mListRecords.addAll(db().select(
 						// "stage_id = ? and reminder != ?",
 						// new Object[] { "1", false }, null, null,
 						// "sequence"));
-						list = db.select("stage_id = ? and reminder != ?",
+						list = db().select("stage_id = ? and reminder != ?",
 								new Object[] { mStageId, "" }, null, null,
 								"sequence");
 						mListRecords.addAll(list);
-						updateMenu(list.size());
 						break;
 					}
+					// updateMenu(mListRecords.size());
 				}
 			});
 			return null;
@@ -200,7 +201,6 @@ public class Note extends BaseFragment implements OnPullListener,
 			// break;
 			// case Note:
 			// }
-
 			mListControl.initListControl(mListRecords);
 			// OControls.setGone(mView, R.id.loadingProgress);
 			// if (mSearchView != null)
@@ -289,14 +289,12 @@ public class Note extends BaseFragment implements OnPullListener,
 		}
 	};
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.clear();
-		inflater.inflate(R.menu.menu_note, menu);
-		mMenu = menu;
-		mSearchView = (SearchView) menu.findItem(R.id.menu_note_search)
-				.getActionView();
-	}
+	// @Override
+	// public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	// menu.clear();
+	// inflater.inflate(R.menu.menu_note, menu);
+	// mMenu = menu;
+	// }
 
 	// @Override
 	// public boolean onOptionsItemSelected(MenuItem item) {
@@ -311,10 +309,12 @@ public class Note extends BaseFragment implements OnPullListener,
 	// return super.onOptionsItemSelected(item);
 	// }
 
-	private void updateMenu(int noteCount) {
-		if (noteCount != 0)
-			mMenu.findItem(R.id.menu_note_count).setTitle(noteCount + "");
-	}
+	// private void updateMenu(int noteCount) {
+	// if (noteCount != 0)
+	// mMenu.findItem(R.id.menu_note_count).setTitle(noteCount + "");
+	// else
+	// mMenu.findItem(R.id.menu_note_count).setTitle("");
+	// }
 
 	@Override
 	public void onRowItemClick(int position, View view, ODataRow row) {
@@ -333,8 +333,12 @@ public class Note extends BaseFragment implements OnPullListener,
 		bundle.putString("key", mCurrentKey.toString());
 		switch (v.getId()) {
 		case R.id.imgCreateQuickNote:
-			Log.d(TAG, "[QuickNote create] Note->onClick()");
 			// bundle.putString("type", "imgCreateQuickNote");
+			Log.d(TAG, "[QuickNote create] Note->onClick()");
+			// FragmentManager fm = getFragmentManager();
+			// NotePopupDialog dialog = new NotePopupDialog();
+			// dialog.setRetainInstance(true);
+			// dialog.show(fm, "fragment");
 			break;
 		case R.id.imgShowQuickNote:
 			Log.d(TAG, "[QuickNote create] Note->onClick()");
@@ -354,8 +358,8 @@ public class Note extends BaseFragment implements OnPullListener,
 			requestSpeechToText();
 			break;
 		}
-		note.setArguments(bundle);
-		startFragment(note, true);
+		// note.setArguments(bundle);
+		// startFragment(note, true);
 	}
 
 	private void requestSpeechToText() {
@@ -412,4 +416,35 @@ public class Note extends BaseFragment implements OnPullListener,
 	public FragmentManager getPaggerFragmentManager() {
 		return getActivity().getSupportFragmentManager();
 	}
+
+	@Override
+	public void onItemDragStart(View drag_view, int position, Object data) {
+
+	}
+
+	@Override
+	public void onItemDrop(View drop_view, Object drag_view_data,
+			Object drop_view_data) {
+
+	}
+
+	@Override
+	public void onItemDragEnd(View drop_view, int position, Object data) {
+
+	}
+
+	// @Override
+	// public View paggerGetView(Context context, View view, ODataRow object,
+	// int position) {
+	// OList mList = (OList) LayoutInflater.from(context).inflate(
+	// R.layout.note_list_layout, null);
+	// Log.e("HI", "Hi");
+	// init(mList, context, object.getInt("id"));
+	// return mList;
+	// }
+	//
+	// @Override
+	// public FragmentManager getPaggerFragmentManager() {
+	// return getActivity().getSupportFragmentManager();
+	// }
 }

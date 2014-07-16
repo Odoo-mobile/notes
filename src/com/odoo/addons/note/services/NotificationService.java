@@ -61,7 +61,7 @@ public class NotificationService extends OService {
 				});
 			}
 		};
-//		timer.schedule(scanTask, 0, 60 * 1000);
+		timer.schedule(scanTask, 0, 60 * 1000);
 	}
 
 	@SuppressLint("SimpleDateFormat")
@@ -75,7 +75,7 @@ public class NotificationService extends OService {
 			oeNotificationHelper.setResultIntent(intent, mContext);
 			Calendar c = Calendar.getInstance();
 			SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-			String formattedDate = df.format(c.getTime())+":00";
+			String formattedDate = df.format(c.getTime()) + ":00";
 			List<ODataRow> list = note.select("reminder=?",
 					new Object[] { formattedDate });
 			for (int i = 0; i < list.size(); i++)

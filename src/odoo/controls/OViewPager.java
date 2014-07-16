@@ -46,7 +46,6 @@ import com.odoo.util.drawer.DrawerItem;
  * The Class OViewPager.
  */
 public class OViewPager extends ViewPager implements OViewPagerObjectListener {
-
 	/** The Constant TAG. */
 	public static final String TAG = OViewPager.class.getSimpleName();
 

@@ -23,7 +23,7 @@
         odoo:with_label="false" >
     </odoo.controls.OField>
 
-    <LinearLayout
+   <!--  <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
@@ -35,6 +35,6 @@
             odoo:field_name="message_follower_ids"
             odoo:with_label="false" >
         </odoo.controls.OField>
-    </LinearLayout>
+    </LinearLayout> -->
 
 </odoo.controls.OForm>

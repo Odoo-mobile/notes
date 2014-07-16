@@ -42,13 +42,14 @@ public class NoteDetail extends BaseFragment {
 	private Integer mId = null;
 	private Boolean mLocalRecord = false;
 	private OForm mForm = null;
-	private Boolean mEditMode = false;
+	private Boolean mEditMode = true;
 	private ODataRow mRecord = null;
 	private Menu mMenu = null;
 	String str = null;
 	Attachment mAttachment = null;
 	PackageManager mPackageManager = null;
 	Context mContext = null;
+	public static final String TAG = NoteDetail.class.getSimpleName();
 	ExpandableHeightGridView mNoteAttachmentGrid = null;
 
 	@Override
@@ -83,8 +84,9 @@ public class NoteDetail extends BaseFragment {
 				mForm.initForm(mRecord);
 			} else {
 				mForm.setModel(notes);
-				mForm.setEditable(mEditMode);
+				// mForm.setEditable(mEditMode);
 			}
+			mForm.setEditable(mEditMode);
 			break;
 		}
 		mNoteAttachmentGrid = (ExpandableHeightGridView) mView
@@ -131,12 +133,13 @@ public class NoteDetail extends BaseFragment {
 			mForm.setEditable(mEditMode);
 			break;
 		case R.id.menu_note_detail_delete:
-			 if(mId!=null)
-				 new NoteNote(getActivity()).delete(mId);
-			 getActivity().getSupportFragmentManager().popBackStack();
-//			DialogFragment FrgDate = new DatePickerFragment();
-//			FrgDate.show(getFragmentManager(), "Date");
-//			setTime();
+			if (mId != null) {
+				new NoteNote(getActivity()).delete(mId);
+				getActivity().getSupportFragmentManager().popBackStack();
+			}
+			// DialogFragment FrgDate = new DatePickerFragment();
+			// FrgDate.show(getFragmentManager(), "Date");
+			// setTime();
 			break;
 		case R.id.menu_note_audio:
 			mAttachment.requestAttachment(Types.AUDIO);
