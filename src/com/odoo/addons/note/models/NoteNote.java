@@ -6,6 +6,7 @@ import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
+import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
@@ -18,7 +19,7 @@ public class NoteNote extends OModel {
 	OColumn sequence = new OColumn("Sequence", OInteger.class).setDefault(0);
 	OColumn stage_id = new OColumn("Select Stage", NoteStage.class,
 			RelationType.ManyToOne);
-	OColumn open = new OColumn("Open", OVarchar.class, 64).setDefault(true);
+	OColumn open = new OColumn("Open", OBoolean.class).setDefault(true);
 	OColumn date_done = new OColumn("Date", OVarchar.class, 64)
 			.setDefault(false);
 	// OColumn note_pad_url = new OColumn("Note Pad Url", OText.class);

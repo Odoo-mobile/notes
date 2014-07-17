@@ -18,6 +18,7 @@
         android:showAsAction="always"
         android:title="Delete">
     </item>
+    <!--
     <item
         android:id="@+id/menu_note_attach"
         android:icon="@drawable/ic_menu_action_content_new_attachment"
@@ -26,29 +27,28 @@
         <menu>
             <item
                 android:id="@+id/menu_note_audio"
+                android:icon="@drawable/ic_action_device_access_volume_on"
                 android:title="Audio">
             </item>
             <item
                 android:id="@+id/menu_note_image"
+                android:icon="@drawable/ic_action_device_access_camera"
                 android:title="Image">
             </item>
             <item
                 android:id="@+id/menu_note_file"
+                android:icon="@drawable/ic_menu_action_content_new_attachment"
                 android:title="File">
             </item>
         </menu>
     </item>
+    -->
     <item
         android:id="@+id/menu_note_operation"
         android:icon="@drawable/ic_action_overflow"
         android:showAsAction="always"
         android:title="More">
         <menu>
-            <item
-                android:id="@+id/menu_note_mark_asread"
-                android:icon="@drawable/ic_action_done"
-                android:title="Mark as read">
-            </item>
             <item
                 android:id="@+id/menu_note_forward_asmail"
                 android:icon="@drawable/ic_menu_forward"
@@ -58,6 +58,21 @@
                 android:id="@+id/menu_note_followers"
                 android:icon="@drawable/ic_menu_add_group"
                 android:title="Followers">
+            </item>
+            <item
+                android:id="@+id/menu_note_audio"
+                android:icon="@drawable/ic_action_device_access_volume_on"
+                android:title="Audio">
+            </item>
+            <item
+                android:id="@+id/menu_note_image"
+                android:icon="@drawable/ic_action_device_access_camera"
+                android:title="Image">
+            </item>
+            <item
+                android:id="@+id/menu_note_file"
+                android:icon="@drawable/ic_menu_action_content_new_attachment"
+                android:title="File">
             </item>
         </menu>
     </item>

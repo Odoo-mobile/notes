@@ -91,7 +91,6 @@ public class Attachment implements OnClickListener {
 	public void requestAttachment(Types type) {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_GET_CONTENT);
-		Log.e("Type", type + "");
 		switch (type) {
 		case IMAGE_OR_CAPTURE_IMAGE:
 			// createDialog(type);
@@ -166,7 +165,6 @@ public class Attachment implements OnClickListener {
 	public ODataRow handleResult(int requestCode, Intent data) {
 		Uri uri = null;
 		Bitmap bitmap = null;
-		Log.e("handle", requestCode + "");
 		switch (requestCode) {
 		case REQUEST_AUDIO:
 			uri = data.getData();

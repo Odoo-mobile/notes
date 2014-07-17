@@ -38,20 +38,20 @@ public class NoteService extends OService {
 			if (sync.syncWithServer())
 				context.sendBroadcast(intent);
 
-			IrAttachment attch = new IrAttachment(context);
-			OSyncHelper syncAttch = attch.getSyncHelper();
-			if (syncAttch.syncWithServer())
-				context.sendBroadcast(intent);
+			// IrAttachment attch = new IrAttachment(context);
+			// OSyncHelper syncAttch = attch.getSyncHelper();
+			// if (syncAttch.syncWithServer())
+			// context.sendBroadcast(intent);
 
-//			MailFollowers maFollowers = new MailFollowers(context);
-//			OSyncHelper syncMail = maFollowers.getSyncHelper();
-//			if (syncMail.syncWithServer())
-//				context.sendBroadcast(intent);
+			// MailFollowers maFollowers = new MailFollowers(context);
+			// OSyncHelper syncMail = maFollowers.getSyncHelper();
+			// if (syncMail.syncWithServer())
+			// context.sendBroadcast(intent);
 
-			NoteTag mNoteTag = new NoteTag(context);
-			OSyncHelper syncTag = mNoteTag.getSyncHelper();
-			if (syncTag.syncWithServer())
-				context.sendBroadcast(intent);
+			// NoteTag mNoteTag = new NoteTag(context);
+			// OSyncHelper syncTag = mNoteTag.getSyncHelper();
+			// if (syncTag.syncWithServer())
+			// context.sendBroadcast(intent);
 
 		} catch (Exception e) {
 			e.printStackTrace();

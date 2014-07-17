@@ -1,19 +1,13 @@
 package com.odoo.addons.note;
 
-import java.util.Calendar;
 import java.util.List;
 
 import odoo.controls.OForm;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,8 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
-import android.widget.TimePicker;
 
 import com.odoo.addons.note.Note.Keys;
 import com.odoo.addons.note.models.NoteNote;
@@ -59,7 +51,6 @@ public class NoteDetail extends BaseFragment {
 		setHasOptionsMenu(true);
 		mView = inflater.inflate(R.layout.note_detail, container, false);
 		mContext = getActivity();
-
 		return mView;
 	}
 
@@ -84,7 +75,6 @@ public class NoteDetail extends BaseFragment {
 				mForm.initForm(mRecord);
 			} else {
 				mForm.setModel(notes);
-				// mForm.setEditable(mEditMode);
 			}
 			mForm.setEditable(mEditMode);
 			break;
@@ -137,9 +127,7 @@ public class NoteDetail extends BaseFragment {
 				new NoteNote(getActivity()).delete(mId);
 				getActivity().getSupportFragmentManager().popBackStack();
 			}
-			// DialogFragment FrgDate = new DatePickerFragment();
-			// FrgDate.show(getFragmentManager(), "Date");
-			// setTime();
+
 			break;
 		case R.id.menu_note_audio:
 			mAttachment.requestAttachment(Types.AUDIO);
@@ -149,12 +137,6 @@ public class NoteDetail extends BaseFragment {
 			break;
 		case R.id.menu_note_file:
 			mAttachment.requestAttachment(Types.FILE);
-			break;
-		case R.id.menu_note_mark_asread:
-			// OValues values = mForm.getFormValues();
-			// if(mId!=null)
-			// new NoteNote(getActivity()).update(values, mId);
-			getActivity().getSupportFragmentManager().popBackStack();
 			break;
 		case R.id.menu_note_detail_save:
 			mEditMode = false;
@@ -208,56 +190,5 @@ public class NoteDetail extends BaseFragment {
 				// .notifiyDataChange(mNoteAttachmentList);
 			}
 		}
-	}
-
-	@SuppressLint("ValidFragment")
-	class DatePickerFragment extends DialogFragment implements
-			DatePickerDialog.OnDateSetListener {
-
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-			final Calendar c = Calendar.getInstance();
-			int year = c.get(Calendar.YEAR);
-			int month = c.get(Calendar.MONTH);
-			int day = c.get(Calendar.DAY_OF_MONTH);
-			return new DatePickerDialog(getActivity(), this, year, month, day);
-		}
-
-		public void onDateSet(DatePicker arg0, int year, int month, int day) {
-			month += 1;
-			String strDay = day + "", strMonth = month + "";
-			if (day < 10)
-				strDay = "0" + day;
-			if (month < 10)
-				strMonth = "0" + month;
-			// date_order.setText(String.valueOf(year) + "-" + strMonth + "-"
-			// + strDay);
-			str = strDay + "-" + strMonth + "-" + String.valueOf(year);
-
-		}
-	}
-
-	public void setTime() {
-		Calendar mcurrentTime = Calendar.getInstance();
-		int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-		int minute = mcurrentTime.get(Calendar.MINUTE);
-		TimePickerDialog mTimePicker;
-		mTimePicker = new TimePickerDialog(getActivity(),
-				new TimePickerDialog.OnTimeSetListener() {
-					@Override
-					public void onTimeSet(TimePicker timePicker,
-							int selectedHour, int selectedMinute) {
-						str = str
-								+ " "
-								+ (selectedHour < 10 ? "0" + selectedHour
-										: selectedHour)
-								+ ":"
-								+ (selectedMinute < 10 ? "0" + selectedMinute
-										: selectedMinute) + ":" + "00";
-						Log.e("date", str);
-					}
-				}, hour, minute, true);
-		mTimePicker.setTitle("Select Time");
-		mTimePicker.show();
 	}
 }
