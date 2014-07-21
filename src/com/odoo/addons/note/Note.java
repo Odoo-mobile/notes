@@ -6,6 +6,7 @@ import java.util.List;
 import odoo.controls.OList;
 import odoo.controls.OList.OnListRowViewClickListener;
 import odoo.controls.OList.OnRowClickListener;
+import odoo.controls.OListDragDropListener;
 import odoo.controls.OViewPager;
 import odoo.controls.OViewPager.OnPaggerGetView;
 import android.app.Activity;
@@ -33,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.odoo.addons.note.models.NoteNote;
+import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.base.ir.Attachment;
 import com.odoo.base.ir.Attachment.Types;
@@ -49,7 +51,7 @@ import com.openerp.OETouchListener.OnPullListener;
 
 public class Note extends BaseFragment implements OnPullListener,
 		OnRowClickListener, OnClickListener, OnPaggerGetView,
-		OnListRowViewClickListener {
+		OnListRowViewClickListener, OListDragDropListener {
 
 	public static final String TAG = Note.class.getSimpleName();
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
@@ -70,6 +72,7 @@ public class Note extends BaseFragment implements OnPullListener,
 	Context mContext = null;
 	Attachment mAttachment = null;
 	private OViewPager mViewPagger = null;
+	OList oListStage = null;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -80,6 +83,7 @@ public class Note extends BaseFragment implements OnPullListener,
 		mAttachment = new Attachment(mContext);
 		mViewPagger = (OViewPager) mView.findViewById(R.id.viewPagger);
 		mViewPagger.setOnPaggerGetView(this);
+		oListStage = (OList) mView.findViewById(R.id.listStageRecords);
 		initControl();
 		return mView;
 	}
@@ -92,7 +96,11 @@ public class Note extends BaseFragment implements OnPullListener,
 		mListControl.setOnListRowViewClickListener(R.id.imgOpen,
 				(OnListRowViewClickListener) this);
 		mListControl.setRowDraggable(true);
+		mListControl.setDragDropListener(this);
 		mTouchListener.setPullableView(mListControl, this);
+		NoteStage noteStage = new NoteStage(mContext);
+		oListStage.initListControl(noteStage.select(null, null, null, null,
+				"sequence"));
 		mDataLoader = new DataLoader(mListControl, context, stage_id);
 		mDataLoader.execute();
 	}
@@ -106,7 +114,6 @@ public class Note extends BaseFragment implements OnPullListener,
 		mView.findViewById(R.id.imgAttachAudio).setOnClickListener(this);
 		mView.findViewById(R.id.imgAttachSpeechToText).setOnClickListener(this);
 		edtTitle = (EditText) mView.findViewById(R.id.edtNoteQuickTitle);
-
 		edtTitle.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
@@ -187,7 +194,6 @@ public class Note extends BaseFragment implements OnPullListener,
 			mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
-
 	}
 
 	@Override
@@ -260,7 +266,7 @@ public class Note extends BaseFragment implements OnPullListener,
 		scope.main().unregisterReceiver(mSyncFinishReceiver);
 	}
 
-	SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
+	private SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
 			scope.main().refreshDrawer(TAG);
@@ -385,4 +391,19 @@ public class Note extends BaseFragment implements OnPullListener,
 		return getActivity().getSupportFragmentManager();
 	}
 
+	@Override
+	public void onItemDragStart(View drag_view, int position, Object data) {
+		oListStage.setVisibility(View.VISIBLE);
+	}
+
+	@Override
+	public void onItemDrop(View drop_view, Object drag_view_data,
+			Object drop_view_data) {
+
+	}
+
+	@Override
+	public void onItemDragEnd(View drop_view, int position, Object data) {
+		oListStage.setVisibility(View.GONE);
+	}
 }

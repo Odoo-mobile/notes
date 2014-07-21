@@ -37,8 +37,8 @@ public class App extends Application {
 	public void onCreate() {
 		Log.d(TAG, "App->onCreate()");
 		super.onCreate();
-//		Intent intent = new Intent(this, NotificationService.class);
-//		startService(intent);
+		// Intent intent = new Intent(this, NotificationService.class);
+		// startService(intent);
 	}
 
 	public Odoo createInstance() {
@@ -64,6 +64,7 @@ public class App extends Application {
 				e.printStackTrace();
 			}
 		}
+		mOdooInstance = odoo;
 		return odoo;
 	}
 
