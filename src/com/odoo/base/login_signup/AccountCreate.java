@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import odoo.ODomain;
-import odoo.Odoo;
 import odoo.OdooAccountExpireException;
 import odoo.OdooInstance;
 

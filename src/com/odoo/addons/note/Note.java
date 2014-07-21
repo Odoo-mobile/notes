@@ -89,6 +89,7 @@ public class Note extends BaseFragment implements OnPullListener,
 	}
 
 	void init(OList mListControl, Context context, int stage_id) {
+		oListStage.setRowDroppable(true, mListControl);
 		scope = new AppScope(context);
 		checkArguments();
 		mTouchListener = scope.main().getTouchAttacher();
