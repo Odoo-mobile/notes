@@ -53,6 +53,9 @@ public class OList extends ScrollView implements View.OnClickListener,
 	/** The Constant KEY_CUSTOM_LAYOUT. */
 	public static final String KEY_CUSTOM_LAYOUT = "custome_layout";
 
+	/** The Constant KEY_SHOW_DIVIDER. */
+	public static final String KEY_SHOW_DIVIDER = "showDivider";
+
 	/** The context. */
 	Context mContext = null;
 
@@ -113,6 +116,9 @@ public class OList extends ScrollView implements View.OnClickListener,
 	/** The m view click listener. */
 	private List<ViewClickListeners> mViewClickListener = new ArrayList<ViewClickListeners>();
 
+	/** The m before list row create listener. */
+	private BeforeListRowCreateListener mBeforeListRowCreateListener = null;
+
 	/**
 	 * Instantiates a new list control.
 	 * 
@@ -169,6 +175,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 					R.styleable.OList);
 			mAttr.put(KEY_CUSTOM_LAYOUT, mTypedArray.getResourceId(
 					R.styleable.OList_custom_layout, 0));
+			mAttr.put(KEY_SHOW_DIVIDER,
+					mTypedArray.getBoolean(R.styleable.OList_showDivider, true));
 			mCustomLayout = mAttr.getResource(KEY_CUSTOM_LAYOUT, 0);
 			mTypedArray.recycle();
 		}
@@ -235,6 +243,10 @@ public class OList extends ScrollView implements View.OnClickListener,
 								});
 					}
 				}
+				if (mBeforeListRowCreateListener != null) {
+					mBeforeListRowCreateListener.beforeListRowCreate(position,
+							record, mView);
+				}
 				return mView;
 			}
 		};
@@ -262,7 +274,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 				view.setOnDragListener(this);
 			}
 			mInnerLayout.addView(view);
-			mInnerLayout.addView(divider());
+			if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true))
+				mInnerLayout.addView(divider());
 		}
 		addView(mInnerLayout);
 	}
@@ -636,6 +649,17 @@ public class OList extends ScrollView implements View.OnClickListener,
 	}
 
 	/**
+	 * Sets the before list row create listener.
+	 * 
+	 * @param callback
+	 *            the new before list row create listener
+	 */
+	public void setBeforeListRowCreateListener(
+			BeforeListRowCreateListener callback) {
+		mBeforeListRowCreateListener = callback;
+	}
+
+	/**
 	 * The listener interface for receiving onListRowViewClick events. The class
 	 * that is interested in processing a onListRowViewClick event implements
 	 * this interface, and the object created with that class is registered with
@@ -722,6 +746,29 @@ public class OList extends ScrollView implements View.OnClickListener,
 			keys.addAll(_listener_view.keySet());
 			return keys;
 		}
+	}
 
+	/**
+	 * The listener interface for receiving beforeListRowCreate events. The
+	 * class that is interested in processing a beforeListRowCreate event
+	 * implements this interface, and the object created with that class is
+	 * registered with a component using the component's
+	 * <code>addBeforeListRowCreateListener<code> method. When
+	 * the beforeListRowCreate event occurs, that object's appropriate
+	 * method is invoked.
+	 * 
+	 * @see BeforeListRowCreateEvent
+	 */
+	public interface BeforeListRowCreateListener {
+
+		/**
+		 * Before list row create.
+		 * 
+		 * @param position
+		 *            the position
+		 * @param view
+		 *            the view
+		 */
+		public void beforeListRowCreate(int position, ODataRow row, View view);
 	}
 }

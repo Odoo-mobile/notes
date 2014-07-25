@@ -10,6 +10,7 @@
     <string name="str_user_name">User Name</string>
     <string name="str_server_url">Server URL</string>
     <string name="str_database">Database</string>
+    <string name="str_odoo_version">Odoo Version</string>
     <string name="str_timezone">TimeZone</string>
     <string name="login_select_database">Select Database</string>
 
@@ -69,7 +70,7 @@
     <string name="title_connecting">Connecting&#8230;</string>
     <string name="title_loggin_in">Logging in&#8230;</string>
     <string name="title_account_create">Creating account&#8230;</string>
-    <string name="title_database_create">Creating database&#8230;</string>
+    <string name="title_database_create">Creating local DB&#8230;</string>
     <string name="title_getting_instances">Getting instances&#8230;</string>
     <string name="title_confirm">Confirm</string>
     <string name="title_ssl_warning">SSL Warning</string>

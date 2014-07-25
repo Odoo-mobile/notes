@@ -32,7 +32,6 @@ public class NoteDetail extends BaseFragment {
 	private View mView = null;
 	private Keys mKey = null;
 	private Integer mId = null;
-	private Boolean mLocalRecord = false;
 	private OForm mForm = null;
 	private Boolean mEditMode = true;
 	private ODataRow mRecord = null;
@@ -71,7 +70,7 @@ public class NoteDetail extends BaseFragment {
 			mForm = (OForm) mView.findViewById(R.id.odooFormNote);
 			NoteNote notes = new NoteNote(getActivity());
 			if (mId != null) {
-				mRecord = notes.select(mId, mLocalRecord);
+				mRecord = notes.select(mId);
 				mForm.initForm(mRecord);
 			} else {
 				mForm.setModel(notes);
@@ -90,11 +89,7 @@ public class NoteDetail extends BaseFragment {
 		if (mKey == Keys.Archive || mKey == Keys.Reminders)
 			mKey = Keys.Note;
 		if (args.containsKey("id")) {
-			mLocalRecord = args.getBoolean("local_record");
-			if (mLocalRecord) {
-				mId = args.getInt("local_id");
-			} else
-				mId = args.getInt("id");
+			mId = args.getInt("id");
 		} else
 			mEditMode = true;
 	}
@@ -146,8 +141,7 @@ public class NoteDetail extends BaseFragment {
 				if (mId != null) {
 					switch (mKey) {
 					case Note:
-						new NoteNote(getActivity()).update(values, mId,
-								mLocalRecord);
+						new NoteNote(getActivity()).update(values, mId);
 						break;
 					}
 				} else {

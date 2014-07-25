@@ -18,12 +18,16 @@
  */
 package odoo.controls;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.TextUtils;
@@ -46,9 +50,13 @@ import android.widget.Toast;
 
 import com.odoo.note.R;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.types.ODateTime;
 import com.odoo.util.Base64Helper;
+import com.odoo.util.ODate;
+import com.odoo.util.StringUtils;
 
 /**
  * The Class OField.
@@ -96,10 +104,27 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 
 	/** The Constant KEY_BOOLEAN_WIDGET. */
 	public static final String KEY_BOOLEAN_WIDGET = "booleanWidget";
+
+	/** The Constant KEY_CUSTOM_LAYOUT. */
 	public static final String KEY_CUSTOM_LAYOUT = "customLayout";
+
+	/** The Constant KEY_BOTTOM_BORDER_HEIGHT. */
 	public static final String KEY_BOTTOM_BORDER_HEIGHT = "bottom_border_height";
+
+	/** The Constant KEY_TEXT_LINES. */
 	public static final String KEY_TEXT_LINES = "textLines";
+
+	/** The Constant KEY_REF_COLUMN. */
 	public static final String KEY_REF_COLUMN = "ref_column";
+
+	/** The Constant KEY_SHOW_AS_TEXT. */
+	public static final String KEY_SHOW_AS_TEXT = "showAsText";
+
+	/** The Constant KEY_DISPLAY_PATTERN. */
+	public static final String KEY_DISPLAY_PATTERN = "displayPattern";
+
+	/** The Constant KEY_ROUND_IMAGE_WIDTH_HEIGHT. */
+	public static final String KEY_ROUND_IMAGE_WIDTH_HEIGHT = "roundImageWidthHeight";
 
 	/**
 	 * The Enum OFieldMode.
@@ -125,6 +150,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		BINARY,
 		/** The binary image. */
 		BINARY_IMAGE,
+		/** The binary rounded image. */
+		BINARY_ROUND_IMAGE,
 		/** The binary file. */
 		BINARY_FILE,
 		/** The boolean widget. */
@@ -290,7 +317,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			break;
 		case BINARY_FILE:
 		case BINARY_IMAGE:
-			createBinaryControl(fieldWidget);
+			createBinaryControl(fieldWidget, false);
+			break;
+		case BINARY_ROUND_IMAGE:
+			createBinaryControl(fieldWidget, true);
 			break;
 		case BOOLEAN_WIDGET:
 		case BOOLEAN_CHECKBOX:
@@ -315,8 +345,14 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		} else {
 			if (mControlRecord != null) {
 
-				List<ODataRow> records = mControlRecord.getM2MRecord(
-						mColumn.getName()).browseEach();
+				List<ODataRow> records = new ArrayList<ODataRow>();
+				if (mColumn.getRelationType() == RelationType.OneToMany) {
+					records.addAll(mControlRecord.getO2MRecord(
+							mColumn.getName()).browseEach());
+				} else {
+					records.addAll(mControlRecord.getM2MRecord(
+							mColumn.getName()).browseEach());
+				}
 				if (records.size() > 0) {
 					HorizontalScrollView mHScroll = new HorizontalScrollView(
 							mContext);
@@ -363,6 +399,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	private void createWebView() {
+		boolean showAsText = mAttributes.getBoolean(KEY_SHOW_AS_TEXT, false);
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			createTextViewControl();
 			if (mControlRecord != null) {
@@ -370,14 +407,21 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			}
 		} else {
 			if (mControlRecord != null) {
-				mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-						LayoutParams.WRAP_CONTENT);
-				mWebView = new WebView(mContext);
-				mWebView.setLayoutParams(mLayoutParams);
-				mWebView.loadData(mControlRecord.getString(mColumn.getName()),
-						"text/html; charset=UTF-8", "UTF-8");
-				mWebView.getSettings().setTextZoom(90);
-				addView(mWebView);
+				if (!showAsText) {
+					mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+							LayoutParams.WRAP_CONTENT);
+					mWebView = new WebView(mContext);
+					mWebView.setLayoutParams(mLayoutParams);
+					mWebView.loadData(
+							mControlRecord.getString(mColumn.getName()),
+							"text/html; charset=UTF-8", "UTF-8");
+					mWebView.getSettings().setTextZoom(90);
+					addView(mWebView);
+				} else {
+					createTextViewControl();
+					setText(StringUtils.htmlToString(mControlRecord
+							.getString(mColumn.getName())));
+				}
 			}
 		}
 	}
@@ -443,7 +487,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		} else {
 			createTextViewControl();
 			if (mControlRecord != null) {
-				setText(mControlRecord.getString(mColumn.getName()));
+				String value = mControlRecord.getString(mColumn.getName());
+				setText(value);
 			}
 
 		}
@@ -454,12 +499,18 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 * 
 	 * @param binary_type
 	 *            the binary_type
+	 * @param roundedImage
 	 */
-	private void createBinaryControl(OFieldType binary_type) {
+	private void createBinaryControl(OFieldType binary_type,
+			boolean roundedImage) {
 		ImageView imgBinary = new ImageView(mContext);
-		mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT);
-		imgBinary.setLayoutParams(mLayoutParams);
+		int heightWidth = mAttributes.getResource(KEY_ROUND_IMAGE_WIDTH_HEIGHT,
+				-1);
+		if (heightWidth > -1) {
+			heightWidth = (int) (heightWidth * mScaleFactor);
+			mLayoutParams = new LayoutParams(heightWidth, heightWidth);
+			imgBinary.setLayoutParams(mLayoutParams);
+		}
 		int default_image = mAttributes.getResource(KEY_DEFAULT_IMAGE,
 				R.drawable.attachment);
 		switch (binary_type) {
@@ -468,17 +519,25 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 					.setImageResource((default_image < 0) ? R.drawable.attachment
 							: default_image);
 			break;
+		case BINARY_ROUND_IMAGE:
 		case BINARY_IMAGE:
-			imgBinary
-					.setImageResource((default_image < 0) ? R.drawable.attachment
-							: default_image);
+			Bitmap binary_image = BitmapFactory
+					.decodeResource(mContext.getResources(),
+							(default_image < 0) ? R.drawable.attachment
+									: default_image);
 			if (mControlRecord != null
 					&& !mControlRecord.getString(mColumn.getName()).equals(
 							"false")) {
-				imgBinary.setImageBitmap(Base64Helper.getBitmapImage(mContext,
-						mControlRecord.getString(mColumn.getName())));
-				imgBinary.setScaleType(ScaleType.CENTER_CROP);
+				binary_image = Base64Helper.getBitmapImage(mContext,
+						mControlRecord.getString(mColumn.getName()));
+				if (!roundedImage)
+					imgBinary.setScaleType(ScaleType.CENTER_CROP);
 			}
+			if (roundedImage)
+				imgBinary.setImageBitmap(Base64Helper.getRoundedCornerBitmap(
+						mContext, binary_image, true));
+			else
+				imgBinary.setImageBitmap(binary_image);
 			break;
 		default:
 			break;
@@ -490,12 +549,13 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 * Creates the many to one widget.
 	 */
 	private void createManyToOneWidget() {
+		String ref_column = mAttributes.getString(KEY_REF_COLUMN, "name");
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mManyToOne = new OManyToOneWidget(mContext);
 			mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
 					LayoutParams.WRAP_CONTENT);
 			mManyToOne.setLayoutParams(mLayoutParams);
-			mManyToOne.setModel(mModel, "name");
+			mManyToOne.setModel(mModel, ref_column);
 			if (mControlRecord != null)
 				mManyToOne.setRecordId((Integer) mControlRecord.getM2ORecord(
 						mColumn.getName()).getId());
@@ -507,13 +567,10 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			if (mControlRecord != null) {
 				ODataRow row = mControlRecord.getM2ORecord(mColumn.getName())
 						.browse();
-				String ref_column = mAttributes.getString(KEY_REF_COLUMN,
-						"name");
 				if (row != null)
 					setText(row.getString(ref_column));
 				else
 					setText("No " + mColumn.getLabel());
-
 			}
 		}
 	}
@@ -689,7 +746,8 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				mTypedArray.getInt(R.styleable.OField_binaryType, -1));
 		int binaryType = mAttributes.getResource(KEY_BINARY_TYPE, -1);
 		if (binaryType > -1) {
-			mFieldWidget = (binaryType == 0) ? OFieldType.BINARY_IMAGE
+			mFieldWidget = (binaryType == 0 || binaryType == 3) ? (binaryType == 0) ? OFieldType.BINARY_IMAGE
+					: OFieldType.BINARY_ROUND_IMAGE
 					: OFieldType.BINARY_FILE;
 		}
 
@@ -719,6 +777,12 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				mTypedArray.getInt(R.styleable.OField_textLines, -1));
 		mAttributes.put(KEY_REF_COLUMN,
 				mTypedArray.getString(R.styleable.OField_ref_column));
+		mAttributes.put(KEY_SHOW_AS_TEXT,
+				mTypedArray.getBoolean(R.styleable.OField_showAsText, false));
+		mAttributes.put(KEY_DISPLAY_PATTERN,
+				mTypedArray.getString(R.styleable.OField_displayPattern));
+		mAttributes.put(KEY_ROUND_IMAGE_WIDTH_HEIGHT, mTypedArray.getInt(
+				R.styleable.OField_roundImageWidthHeight, -1));
 	}
 
 	/**
@@ -766,6 +830,13 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mFieldEditText.setText(text);
 		} else {
+			String displayPattern = mAttributes.getString(KEY_DISPLAY_PATTERN,
+					null);
+			if (displayPattern != null
+					&& mColumn.getType().isAssignableFrom(ODateTime.class)) {
+				text = ODate.getDate(mContext, text, TimeZone.getDefault()
+						.getID(), displayPattern);
+			}
 			mFieldTextView.setText(text);
 		}
 	}
@@ -912,6 +983,6 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 */
 	@Override
 	public void onManyToOneItemChangeListener(OColumn column, ODataRow row) {
-		mFieldValue = row.get("id");
+		mFieldValue = row.get(OColumn.ROW_ID);
 	}
 }
