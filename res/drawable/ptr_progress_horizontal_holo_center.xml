@@ -5,7 +5,8 @@
         <scale
             android:drawable="@drawable/ptr_progress_primary_holo_light"
             android:scaleGravity="center"
-            android:scaleWidth="100%" />
+            android:scaleWidth="100%" >
+        </scale>
     </item>
 
 </layer-list>
