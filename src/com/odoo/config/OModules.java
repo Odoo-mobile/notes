@@ -25,6 +25,5 @@ import com.odoo.support.OModulesHelper;
  */
 public class OModules extends OModulesHelper {
 
-	//OModule library = new OModule(Library.class).setDefault();
-
+	// OModule library = new OModule(Library.class).setDefault();
 }
