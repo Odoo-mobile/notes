@@ -7,6 +7,7 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.OHtml;
 import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
@@ -15,7 +16,7 @@ public class NoteNote extends OModel {
 	OColumn name = new OColumn("Title", OVarchar.class, 64);
 	OColumn message_follower_ids = new OColumn("Name", ResPartner.class,
 			RelationType.ManyToMany);
-	OColumn memo = new OColumn("Desription", OText.class);
+	OColumn memo = new OColumn("Desription", OHtml.class);
 	OColumn sequence = new OColumn("Sequence", OInteger.class).setDefault(0);
 	OColumn stage_id = new OColumn("Select Stage", NoteStage.class,
 			RelationType.ManyToOne);

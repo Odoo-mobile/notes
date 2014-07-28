@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         odoo:field_name="memo"
-        odoo:showAsText="false"
+        odoo:showAsText="true"
         odoo:textLines="3"
         odoo:with_label="false" >
     </odoo.controls.OField>
