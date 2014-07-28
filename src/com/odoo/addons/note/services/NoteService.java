@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
+import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.service.OService;
@@ -35,6 +36,11 @@ public class NoteService extends OService {
 			NoteNote db = new NoteNote(context);
 			OSyncHelper sync = db.getSyncHelper();
 			if (sync.syncWithServer())
+				context.sendBroadcast(intent);
+
+			ResPartner resPartner = new ResPartner(context);
+			OSyncHelper syncRes = resPartner.getSyncHelper();
+			if (syncRes.syncWithServer())
 				context.sendBroadcast(intent);
 
 			NoteStage noteStage = new NoteStage(context);

@@ -29,6 +29,8 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -395,6 +397,9 @@ public class Note extends BaseFragment implements OnPullListener,
 	@Override
 	public void onItemDragStart(View drag_view, int position, Object data) {
 		oListStage.setVisibility(View.VISIBLE);
+		Animation slideInAnimation = AnimationUtils.loadAnimation(
+				getActivity(), R.anim.slide_left_to_right);
+		slideInAnimation.start();
 	}
 
 	@Override
@@ -405,6 +410,9 @@ public class Note extends BaseFragment implements OnPullListener,
 
 	@Override
 	public void onItemDragEnd(View drop_view, int position, Object data) {
+		Animation slideOutAnimation = AnimationUtils.loadAnimation(
+				getActivity(), R.anim.slide_right_to_left);
+		slideOutAnimation.start();
 		oListStage.setVisibility(View.GONE);
 	}
 }
