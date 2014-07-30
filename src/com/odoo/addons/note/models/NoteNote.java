@@ -1,5 +1,6 @@
 package com.odoo.addons.note.models;
 
+import odoo.ODomain;
 import android.content.Context;
 
 import com.odoo.base.res.ResPartner;
@@ -11,8 +12,10 @@ import com.odoo.orm.types.OHtml;
 import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.OUser;
 
 public class NoteNote extends OModel {
+	Context mContext = null;
 	OColumn name = new OColumn("Title", OVarchar.class, 64);
 	OColumn message_follower_ids = new OColumn("Name", ResPartner.class,
 			RelationType.ManyToMany);
@@ -32,9 +35,18 @@ public class NoteNote extends OModel {
 
 	public NoteNote(Context context) {
 		super(context, "note.note");
+		mContext = context;
+	}
+
+	@Override
+	public ODomain defaultDomain() {
+		ODomain domain = new ODomain();
+		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		return domain;
 	}
 
 	public static class NoteStage extends OModel {
+		Context mContext = null;
 		OColumn name = new OColumn("Name", OText.class).setRequired(true);
 		OColumn sequence = new OColumn("Sequence", OInteger.class);
 
@@ -43,6 +55,14 @@ public class NoteNote extends OModel {
 
 		public NoteStage(Context context) {
 			super(context, "note.stage");
+			mContext = context;
+		}
+
+		@Override
+		public ODomain defaultDomain() {
+			ODomain domain = new ODomain();
+			domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+			return domain;
 		}
 	}
 

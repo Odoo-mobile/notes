@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.OList;
+import odoo.controls.OList.OnListBottomReachedListener;
 import odoo.controls.OList.OnListRowViewClickListener;
 import odoo.controls.OList.OnRowClickListener;
 import odoo.controls.OListDragDropListener;
@@ -42,6 +43,7 @@ import com.odoo.base.ir.Attachment;
 import com.odoo.base.ir.Attachment.Types;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OModel;
 import com.odoo.orm.OValues;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
@@ -53,7 +55,8 @@ import com.openerp.OETouchListener.OnPullListener;
 
 public class Note extends BaseFragment implements OnPullListener,
 		OnRowClickListener, OnClickListener, OnPaggerGetView,
-		OnListRowViewClickListener, OListDragDropListener {
+		OnListRowViewClickListener, OListDragDropListener,
+		OnListBottomReachedListener {
 
 	public static final String TAG = Note.class.getSimpleName();
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
@@ -75,6 +78,8 @@ public class Note extends BaseFragment implements OnPullListener,
 	Attachment mAttachment = null;
 	private OViewPager mViewPagger = null;
 	OList oListStage = null;
+	Integer mLastPosition = -1;
+	Integer mLimit = 2;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -104,8 +109,12 @@ public class Note extends BaseFragment implements OnPullListener,
 		NoteStage noteStage = new NoteStage(mContext);
 		oListStage.initListControl(noteStage.select(null, null, null, null,
 				"sequence"));
-		mDataLoader = new DataLoader(mListControl, context, stage_id);
-		mDataLoader.execute();
+		mListControl.setOnListBottomReachedListener(this);
+		mListControl.setRecordLimit(mLimit);
+		if (mLastPosition == -1) {
+			mDataLoader = new DataLoader(0, mListControl, context, stage_id);
+			mDataLoader.execute();
+		}
 	}
 
 	void initControl() {
@@ -140,13 +149,19 @@ public class Note extends BaseFragment implements OnPullListener,
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
-
+		Integer mOffset = 0;
 		OList mListControl = null;
 		Context mContext = null;
 		int mStageId = 0;
 		List<ODataRow> list = null;
 
-		public DataLoader(OList listControl, Context context, int stage_id) {
+		public DataLoader(Integer offset) {
+			mOffset = offset;
+		}
+
+		public DataLoader(Integer offset, OList listControl, Context context,
+				int stage_id) {
+			mOffset = offset;
 			mListControl = listControl;
 			mContext = context;
 			scope = new AppScope(context);
@@ -163,28 +178,34 @@ public class Note extends BaseFragment implements OnPullListener,
 						scope.main().requestSync(NoteProvider.AUTHORITY);
 					}
 					mListRecords.clear();
-
+					String where = "";
+					Object args[] = null;
+					if (mOffset == 0)
+						mListRecords.clear();
 					switch (mCurrentKey) {
 					case Note:
-						list = db().select(
-								"stage_id = ? and open = ? and reminder = ?",
-								new Object[] { mStageId, true, "" }, null,
-								null, "sequence");
+						where = "stage_id = ? and open = ? and reminder = ?";
+						args = new Object[] { mStageId, true, "" };
+						list = db().select(where, args, null, null, "sequence");
 						mListRecords.addAll(list);
 						break;
 					case Archive:
-						list = db().select("stage_id = ? and open = ?",
-								new Object[] { mStageId, false }, null, null,
-								"sequence");
+						where = "stage_id = ? and open = ?";
+						args = new Object[] { mStageId, false };
+						list = db().select(where, args, null, null, "sequence");
 						mListRecords.addAll(list);
 						break;
 					case Reminders:
-						list = db().select("stage_id = ? and reminder != ?",
-								new Object[] { mStageId, "" }, null, null,
-								"sequence");
+						where = "stage_id = ? and reminder != ?";
+						args = new Object[] { mStageId, "" };
+						list = db().select(where, args, null, null, "sequence");
 						mListRecords.addAll(list);
 						break;
 					}
+//					mListRecords.addAll(db().setLimit(mLimit)
+//							.setOffset(mOffset)
+//							.select(where, args, null, null, "sequence"));
+//					mListControl.setRecordOffset(db().getNextOffset());
 				}
 			});
 			return null;
@@ -194,7 +215,8 @@ public class Note extends BaseFragment implements OnPullListener,
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			updateMenu(mListRecords.size()); // Next Count
-			mListControl.initListControl(mListRecords);
+			if(mListRecords.size()>0)
+				mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
 	}
@@ -414,5 +436,19 @@ public class Note extends BaseFragment implements OnPullListener,
 				getActivity(), R.anim.slide_right_to_left);
 		slideOutAnimation.start();
 		oListStage.setVisibility(View.GONE);
+	}
+
+	@Override
+	public void onBottomReached(Integer limit, Integer offset) {
+		if (mDataLoader != null) {
+			mDataLoader.cancel(true);
+		}
+		mDataLoader = new DataLoader(offset);
+		mDataLoader.execute();
+	}
+
+	@Override
+	public Boolean showLoader() {
+		return true;
 	}
 }
