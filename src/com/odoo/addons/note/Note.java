@@ -79,7 +79,7 @@ public class Note extends BaseFragment implements OnPullListener,
 	private OViewPager mViewPagger = null;
 	OList oListStage = null;
 	Integer mLastPosition = -1;
-	Integer mLimit = 2;
+	Integer mLimit = 3;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -177,7 +177,7 @@ public class Note extends BaseFragment implements OnPullListener,
 					if (db().isEmptyTable()) {
 						scope.main().requestSync(NoteProvider.AUTHORITY);
 					}
-					mListRecords.clear();
+					// mListRecords.clear();
 					String where = "";
 					Object args[] = null;
 					if (mOffset == 0)
@@ -187,19 +187,19 @@ public class Note extends BaseFragment implements OnPullListener,
 						where = "stage_id = ? and open = ? and reminder = ?";
 						args = new Object[] { mStageId, true, "" };
 						list = db().select(where, args, null, null, "sequence");
-						mListRecords.addAll(list);
+						 mListRecords.addAll(list);
 						break;
 					case Archive:
 						where = "stage_id = ? and open = ?";
 						args = new Object[] { mStageId, false };
 						list = db().select(where, args, null, null, "sequence");
-						mListRecords.addAll(list);
+						 mListRecords.addAll(list);
 						break;
 					case Reminders:
 						where = "stage_id = ? and reminder != ?";
 						args = new Object[] { mStageId, "" };
 						list = db().select(where, args, null, null, "sequence");
-						mListRecords.addAll(list);
+						 mListRecords.addAll(list);
 						break;
 					}
 //					mListRecords.addAll(db().setLimit(mLimit)
@@ -215,7 +215,7 @@ public class Note extends BaseFragment implements OnPullListener,
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			updateMenu(mListRecords.size()); // Next Count
-			if(mListRecords.size()>0)
+			if (mListRecords.size() > 0)
 				mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
@@ -443,12 +443,14 @@ public class Note extends BaseFragment implements OnPullListener,
 		if (mDataLoader != null) {
 			mDataLoader.cancel(true);
 		}
-		mDataLoader = new DataLoader(offset);
-		mDataLoader.execute();
+		if (mListRecords.size() == offset) {
+			mDataLoader = new DataLoader(offset);
+			mDataLoader.execute();
+		}
 	}
 
 	@Override
 	public Boolean showLoader() {
-		return true;
+		return false;
 	}
 }

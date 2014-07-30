@@ -38,15 +38,15 @@ public class NoteService extends OService {
 			if (sync.syncWithServer())
 				context.sendBroadcast(intent);
 
-			// ResPartner resPartner = new ResPartner(context);
-			// OSyncHelper syncRes = resPartner.getSyncHelper();
-			// if (syncRes.syncWithServer())
-			// context.sendBroadcast(intent);
-			//
-			// NoteStage noteStage = new NoteStage(context);
-			// OSyncHelper syncStage = noteStage.getSyncHelper();
-			// if (syncStage.syncWithServer())
-			// context.sendBroadcast(intent);
+			ResPartner resPartner = new ResPartner(context);
+			OSyncHelper syncRes = resPartner.getSyncHelper();
+			if (syncRes.syncWithServer())
+				context.sendBroadcast(intent);
+
+			NoteStage noteStage = new NoteStage(context);
+			OSyncHelper syncStage = noteStage.getSyncHelper();
+			if (syncStage.syncWithServer())
+				context.sendBroadcast(intent);
 
 			// IrAttachment attch = new IrAttachment(context);
 			// OSyncHelper syncAttch = attch.getSyncHelper();
