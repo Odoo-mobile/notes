@@ -34,6 +34,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.odoo.addons.note.models.NoteNote;
@@ -43,7 +44,6 @@ import com.odoo.base.ir.Attachment;
 import com.odoo.base.ir.Attachment.Types;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
-import com.odoo.orm.OModel;
 import com.odoo.orm.OValues;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
@@ -78,6 +78,7 @@ public class Note extends BaseFragment implements OnPullListener,
 	Attachment mAttachment = null;
 	private OViewPager mViewPagger = null;
 	OList oListStage = null;
+	OList mListControl = null;
 	Integer mLastPosition = -1;
 	Integer mLimit = 3;
 
@@ -95,7 +96,8 @@ public class Note extends BaseFragment implements OnPullListener,
 		return mView;
 	}
 
-	void init(OList mListControl, Context context, int stage_id) {
+	void init(OList ListControl, Context context, int stage_id) {
+		mListControl = ListControl;
 		oListStage.setRowDroppable(true, mListControl);
 		scope = new AppScope(context);
 		checkArguments();
@@ -187,25 +189,25 @@ public class Note extends BaseFragment implements OnPullListener,
 						where = "stage_id = ? and open = ? and reminder = ?";
 						args = new Object[] { mStageId, true, "" };
 						list = db().select(where, args, null, null, "sequence");
-						 mListRecords.addAll(list);
+						mListRecords.addAll(list);
 						break;
 					case Archive:
 						where = "stage_id = ? and open = ?";
 						args = new Object[] { mStageId, false };
 						list = db().select(where, args, null, null, "sequence");
-						 mListRecords.addAll(list);
+						mListRecords.addAll(list);
 						break;
 					case Reminders:
 						where = "stage_id = ? and reminder != ?";
 						args = new Object[] { mStageId, "" };
 						list = db().select(where, args, null, null, "sequence");
-						 mListRecords.addAll(list);
+						mListRecords.addAll(list);
 						break;
 					}
-//					mListRecords.addAll(db().setLimit(mLimit)
-//							.setOffset(mOffset)
-//							.select(where, args, null, null, "sequence"));
-//					mListControl.setRecordOffset(db().getNextOffset());
+					// mListRecords.addAll(db().setLimit(mLimit)
+					// .setOffset(mOffset)
+					// .select(where, args, null, null, "sequence"));
+					// mListControl.setRecordOffset(db().getNextOffset());
 				}
 			});
 			return null;
@@ -249,7 +251,8 @@ public class Note extends BaseFragment implements OnPullListener,
 		int count = 0;
 		switch (key) {
 		case Note:
-			count = new NoteNote(context).count();
+			count = new NoteNote(context).select("open = ? AND reminder = ?",
+					new Object[] { true, "" }).size();
 			break;
 		case Archive:
 			count = new NoteNote(context).select("open = ?",
@@ -301,9 +304,14 @@ public class Note extends BaseFragment implements OnPullListener,
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
 		menu.clear();
 		inflater.inflate(R.menu.menu_note, menu);
 		mMenu = menu;
+		SearchView mSearchView = (SearchView) menu.findItem(
+				R.id.menu_note_search).getActionView();
+		if (mListControl != null)
+			mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
 	}
 
 	private void updateMenu(int noteCount) {
@@ -407,6 +415,7 @@ public class Note extends BaseFragment implements OnPullListener,
 			int position) {
 		OList mList = (OList) LayoutInflater.from(context).inflate(
 				R.layout.note_list_layout, null);
+		mListControl = mList;
 		init(mList, context, object.getInt("id"));
 		return mList;
 	}
