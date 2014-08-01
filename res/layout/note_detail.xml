@@ -1,5 +1,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res/com.odoo.note"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
@@ -19,6 +20,14 @@
             android:padding="15dp"
             android:visibility="gone"
             odoo:model="note.note" >
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:customLayout="@layout/note_custom_tag_view"
+                odoo:field_name="message_follower_ids"
+                odoo:label_bottom_border_height="0"
+                odoo:with_label="false" />
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
