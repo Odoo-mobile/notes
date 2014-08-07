@@ -16,13 +16,13 @@ import com.odoo.support.OUser;
 
 public class NoteNote extends OModel {
 	Context mContext = null;
-	OColumn name = new OColumn("Title", OVarchar.class, 64);
+	OColumn name = new OColumn("Title", OVarchar.class, 64).setRequired(true);
 	OColumn message_follower_ids = new OColumn("Name", ResPartner.class,
 			RelationType.ManyToMany);
 	OColumn memo = new OColumn("Desription", OHtml.class);
 	OColumn sequence = new OColumn("Sequence", OInteger.class).setDefault(0);
 	OColumn stage_id = new OColumn("Select Stage", NoteStage.class,
-			RelationType.ManyToOne);
+			RelationType.ManyToOne).setDefault(1);
 	OColumn open = new OColumn("Open", OBoolean.class).setDefault(true);
 	OColumn date_done = new OColumn("Date", OVarchar.class, 64)
 			.setDefault(false);
