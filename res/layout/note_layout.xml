@@ -113,22 +113,28 @@
             android:visibility="gone"
             app:custom_layout="@layout/note_custom_view_note_stage" />
 
-        <odoo.controls.OViewPager
-            android:id="@+id/viewPagger"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:pager_model="note.stage"
-            app:view_column_name="name" >
+        <android.widgets.SwipeRefreshLayout
+            android:id="@+id/swipe_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-            <android.support.v4.view.PagerTitleStrip
-                style="?android:attr/textAppearanceSmallInverse"
-                android:layout_width="match_parent"
+            <odoo.controls.OViewPager
+                android:id="@+id/viewPagger"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:background="@color/odoo_purple"
-                android:padding="5dp" />
-        </odoo.controls.OViewPager>
+                android:layout_weight="1"
+                app:pager_model="note.stage"
+                app:view_column_name="name" >
+
+                <android.support.v4.view.PagerTitleStrip
+                    style="?android:attr/textAppearanceSmallInverse"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="@color/odoo_purple"
+                    android:padding="5dp" />
+            </odoo.controls.OViewPager>
+        </android.widgets.SwipeRefreshLayout>
     </LinearLayout>
 
 </LinearLayout>

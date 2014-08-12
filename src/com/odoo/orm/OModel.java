@@ -41,6 +41,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.odoo.App;
+import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ORelIds.RelData;
 import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.annotations.Odoo.Functional;
@@ -344,9 +345,11 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					if (method != null) {
 						column.setFunctionalMethod(method);
 						column.setFunctionalStore(checkForFunctionalStore(field));
+						column.checkRowId(checkForFunctionalRowIdCheck(field));
 						if (column.canFunctionalStore()) {
-							column.setLocalColumn(false);
 							column.setFunctionalStoreDepends(getFunctionalDepends(field));
+						} else {
+							column.setLocalColumn();
 						}
 					}
 				} else
@@ -421,6 +424,22 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			return functional.store();
 		}
 		return false;
+	}
+
+	/**
+	 * Check for functional row id check.
+	 * 
+	 * @param field
+	 *            the field
+	 * @return the boolean
+	 */
+	private Boolean checkForFunctionalRowIdCheck(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+		if (annotation != null) {
+			Odoo.Functional functional = (Functional) annotation;
+			return functional.checkRowId();
+		}
+		return true;
 	}
 
 	/**
@@ -620,7 +639,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 							break;
 						case ManyToOne:
 							row.put(col.getName(),
-									new OM2ORecord(this, col, cr.getString(cr
+									new OM2ORecord(this, col, cr.getInt(cr
 											.getColumnIndex(col.getName()))));
 							break;
 						}
@@ -647,6 +666,94 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		cr.close();
 		db.close();
 		return records;
+	}
+
+	/**
+	 * Gets the name.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param row_id
+	 *            the row_id
+	 * @return the name
+	 */
+	public String getName(int row_id) {
+		String name = "false";
+		if (getColumn("name") != null) {
+			SQLiteDatabase db = getReadableDatabase();
+			Cursor cr = db.query(getTableName(), new String[] { "name" },
+					OColumn.ROW_ID + " = ?", new String[] { row_id + "" },
+					null, null, null);
+			if (cr.moveToFirst()) {
+				name = cr.getString(cr.getColumnIndex("name"));
+			}
+			cr.close();
+			db.close();
+		}
+		return name;
+	}
+
+	/**
+	 * Select one to many rel ids.
+	 * 
+	 * @param base
+	 *            the base
+	 * @param rel
+	 *            the rel
+	 * @param base_id
+	 *            the base_id
+	 * @param ref_column
+	 *            the ref_column
+	 * @return the list
+	 */
+	public List<Integer> selecto2MRelIds(OModel base, OModel rel, int base_id,
+			String ref_column) {
+		List<Integer> ids = new ArrayList<Integer>();
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cr = db.query(rel.getTableName(), new String[] { "id" },
+				ref_column + " = ?", new String[] { base_id + "" }, null, null,
+				null);
+		if (cr.moveToFirst()) {
+			do {
+				ids.add(cr.getInt(cr.getColumnIndex("id")));
+			} while (cr.moveToNext());
+		}
+		cr.close();
+		db.close();
+		return ids;
+	}
+
+	/**
+	 * Select many to many rel ids.
+	 * 
+	 * @param base
+	 *            the base
+	 * @param rel
+	 *            the rel
+	 * @param base_id
+	 *            the base_id
+	 * @return the list
+	 */
+	public List<Integer> selectM2MRelIds(OModel base, OModel rel, int base_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		String table = base.getTableName() + "_" + rel.getTableName() + "_rel";
+		String base_col = base.getTableName() + "_id";
+		String rel_col = rel.getTableName() + "_id";
+		SQLiteDatabase db = getReadableDatabase();
+		String where = base_col + " = ? and odoo_name = ?";
+		Object[] whereArgs = new Object[] { base_id, mUser.getAndroidName() };
+		Cursor cr = db.query(table, new String[] { "*" },
+				getWhereClause(where), getWhereArgs(where, whereArgs), null,
+				null, null);
+		if (cr.moveToFirst()) {
+			do {
+				int rel_id = cr.getInt(cr.getColumnIndex(rel_col));
+				ids.add(rel_id);
+			} while (cr.moveToNext());
+		}
+		cr.close();
+		db.close();
+		return ids;
 	}
 
 	/**
@@ -1055,17 +1162,20 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		ContentValues vals = new ContentValues();
 		for (OColumn column : getColumns()) {
 			// Checking for functional store column
-			if (values.contains(OColumn.ROW_ID) && column.isFunctionalColumn()
-					&& column.canFunctionalStore()) {
-				int contains = 0;
-				// getting depends column from values
-				for (String col : column.getFunctionalStoreDepends())
-					if (values.contains(col))
-						contains++;
-				if (contains == column.getFunctionalStoreDepends().size()) {
-					// Getting functional value before create or update
-					vals.put(column.getName(),
-							getFunctionalMethodValue(column, values).toString());
+			if (column.isFunctionalColumn() && column.canFunctionalStore()) {
+				if ((column.checkRowId() && values.contains(OColumn.ROW_ID) || !column
+						.checkRowId())) {
+					int contains = 0;
+					// getting depends column from values
+					for (String col : column.getFunctionalStoreDepends())
+						if (values.contains(col))
+							contains++;
+					if (contains == column.getFunctionalStoreDepends().size()) {
+						// Getting functional value before create or update
+						vals.put(column.getName(),
+								getFunctionalMethodValue(column, values)
+										.toString());
+					}
 				}
 			}
 			if (values.contains(column.getName())) {
@@ -1088,6 +1198,129 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		}
 		vals.put("local_write_date", ODate.getDate());
 		return vals;
+	}
+
+	/**
+	 * Adds the many to many record.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_id
+	 *            the relation_record_id
+	 */
+	public void addManyToManyRecord(String column, Integer base_id,
+			Integer relation_record_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(relation_record_id);
+		addManyToManyRecords(column, base_id, ids);
+	}
+
+	/**
+	 * Adds the many to many records.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_ids
+	 *            the relation_record_ids
+	 */
+	public void addManyToManyRecords(String column, Integer base_id,
+			List<Integer> relation_record_ids) {
+		handleManyToManyData(column, base_id, relation_record_ids, Command.Add);
+	}
+
+	/**
+	 * Delete many to many record.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_id
+	 *            the relation_record_id
+	 */
+	public void deleteManyToManyRecord(String column, Integer base_id,
+			Integer relation_record_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(relation_record_id);
+		deleteManyToManyRecords(column, base_id, ids);
+	}
+
+	/**
+	 * Delete many to many records.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_ids
+	 *            the relation_record_ids
+	 */
+	public void deleteManyToManyRecords(String column, Integer base_id,
+			List<Integer> relation_record_ids) {
+		handleManyToManyData(column, base_id, relation_record_ids,
+				Command.Delete);
+	}
+
+	/**
+	 * Replace many to many record.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_id
+	 *            the relation_record_id
+	 */
+	public void replaceManyToManyRecord(String column, Integer base_id,
+			Integer relation_record_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(relation_record_id);
+		replaceManyToManyRecords(column, base_id, ids);
+
+	}
+
+	/**
+	 * Replace many to many records.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_ids
+	 *            the relation_record_ids
+	 */
+	public void replaceManyToManyRecords(String column, Integer base_id,
+			List<Integer> relation_record_ids) {
+		handleManyToManyData(column, base_id, relation_record_ids,
+				Command.Replace);
+	}
+
+	/**
+	 * Handle many to many data.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param base_id
+	 *            the base_id
+	 * @param relation_record_ids
+	 *            the relation_record_ids
+	 * @param command
+	 *            the command
+	 */
+	private void handleManyToManyData(String column, Integer base_id,
+			List<Integer> relation_record_ids, Command command) {
+		OColumn col = getColumn(column);
+		if (col.getRelationType() == RelationType.ManyToMany) {
+			SQLiteDatabase db = getWritableDatabase();
+			OModel rel_model = createInstance(col.getType());
+			manageManyToManyRecords(db, rel_model, relation_record_ids,
+					base_id, command);
+			db.close();
+		}
 	}
 
 	/**

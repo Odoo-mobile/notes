@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +37,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.Toast;
+import android.widgets.SwipeRefreshLayout;
+import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
@@ -50,13 +53,10 @@ import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
-import com.openerp.OETouchListener;
-import com.openerp.OETouchListener.OnPullListener;
 
-public class Note extends BaseFragment implements OnPullListener,
-		OnRowClickListener, OnClickListener, OnPaggerGetView,
-		OnListRowViewClickListener, OListDragDropListener,
-		OnListBottomReachedListener {
+public class Note extends BaseFragment implements OnRowClickListener,
+		OnClickListener, OnPaggerGetView, OnListRowViewClickListener,
+		OListDragDropListener, OnListBottomReachedListener, OnRefreshListener {
 
 	public static final String TAG = Note.class.getSimpleName();
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
@@ -67,7 +67,6 @@ public class Note extends BaseFragment implements OnPullListener,
 
 	View mView = null;
 	Keys mCurrentKey = Keys.Note;
-	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
 	EditText edtTitle = null;
@@ -81,6 +80,7 @@ public class Note extends BaseFragment implements OnPullListener,
 	OList mListControl = null;
 	Integer mLastPosition = -1;
 	Integer mLimit = 3;
+	private SwipeRefreshLayout mSwipeRefresh = null;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -101,18 +101,23 @@ public class Note extends BaseFragment implements OnPullListener,
 		oListStage.setRowDroppable(true, mListControl);
 		scope = new AppScope(context);
 		checkArguments();
-		mTouchListener = scope.main().getTouchAttacher();
 		mListControl.setOnRowClickListener(this);
 		mListControl.setOnListRowViewClickListener(R.id.imgOpen,
 				(OnListRowViewClickListener) this);
 		mListControl.setRowDraggable(true);
 		mListControl.setDragDropListener(this);
-		mTouchListener.setPullableView(mListControl, this);
 		NoteStage noteStage = new NoteStage(mContext);
 		oListStage.initListControl(noteStage.select(null, null, null, null,
 				"sequence"));
 		mListControl.setOnListBottomReachedListener(this);
 		mListControl.setRecordLimit(mLimit);
+		mSwipeRefresh = (SwipeRefreshLayout) mView
+				.findViewById(R.id.swipe_container);
+		mSwipeRefresh.setOnRefreshListener(this);
+		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
 		if (mLastPosition == -1) {
 			mDataLoader = new DataLoader(0, mListControl, context, stage_id);
 			mDataLoader.execute();
@@ -277,11 +282,6 @@ public class Note extends BaseFragment implements OnPullListener,
 	}
 
 	@Override
-	public void onPullStarted(View arg0) {
-		scope.main().requestSync(NoteProvider.AUTHORITY);
-	}
-
-	@Override
 	public void onResume() {
 		super.onResume();
 		scope.main().registerReceiver(mSyncFinishReceiver,
@@ -298,7 +298,7 @@ public class Note extends BaseFragment implements OnPullListener,
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
 			scope.main().refreshDrawer(TAG);
-			mTouchListener.setPullComplete();
+			hideRefreshingProgress();
 		}
 	};
 
@@ -462,4 +462,25 @@ public class Note extends BaseFragment implements OnPullListener,
 	public Boolean showLoader() {
 		return false;
 	}
+
+	@Override
+	public void onRefresh() {
+		if (app().inNetwork()) {
+			scope.main().requestSync(NoteProvider.AUTHORITY);
+		} else {
+			hideRefreshingProgress();
+			Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_LONG)
+					.show();
+		}
+	}
+
+	private void hideRefreshingProgress() {
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				mSwipeRefresh.setRefreshing(false);
+			}
+		}, 1000);
+	}
+
 }
