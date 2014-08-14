@@ -19,7 +19,6 @@ import android.view.ViewGroup;
 import com.odoo.addons.note.Note.Keys;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.base.ir.Attachment;
-import com.odoo.base.ir.Attachment.Types;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
@@ -109,8 +108,11 @@ public class NoteDetail extends BaseFragment {
 		mMenu.findItem(R.id.menu_note_detail_edit).setVisible(!edit_mode);
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_GET_CONTENT);
 		switch (item.getItemId()) {
 		case R.id.menu_note_detail_edit:
 			mEditMode = !mEditMode;
@@ -125,13 +127,19 @@ public class NoteDetail extends BaseFragment {
 
 			break;
 		case R.id.menu_note_audio:
-			mAttachment.requestAttachment(Types.AUDIO);
+			// mAttachment.requestAttachment(Types.AUDIO);
+			intent.setType("audio/*");
+			startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
 			break;
 		case R.id.menu_note_image:
-			mAttachment.requestAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
+			// mAttachment.requestAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
+			intent.setType("image/*");
+			startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
 			break;
 		case R.id.menu_note_file:
-			mAttachment.requestAttachment(Types.FILE);
+			// mAttachment.requestAttachment(Types.FILE);
+			intent.setType("application/file");
+			startActivityForResult(intent, mAttachment.REQUEST_FILE);
 			break;
 		case R.id.menu_note_detail_save:
 			mEditMode = false;
@@ -173,9 +181,7 @@ public class NoteDetail extends BaseFragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		Log.e("Result Detail", "" + resultCode);
 		if (resultCode == Activity.RESULT_OK) {
-
 			ODataRow newAttachment = mAttachment
 					.handleResult(requestCode, data);
 			if (newAttachment.getString("content").equals("false")) {
@@ -183,6 +189,7 @@ public class NoteDetail extends BaseFragment {
 				// mNoteListAdapterAttach
 				// .notifiyDataChange(mNoteAttachmentList);
 			}
+			Log.e("Result Detail ", "new  :" + newAttachment);
 		}
 	}
 }

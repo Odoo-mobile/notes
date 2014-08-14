@@ -44,7 +44,6 @@ import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.base.ir.Attachment;
-import com.odoo.base.ir.Attachment.Types;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
@@ -93,6 +92,13 @@ public class Note extends BaseFragment implements OnRowClickListener,
 		mViewPagger.setOnPaggerGetView(this);
 		oListStage = (OList) mView.findViewById(R.id.listStageRecords);
 		initControl();
+		mSwipeRefresh = (SwipeRefreshLayout) mView
+				.findViewById(R.id.swipe_container);
+		mSwipeRefresh.setOnRefreshListener(this);
+		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
 		return mView;
 	}
 
@@ -111,13 +117,7 @@ public class Note extends BaseFragment implements OnRowClickListener,
 				"sequence"));
 		mListControl.setOnListBottomReachedListener(this);
 		mListControl.setRecordLimit(mLimit);
-		mSwipeRefresh = (SwipeRefreshLayout) mView
-				.findViewById(R.id.swipe_container);
-		mSwipeRefresh.setOnRefreshListener(this);
-		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
-				android.R.color.holo_green_light,
-				android.R.color.holo_orange_light,
-				android.R.color.holo_red_light);
+
 		if (mLastPosition == -1) {
 			mDataLoader = new DataLoader(0, mListControl, context, stage_id);
 			mDataLoader.execute();
@@ -221,7 +221,7 @@ public class Note extends BaseFragment implements OnRowClickListener,
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			updateMenu(mListRecords.size()); // Next Count
+			// updateMenu(mListRecords.size()); // Next Count
 			if (mListRecords.size() > 0)
 				mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
@@ -314,12 +314,12 @@ public class Note extends BaseFragment implements OnRowClickListener,
 			mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
 	}
 
-	private void updateMenu(int noteCount) {
-		if (noteCount != 0)
-			mMenu.findItem(R.id.menu_note_count).setTitle(noteCount + "");
-		else
-			mMenu.findItem(R.id.menu_note_count).setTitle("");
-	}
+	// private void updateMenu(int noteCount) {
+	// if (noteCount != 0)
+	// mMenu.findItem(R.id.menu_note_count).setTitle(noteCount + "");
+	// else
+	// mMenu.findItem(R.id.menu_note_count).setTitle("");
+	// }
 
 	@Override
 	public void onRowItemClick(int position, View view, final ODataRow row) {
@@ -341,11 +341,14 @@ public class Note extends BaseFragment implements OnRowClickListener,
 		// id 0 or More
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void onClick(View v) {
 		NoteDetail note = new NoteDetail();
 		Bundle bundle = new Bundle();
 		bundle.putString("key", mCurrentKey.toString());
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_GET_CONTENT);
 		switch (v.getId()) {
 		case R.id.imgShowQuickNote:
 			OValues oValues = new OValues();
@@ -361,10 +364,14 @@ public class Note extends BaseFragment implements OnRowClickListener,
 			startFragment(note, true);
 			break;
 		case R.id.imgAttachImage:
-			mAttachment.requestAttachment(Types.CAPTURE_IMAGE);
+			// mAttachment.requestAttachment(Types.CAPTURE_IMAGE);
+			intent.setType("image/*");
+			startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
 			break;
 		case R.id.imgAttachAudio:
-			mAttachment.requestAttachment(Types.AUDIO);
+			// mAttachment.requestAttachment(Types.AUDIO);
+			intent.setType("audio/*");
+			startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
 			break;
 		case R.id.imgAttachSpeechToText:
 			requestSpeechToText();
