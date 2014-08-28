@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -45,6 +46,8 @@ import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ORelIds.RelData;
 import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.annotations.Odoo.Functional;
+import com.odoo.orm.sql.OQuery;
+import com.odoo.orm.sql.OQuery.QueryType;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OInteger;
@@ -52,9 +55,12 @@ import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 import com.odoo.receivers.DataSetChangeReceiver;
 import com.odoo.support.OUser;
+import com.odoo.support.provider.OContentProvider;
+import com.odoo.support.provider.OContentProviderHelper;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.StringUtils;
+import com.odoo.util.logger.OLog;
 
 /**
  * The Class OModel.
@@ -75,6 +81,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	/** The functional columns. */
 	private List<OColumn> mFunctionalColumns = new ArrayList<OColumn>();
+	private List<OColumn> mRelationColumns = new ArrayList<OColumn>();
 
 	/** The user. */
 	private OUser mUser = null;
@@ -99,6 +106,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 	/** The limit. */
 	private Integer mLimit = -1;
+
+	/** The with functional columns. */
+	private Boolean mWithFunctionalColumns = false;
 
 	/**
 	 * The Enum Command.
@@ -132,8 +142,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			.setParsePattern(ODate.DEFAULT_FORMAT);
 
 	// Local Base Columns
-	/** The local_id. */
-	OColumn local_id = new OColumn("Local ID", OInteger.class)
+	/** The _id. */
+	OColumn _id = new OColumn("Local ID", OInteger.class)
 			.setAutoIncrement(true).setLocalColumn();
 
 	/** The odoo_name. */
@@ -155,6 +165,23 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	/** The declared fields. */
 	private HashMap<String, Field> mDeclaredFields = new HashMap<String, Field>();
 
+	public static String getSyncUserDB(Context context) {
+		OUser user = OModel.getSyncUser(context);
+		if (user != null) {
+			return user.getDBName();
+		}
+		return "";
+	}
+
+	public static OUser getSyncUser(Context context) {
+		App app = (App) context.getApplicationContext();
+		OUser user = app.getSyncUser();
+		if (user == null) {
+			user = OUser.current(context);
+		}
+		return user;
+	}
+
 	/**
 	 * Instantiates a new o model.
 	 * 
@@ -164,7 +191,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the model_name
 	 */
 	public OModel(Context context, String model_name) {
-		super(context);
+		super(context, OModel.getSyncUserDB(context));
 		mContext = context;
 		_name = model_name;
 		mUser = OUser.current(mContext);
@@ -189,6 +216,44 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return null;
 	}
 
+	public OContentProvider getContentProvider() {
+		return null;
+	}
+
+	/**
+	 * Generate content Uri.
+	 * 
+	 * @return the uri
+	 */
+	public Uri uri() {
+		return OContentProvider.buildURI(authority(), path());
+	}
+
+	public String path() {
+		OContentProviderHelper provider = (OContentProviderHelper) getContentProvider();
+		if (provider != null)
+			return provider.path();
+		else
+			OLog.log("Override getContentProvider() method in "
+					+ getClass().getSimpleName());
+		return null;
+	}
+
+	/**
+	 * Generate content Authority.
+	 * 
+	 * @return the string
+	 */
+	public String authority() {
+		OContentProviderHelper provider = (OContentProviderHelper) getContentProvider();
+		if (provider != null)
+			return provider.authority();
+		else
+			OLog.log("Override getContentProvider() method in "
+					+ getClass().getSimpleName());
+		return null;
+	}
+
 	/**
 	 * Sets the user.
 	 * 
@@ -197,6 +262,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 */
 	public void setUser(OUser user) {
 		mUser = user;
+	}
+
+	public OUser getUser() {
+		return mUser;
 	}
 
 	/**
@@ -310,6 +379,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		for (String key : mDeclaredFields.keySet()) {
 			OColumn column = getColumn(key);
 			if (column != null) {
+				if (column.getRelationType() != null) {
+					mRelationColumns.add(column);
+				}
 				if (column.isFunctionalColumn()) {
 					if (column.canFunctionalStore()) {
 						mColumns.add(column);
@@ -320,6 +392,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				}
 			}
 		}
+	}
+
+	public List<OColumn> getRelationColumns() {
+		return mRelationColumns;
+	}
+
+	public List<OColumn> getFunctionalColumns() {
+		return mFunctionalColumns;
 	}
 
 	/**
@@ -417,7 +497,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the field
 	 * @return the boolean
 	 */
-	private Boolean checkForFunctionalStore(Field field) {
+	public Boolean checkForFunctionalStore(Field field) {
 		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
 		if (annotation != null) {
 			Odoo.Functional functional = (Functional) annotation;
@@ -449,7 +529,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the field
 	 * @return the functional depends
 	 */
-	private String[] getFunctionalDepends(Field field) {
+	public String[] getFunctionalDepends(Field field) {
 		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
 		if (annotation != null) {
 			Odoo.Functional functional = (Functional) annotation;
@@ -548,6 +628,22 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	/**
+	 * Generate columns string array used as Projection in ContentProvider.
+	 * 
+	 * @return the string[]
+	 */
+	public String[] projection() {
+		List<String> projection = new ArrayList<String>();
+		for (OColumn col : getColumns()) {
+			if (col.getRelationType() == null
+					|| (col.getRelationType() != null && col.getRelationType() == RelationType.ManyToOne)) {
+				projection.add(col.getName());
+			}
+		}
+		return projection.toArray(new String[projection.size()]);
+	}
+
+	/**
 	 * Select.
 	 * 
 	 * @return the list
@@ -576,6 +672,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		List<ODataRow> records = select("id = ? ", new Object[] { server_id });
 		if (records.size() > 0) {
 			return records.get(0).getInt(OColumn.ROW_ID);
+		}
+		return null;
+	}
+
+	public Integer selectServerId(Integer row_id) {
+		List<ODataRow> records = browse().columns("id", OColumn.ROW_ID, "name")
+				.addWhere(OColumn.ROW_ID, "=", row_id).fetch();
+		if (records.size() > 0) {
+			return records.get(0).getInt("id");
 		}
 		return null;
 	}
@@ -668,6 +773,53 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return records;
 	}
 
+	public List<ODataRow> query(String sql, String[] args) {
+		List<ODataRow> records = new ArrayList<ODataRow>();
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cr = db.rawQuery(sql, args);
+		if (cr.moveToFirst()) {
+			do {
+				ODataRow row = createRowFromCursor(cr);
+				if (mWithFunctionalColumns) {
+					for (OColumn col : mFunctionalColumns) {
+						if (!col.canFunctionalStore()) {
+							row.put(col.getName(),
+									getFunctionalMethodValue(col, row));
+						}
+					}
+				}
+				records.add(row);
+			} while (cr.moveToNext());
+		}
+		cr.close();
+		db.close();
+		return records;
+	}
+
+	public OModel withFunctionalColumns() {
+		return withFunctionalColumns(true);
+	}
+
+	public OModel withFunctionalColumns(Boolean withFunctionalColumns) {
+		mWithFunctionalColumns = withFunctionalColumns;
+		if (withFunctionalColumns) {
+			prepareColumns();
+		}
+		return this;
+	}
+
+	public ODataRow createRowFromCursor(Cursor cr) {
+		ODataRow row = new ODataRow();
+		for (String col_name : cr.getColumnNames()) {
+			OColumn col = new OColumn(col_name).setDefault(false);
+			col.setName(col_name);
+			row.put(col_name, createRecordRow(col, cr));
+		}
+		if (row.getInt("id") == 0 || row.getString("id").equals("false"))
+			row.put("id", 0);
+		return row;
+	}
+
 	/**
 	 * Gets the name.
 	 * 
@@ -748,7 +900,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		if (cr.moveToFirst()) {
 			do {
 				int rel_id = cr.getInt(cr.getColumnIndex(rel_col));
-				ids.add(rel_id);
+				if (rel.count(OColumn.ROW_ID + " = ?", new Object[] { rel_id }) > 0)
+					ids.add(rel_id);
 			} while (cr.moveToNext());
 		}
 		cr.close();
@@ -803,7 +956,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 *            the cr
 	 * @return the object
 	 */
-	private Object createRecordRow(OColumn column, Cursor cr) {
+	public Object createRecordRow(OColumn column, Cursor cr) {
 		Object value = false;
 		if (column.getDefaultValue() != null) {
 			value = column.getDefaultValue();
@@ -858,6 +1011,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return the int
 	 */
 	public int count(String where, Object[] whereArgs) {
+
 		int count = 0;
 		SQLiteDatabase db = getReadableDatabase();
 		String whr = getWhereClause(where);
@@ -938,6 +1092,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		values.put(OColumn.ROW_ID, newId);
 		updateRelationColumns(values);
 		sendDatasetChangeBroadcast(newId);
+		notifyDataChange(newId);
 		return newId;
 	}
 
@@ -1030,6 +1185,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return true;
 	}
 
+	private void notifyDataChange(Integer id) {
+		// FIXME: remove method after content provider ready
+		/*
+		 * Uri uri = uri(); if (id != null) uri.buildUpon().appendPath(id + "");
+		 * mContext.getContentResolver().notifyChange(uri, null, false);
+		 */
+	}
+
 	private void sendDatasetChangeBroadcast(Integer newId) {
 		Intent intent = new Intent();
 		intent.setAction(DataSetChangeReceiver.DATA_CHANGED);
@@ -1090,6 +1253,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				getWhereArgs(where, whereArgs));
 		db.close();
 		updateRelationColumns(updateValues);
+		notifyDataChange(null);
 		return affectedRows;
 	}
 
@@ -1101,7 +1265,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @return true, if successful
 	 */
 	public boolean delete(int id) {
-		return delete("local_id  = ? ", new Object[] { id });
+		return delete(OColumn.ROW_ID + " = ? ", new Object[] { id });
 	}
 
 	/**
@@ -1651,6 +1815,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	/**
+	 * browse, New API
+	 * 
+	 * @return OQuery object
+	 */
+	public OQuery browse() {
+		return new OQuery(mContext, this, QueryType.Select);
+	}
+
+	/**
 	 * The Class AutoUpdateOnServer.
 	 */
 	class AutoUpdateOnServer extends AsyncTask<Void, Void, Void> {
@@ -1666,6 +1839,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			return null;
 		}
 	}
+
 }
 
 /**
