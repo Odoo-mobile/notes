@@ -9,42 +9,28 @@ import java.util.TimerTask;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
-import android.app.Service;
-import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SyncResult;
-import android.os.Bundle;
 import android.os.Handler;
 
 import com.odoo.MainActivity;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
-import com.odoo.support.service.OService;
-import com.odoo.util.OENotificationHelper;
+import com.odoo.support.service.OSyncAdapter;
+import com.odoo.support.service.OSyncService;
+import com.odoo.util.ONotificationHelper;
 
-public class NotificationService extends OService {
+public class NotificationService extends OSyncService {
 	private Timer timer = new Timer();
 	TimerTask scanTask = null;
 	Handler handler = new Handler();
 	Context mContext = null;
-	OENotificationHelper oeNotificationHelper = null;
-
-	@Override
-	public Service getService() {
-		return this;
-	}
+	ONotificationHelper oeNotificationHelper = null;
 
 	public NotificationService() {
 		super();
 		this.mContext = this;
-	}
-
-	@Override
-	public void performSync(Context context, Account account, Bundle extras,
-			String authority, ContentProviderClient provider,
-			SyncResult syncResult) {
 	}
 
 	@Override
@@ -70,7 +56,7 @@ public class NotificationService extends OService {
 		Account[] acc = accMan.getAccountsByType("com.odoo.auth");
 		NoteNote note = new NoteNote(mContext);
 		if (acc.length > 0) {
-			oeNotificationHelper = new OENotificationHelper();
+			oeNotificationHelper = new ONotificationHelper();
 			Intent intent = new Intent(mContext, MainActivity.class);
 			oeNotificationHelper.setResultIntent(intent, mContext);
 			Calendar c = Calendar.getInstance();
@@ -83,5 +69,11 @@ public class NotificationService extends OService {
 						.getString("name"), list.get(i).getString("memo"), list
 						.get(i).getString("reminder"), R.drawable.ic_launcher);
 		}
+	}
+
+	@Override
+	public OSyncAdapter getSyncAdapter() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

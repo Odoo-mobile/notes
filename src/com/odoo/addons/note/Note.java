@@ -10,7 +10,6 @@ import odoo.controls.OList.OnRowClickListener;
 import odoo.controls.OListDragDropListener;
 import odoo.controls.OViewPager;
 import odoo.controls.OViewPager.OnPaggerGetView;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,7 +17,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -43,7 +41,7 @@ import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.providers.note.NoteProvider;
-import com.odoo.base.ir.Attachment;
+import com.odoo.base.ir.Attachments;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
@@ -73,7 +71,7 @@ public class Note extends BaseFragment implements OnRowClickListener,
 	private Menu mMenu = null;
 	PackageManager mPackageManager = null;
 	Context mContext = null;
-	Attachment mAttachment = null;
+	Attachments mAttachment = null;
 	private OViewPager mViewPagger = null;
 	OList oListStage = null;
 	OList mListControl = null;
@@ -87,7 +85,7 @@ public class Note extends BaseFragment implements OnRowClickListener,
 		mContext = getActivity();
 		scope = new AppScope(this);
 		mView = inflater.inflate(R.layout.note_layout, container, false);
-		mAttachment = new Attachment(mContext);
+		mAttachment = new Attachments(mContext);
 		mViewPagger = (OViewPager) mView.findViewById(R.id.viewPagger);
 		mViewPagger.setOnPaggerGetView(this);
 		oListStage = (OList) mView.findViewById(R.id.listStageRecords);
@@ -366,12 +364,12 @@ public class Note extends BaseFragment implements OnRowClickListener,
 		case R.id.imgAttachImage:
 			// mAttachment.requestAttachment(Types.CAPTURE_IMAGE);
 			intent.setType("image/*");
-			startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
+//			startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
 			break;
 		case R.id.imgAttachAudio:
 			// mAttachment.requestAttachment(Types.AUDIO);
 			intent.setType("audio/*");
-			startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
+//			startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
 			break;
 		case R.id.imgAttachSpeechToText:
 			requestSpeechToText();
@@ -399,22 +397,22 @@ public class Note extends BaseFragment implements OnRowClickListener,
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		Log.e("Result", resultCode + "");
-		if (resultCode == Activity.RESULT_OK) {
-			Log.e("OnActivity", "ResultOK");
-			if (requestCode == REQUEST_SPEECH_TO_TEXT) {
-				ArrayList<String> matches = data
-						.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-				Log.e("Speech TO test", matches.get(0) + "");
-			} else {
-				ODataRow newAttachment = mAttachment.handleResult(requestCode,
-						data);
-				if (newAttachment.getString("content").equals("false")) {
-					// mNoteAttachmentList.add(newAttachment);
-					// mNoteListAdapterAttach.notifiyDataChange(mNoteAttachmentList);
-					Log.e("Attachment", newAttachment + "");
-				}
-			}
-		}
+		// if (resultCode == Activity.RESULT_OK) {
+		// Log.e("OnActivity", "ResultOK");
+		// if (requestCode == REQUEST_SPEECH_TO_TEXT) {
+		// ArrayList<String> matches = data
+		// .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+		// Log.e("Speech TO test", matches.get(0) + "");
+		// } else {
+		// ODataRow newAttachment = mAttachment.handleResult(requestCode,
+		// data);
+		// if (newAttachment.getString("content").equals("false")) {
+		// // mNoteAttachmentList.add(newAttachment);
+		// // mNoteListAdapterAttach.notifiyDataChange(mNoteAttachmentList);
+		// Log.e("Attachment", newAttachment + "");
+		// }
+		// }
+		// }
 	}
 
 	@Override
@@ -481,13 +479,13 @@ public class Note extends BaseFragment implements OnRowClickListener,
 		}
 	}
 
-	private void hideRefreshingProgress() {
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				mSwipeRefresh.setRefreshing(false);
-			}
-		}, 1000);
-	}
+	// private void hideRefreshingProgress() {
+	// new Handler().postDelayed(new Runnable() {
+	// @Override
+	// public void run() {
+	// mSwipeRefresh.setRefreshing(false);
+	// }
+	// }, 1000);
+	// }
 
 }

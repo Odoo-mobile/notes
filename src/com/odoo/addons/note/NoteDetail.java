@@ -3,12 +3,10 @@ package com.odoo.addons.note;
 import java.util.List;
 
 import odoo.controls.OForm;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +16,7 @@ import android.view.ViewGroup;
 
 import com.odoo.addons.note.Note.Keys;
 import com.odoo.addons.note.models.NoteNote;
-import com.odoo.base.ir.Attachment;
+import com.odoo.base.ir.Attachments;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
@@ -36,7 +34,7 @@ public class NoteDetail extends BaseFragment {
 	private ODataRow mRecord = null;
 	private Menu mMenu = null;
 	String str = null;
-	Attachment mAttachment = null;
+	Attachments mAttachment = null;
 	PackageManager mPackageManager = null;
 	Context mContext = null;
 	public static final String TAG = NoteDetail.class.getSimpleName();
@@ -55,7 +53,7 @@ public class NoteDetail extends BaseFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		mAttachment = new Attachment(mContext);
+		mAttachment = new Attachments(mContext);
 		init();
 	}
 
@@ -129,17 +127,17 @@ public class NoteDetail extends BaseFragment {
 		case R.id.menu_note_audio:
 			// mAttachment.requestAttachment(Types.AUDIO);
 			intent.setType("audio/*");
-			startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
+//			startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
 			break;
 		case R.id.menu_note_image:
 			// mAttachment.requestAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
 			intent.setType("image/*");
-			startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
+//			startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
 			break;
 		case R.id.menu_note_file:
 			// mAttachment.requestAttachment(Types.FILE);
 			intent.setType("application/file");
-			startActivityForResult(intent, mAttachment.REQUEST_FILE);
+//			startActivityForResult(intent, mAttachment.REQUEST_FILE);
 			break;
 		case R.id.menu_note_detail_save:
 			mEditMode = false;
@@ -181,15 +179,15 @@ public class NoteDetail extends BaseFragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == Activity.RESULT_OK) {
-			ODataRow newAttachment = mAttachment
-					.handleResult(requestCode, data);
-			if (newAttachment.getString("content").equals("false")) {
-				// mNoteAttachmentList.add(newAttachment);
-				// mNoteListAdapterAttach
-				// .notifiyDataChange(mNoteAttachmentList);
-			}
-			Log.e("Result Detail ", "new  :" + newAttachment);
-		}
+		// if (resultCode == Activity.RESULT_OK) {
+		// ODataRow newAttachment = mAttachment
+		// .handleResult(requestCode, data);
+		// if (newAttachment.getString("content").equals("false")) {
+		// // mNoteAttachmentList.add(newAttachment);
+		// // mNoteListAdapterAttach
+		// // .notifiyDataChange(mNoteAttachmentList);
+		// }
+		// Log.e("Result Detail ", "new  :" + newAttachment);
+		// }
 	}
 }

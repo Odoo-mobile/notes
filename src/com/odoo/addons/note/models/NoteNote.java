@@ -3,6 +3,7 @@ package com.odoo.addons.note.models;
 import odoo.ODomain;
 import android.content.Context;
 
+import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
@@ -13,6 +14,7 @@ import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 import com.odoo.support.OUser;
+import com.odoo.support.provider.OContentProvider;
 
 public class NoteNote extends OModel {
 	Context mContext = null;
@@ -45,6 +47,11 @@ public class NoteNote extends OModel {
 		return domain;
 	}
 
+	@Override
+	public OContentProvider getContentProvider() {
+		return new NoteProvider();
+	}
+
 	public static class NoteStage extends OModel {
 		Context mContext = null;
 		OColumn name = new OColumn("Name", OText.class).setRequired(true);
@@ -64,6 +71,11 @@ public class NoteNote extends OModel {
 			domain.add("user_id", "=", OUser.current(mContext).getUser_id());
 			return domain;
 		}
+
+		@Override
+		public OContentProvider getContentProvider() {
+			return new NoteProvider();
+		}
 	}
 
 	public static class NoteTag extends OModel {
@@ -71,6 +83,11 @@ public class NoteNote extends OModel {
 
 		public NoteTag(Context context) {
 			super(context, "note.tag");
+		}
+
+		@Override
+		public OContentProvider getContentProvider() {
+			return new NoteProvider();
 		}
 	}
 }

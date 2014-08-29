@@ -57,12 +57,59 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.odoo.AppSettingsActivity" >
+        <activity android:name="com.odoo.BaseSettings" >
             <intent-filter>
-                <action android:name="com.odoo.ACTION_ACCOUNT_CONFIG" />
+                <action android:name="com.odoo.ACTION_ACCOUNT_BASE_CONFIG" />
+
+                <category android:name="android.intent.category.PREFERENCE" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.odoo.GeneralSettings" >
+            <intent-filter>
+                <action android:name="com.odoo.ACTION_ACCOUNT_GENERAL_CONFIG" />
+
+                <category android:name="android.intent.category.PREFERENCE" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.odoo.base.about.About" >
+            <intent-filter>
+                <action android:name="com.odoo.ACTION_ABOUT" />
             </intent-filter>
         </activity>
 
+        <!-- Base Providers (Note: update authority as per your app package) -->
+        <provider
+            android:name="com.odoo.base.ir.providers.model.ModelProvider"
+            android:authorities="com.odoo.note.base.ir.providers.model"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.users.UsersProvider"
+            android:authorities="com.odoo.note.base.res.providers.users"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.ir.providers.attachments.AttachmentProvider"
+            android:authorities="com.odoo.note.base.ir.providers.attachments"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.country.CountryProvider"
+            android:authorities="com.odoo.note.base.res.providers.country"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.company.CompanyProvider"
+            android:authorities="com.odoo.note.base.res.providers.company"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.partners.PartnersProvider"
+            android:authorities="com.odoo.note.base.res.providers.partners"
+            android:exported="false"
+            android:multiprocess="true" />
+
+        <!-- /Base Providers -->
         <!-- Contact service -->
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"
@@ -84,8 +131,8 @@
             android:name="com.odoo.addons.note.providers.note.NoteProvider"
             android:authorities="com.odoo.addons.note.providers.note"
             android:enabled="true"
-            android:exported="true"
-            android:label="Note Data"
+            android:exported="false"
+            android:label="Note"
             android:syncable="true" />
         <!-- Note Service -->
         <service
@@ -99,7 +146,7 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_note_data" />
         </service>
-         <!-- Notification Service -->
+        <!-- Notification Service -->
         <service
             android:name="com.odoo.addons.note.services.NotificationService"
             android:exported="true" >
