@@ -21,9 +21,7 @@ package com.odoo.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.support.SyncValue;
-import com.odoo.support.SyncValue.Type;
 import com.odoo.support.SyncWizardHelper;
 
 public class SyncWizardValues implements SyncWizardHelper {
@@ -31,9 +29,6 @@ public class SyncWizardValues implements SyncWizardHelper {
 	@Override
 	public List<SyncValue> syncValues() {
 		List<SyncValue> list = new ArrayList<SyncValue>();
-		list.add(new SyncValue("Partners"));
-		list.add(new SyncValue("All Partners", PartnersProvider.AUTHORITY,
-				Type.CHECKBOX));
 		return list;
 	}
 }

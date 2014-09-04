@@ -6,11 +6,10 @@
         res/values-v11/styles.xml on API 14+ devices.
     -->
     <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/CustomActionbar</item>
         <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
     </style>
 
-    <style name="PreferenceTheme" parent="AppBaseTheme">
+    <style name="PreferenceTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/CustomActionbar</item>
     </style>
 

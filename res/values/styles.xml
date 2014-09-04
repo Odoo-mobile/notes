@@ -30,8 +30,6 @@
         <item name="android:textColor">#ffffff</item>
     </style>
 
-    <style name="PreferenceTheme" parent="AppBaseTheme">
-        <item name="android:actionBarStyle">@style/CustomActionbar</item>
-    </style>
+    <style name="PreferenceTheme" parent="AppTheme"></style>
 
 </resources>
