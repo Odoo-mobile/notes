@@ -334,8 +334,8 @@ public class Note extends BaseFragment implements OnRowClickListener,
 			ODataRow row) {
 		OValues values = new OValues();
 		values.put("open", !row.getBoolean("open"));
-		new NoteNote(getActivity()).update(values, "local_id=?",
-				new Object[] { row.getInt("local_id") });
+		new NoteNote(getActivity()).update(values, "_id=?",
+				new Object[] { row.getInt("_id") });
 		// id 0 or More
 	}
 
@@ -364,12 +364,12 @@ public class Note extends BaseFragment implements OnRowClickListener,
 		case R.id.imgAttachImage:
 			// mAttachment.requestAttachment(Types.CAPTURE_IMAGE);
 			intent.setType("image/*");
-//			startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
+			// startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
 			break;
 		case R.id.imgAttachAudio:
 			// mAttachment.requestAttachment(Types.AUDIO);
 			intent.setType("audio/*");
-//			startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
+			// startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
 			break;
 		case R.id.imgAttachSpeechToText:
 			requestSpeechToText();

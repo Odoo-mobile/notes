@@ -41,8 +41,6 @@ public class App extends Application {
 	public void onCreate() {
 		Log.d(TAG, "App->onCreate()");
 		super.onCreate();
-		// Intent intent = new Intent(this, NotificationService.class);
-		// startService(intent);
 	}
 
 	public void setSyncUser(OUser user) {

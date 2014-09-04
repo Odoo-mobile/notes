@@ -4,6 +4,8 @@ import odoo.ODomain;
 import android.content.Context;
 
 import com.odoo.addons.note.providers.note.NoteProvider;
+import com.odoo.addons.note.providers.note.NoteStageProvider;
+import com.odoo.addons.note.providers.note.NoteTagProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
@@ -74,7 +76,7 @@ public class NoteNote extends OModel {
 
 		@Override
 		public OContentProvider getContentProvider() {
-			return new NoteProvider();
+			return new NoteStageProvider();
 		}
 	}
 
@@ -87,7 +89,7 @@ public class NoteNote extends OModel {
 
 		@Override
 		public OContentProvider getContentProvider() {
-			return new NoteProvider();
+			return new NoteTagProvider();
 		}
 	}
 }

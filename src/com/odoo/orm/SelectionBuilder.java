@@ -379,7 +379,8 @@ public class SelectionBuilder {
 		assertTable();
 		if (columns != null)
 			mapColumns(columns);
-		//Log.v(TAG, "query(columns=" + Arrays.toString(columns) + ") " + this);
+		// Log.v(TAG, "query(columns=" + Arrays.toString(columns) + ") " +
+		// this);
 		return db.query(mTable, columns, getSelection(), getSelectionArgs(),
 				groupBy, having, orderBy, limit);
 	}
@@ -396,7 +397,7 @@ public class SelectionBuilder {
 	 */
 	public int update(SQLiteDatabase db, ContentValues values) {
 		assertTable();
-		//Log.v(TAG, "update() " + this);
+		// Log.v(TAG, "update() " + this);
 		return db.update(mTable, values, getSelection(), getSelectionArgs());
 	}
 
@@ -409,7 +410,7 @@ public class SelectionBuilder {
 	 */
 	public int delete(SQLiteDatabase db) {
 		assertTable();
-		//Log.v(TAG, "delete() " + this);
+		// Log.v(TAG, "delete() " + this);
 		return db.delete(mTable, getSelection(), getSelectionArgs());
 	}
 }
