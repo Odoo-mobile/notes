@@ -11,12 +11,14 @@ import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 
 import com.odoo.MainActivity;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
+import com.odoo.support.OUser;
 import com.odoo.support.service.OSyncAdapter;
 import com.odoo.support.service.OSyncService;
 import com.odoo.util.ONotificationHelper;
@@ -75,5 +77,11 @@ public class NotificationService extends OSyncService {
 	public OSyncAdapter getSyncAdapter() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
+		// TODO Auto-generated method stub
+
 	}
 }

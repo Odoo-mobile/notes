@@ -9,14 +9,14 @@ import com.odoo.support.provider.OContentProvider;
 
 public class NoteTagProvider extends OContentProvider {
 
-	public static String AUTHORITY = "com.odoo.addons.note.providers.note";
+	public static String AUTHORITY = "com.odoo.addons.note.providers.note.notetag";
 	public static final String PATH = "note_tag";
 	public static final Uri CONTENT_URI = OContentProvider.buildURI(AUTHORITY,
 			PATH);
 
 	@Override
 	public OModel model(Context context) {
-		return new NoteNote(context);
+		return new NoteNote.NoteTag(context);
 	}
 
 	@Override

@@ -1,7 +1,11 @@
 package com.odoo.addons.note.services;
 
+import android.content.SyncResult;
+import android.os.Bundle;
+
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
+import com.odoo.support.OUser;
 import com.odoo.support.service.OSyncAdapter;
 import com.odoo.support.service.OSyncFinishListener;
 import com.odoo.support.service.OSyncService;
@@ -13,14 +17,19 @@ public class NoteService extends OSyncService implements OSyncFinishListener {
 	@Override
 	public OSyncAdapter getSyncAdapter() {
 		return new OSyncAdapter(getApplicationContext(), new NoteNote(
-				getApplicationContext()), true).syncDataLimit(50).onSyncFinish(
-				this);
+				getApplicationContext()), this, true).syncDataLimit(50)
+				.onSyncFinish(this);
 	}
 
 	@Override
-	public OSyncAdapter performSync() {
+	public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
+
+	}
+
+	@Override
+	public OSyncAdapter performSync(SyncResult syncResult) {
 		return new OSyncAdapter(getApplicationContext(), new NoteStage(
-				getApplicationContext()), true);
+				getApplicationContext()), this, true);
 	}
 
 	// @Override
