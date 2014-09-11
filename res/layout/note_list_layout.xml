@@ -1,4 +1,4 @@
-<odoo.controls.OList xmlns:android="http://schemas.android.com/apk/res/android"
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/listRecords"
     android:layout_width="match_parent"
@@ -6,4 +6,4 @@
     android:background="#ffffff"
     app:custom_layout="@layout/note_custom_view_note" >
 
-</odoo.controls.OList>
+</ListView>

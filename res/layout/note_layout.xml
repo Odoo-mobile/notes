@@ -103,16 +103,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <odoo.controls.OList
+        <!--
+             <ListView
             android:id="@+id/listStageRecords"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:background="#ffffff"
-            android:visibility="gone"
-            app:custom_layout="@layout/note_custom_view_note_stage" />
+            android:visibility="gone" />
+        -->
 
-        <android.widgets.SwipeRefreshLayout
+        <ListView
+            android:id="@+id/listRecords"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff" />
+        <!--
+        android.widgets.SwipeRefreshLayout
             android:id="@+id/swipe_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
@@ -134,6 +141,7 @@
                     android:padding="5dp" />
             </odoo.controls.OViewPager>
         </android.widgets.SwipeRefreshLayout>
+        -->
     </LinearLayout>
 
 </LinearLayout>
