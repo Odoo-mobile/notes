@@ -12,6 +12,7 @@
         odoo:binaryType="round_image"
         odoo:defaultImage="@drawable/avatar"
         odoo:field_name="image_small"
+        odoo:imageWidthHeight="28"
         odoo:with_label="false" />
 
 </odoo.controls.OForm>

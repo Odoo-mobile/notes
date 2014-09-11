@@ -10,6 +10,8 @@ import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
+import com.odoo.orm.OValues;
+import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.OHtml;
 import com.odoo.orm.types.OInteger;
@@ -17,6 +19,7 @@ import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 import com.odoo.support.OUser;
 import com.odoo.support.provider.OContentProvider;
+import com.odoo.util.StringUtils;
 
 public class NoteNote extends OModel {
 	Context mContext = null;
@@ -36,6 +39,9 @@ public class NoteNote extends OModel {
 	OColumn color = new OColumn("Color", OInteger.class).setDefault(0);
 	OColumn tag_ids = new OColumn("Tags", NoteTag.class,
 			RelationType.ManyToMany);
+	@Odoo.Functional(store = true, depends = { "memo" }, method = "storeShortMemo")
+	OColumn short_memo = new OColumn("Short Memo", OVarchar.class, 100)
+			.setLocalColumn();
 
 	public NoteNote(Context context) {
 		super(context, "note.note");
@@ -47,6 +53,12 @@ public class NoteNote extends OModel {
 		ODomain domain = new ODomain();
 		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
 		return domain;
+	}
+
+	public String storeShortMemo(OValues vals) {
+		String body = StringUtils.htmlToString(vals.getString("memo"));
+		int end = (body.length() > 150) ? 150 : body.length();
+		return body.substring(0, end);
 	}
 
 	@Override

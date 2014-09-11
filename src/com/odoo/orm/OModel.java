@@ -39,11 +39,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.odoo.App;
-import com.odoo.base.ir.providers.model.ModelProvider;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ORelIds.RelData;
 import com.odoo.orm.annotations.Odoo;
@@ -1487,6 +1485,30 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					base_id, command);
 			db.close();
 		}
+	}
+
+	public ODataRow selectRelRecord(String[] columns, int base_id) {
+		ODataRow row = new ODataRow();
+		for (String col : columns) {
+			OColumn column = getColumn(col);
+			if (column.getRelationType() != null) {
+				switch (column.getRelationType()) {
+				case ManyToMany:
+					row.put(column.getName(), new OM2MRecord(this, column,
+							base_id));
+					break;
+				case OneToMany:
+					row.put(column.getName(), new OO2MRecord(this, column,
+							base_id));
+					break;
+				case ManyToOne:
+					row.put(column.getName(), new OM2ORecord(this, column,
+							base_id));
+					break;
+				}
+			}
+		}
+		return row;
 	}
 
 	/**

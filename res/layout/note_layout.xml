@@ -2,94 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="#dedede"
     android:clipToPadding="false"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:background="#ebebeb"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp"
-        android:weightSum="1" >
-
-        <EditText
-            android:id="@+id/edtNoteQuickTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#fff"
-            android:fontFamily="sans-serif-condensed"
-            android:hint="Add quick note"
-            android:inputType="text"
-            android:padding="10dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="italic|bold" />
-
-        <ImageView
-            android:id="@+id/imgShowQuickNote"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/oe_background_selector"
-            android:clickable="true"
-            android:padding="3dp"
-            android:src="@drawable/ic_action_content_new"
-            android:tint="@color/dark_icon"
-            android:visibility="gone" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#d5d5d5"
-        android:orientation="horizontal"
-        android:paddingBottom="0.5dp" >
-
-        <ImageView
-            android:id="@+id/imgCreateQuickNote"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/oe_background_selector"
-            android:clickable="true"
-            android:padding="5dp"
-            android:src="@drawable/ic_action_new_note"
-            android:tint="@color/dark_icon" />
-
-        <ImageView
-            android:id="@+id/imgAttachImage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/oe_background_selector"
-            android:clickable="true"
-            android:padding="5dp"
-            android:src="@drawable/ic_action_device_access_camera"
-            android:tint="@color/dark_icon" />
-
-        <ImageView
-            android:id="@+id/imgAttachAudio"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/oe_background_selector"
-            android:clickable="true"
-            android:padding="5dp"
-            android:src="@drawable/ic_action_device_access_volume_on"
-            android:tint="@color/dark_icon" />
-
-        <ImageView
-            android:id="@+id/imgAttachSpeechToText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/oe_background_selector"
-            android:clickable="true"
-            android:padding="5dp"
-            android:src="@drawable/ic_action_speech_to_text"
-            android:tint="@color/dark_icon" />
-    </LinearLayout>
+    <!-- <include layout="@layout/note_quick_controls" /> -->
 
     <include
         android:id="@+id/loadingProgress"
@@ -98,50 +15,25 @@
         android:paddingTop="5dp"
         android:visibility="gone" />
 
-    <LinearLayout
+    <android.widgets.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_height="match_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" >
 
-        <!--
-             <ListView
-            android:id="@+id/listStageRecords"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:background="#ffffff"
-            android:visibility="gone" />
-        -->
-
-        <ListView
+        <com.odoo.util.controls.HeaderGridView
             android:id="@+id/listRecords"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ffffff" />
-        <!--
-        android.widgets.SwipeRefreshLayout
-            android:id="@+id/swipe_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <odoo.controls.OViewPager
-                android:id="@+id/viewPagger"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:pager_model="note.stage"
-                app:view_column_name="name" >
-
-                <android.support.v4.view.PagerTitleStrip
-                    style="?android:attr/textAppearanceSmallInverse"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:background="@color/odoo_purple"
-                    android:padding="5dp" />
-            </odoo.controls.OViewPager>
-        </android.widgets.SwipeRefreshLayout>
-        -->
-    </LinearLayout>
+            android:layout_marginTop="5dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:horizontalSpacing="5dp"
+            android:numColumns="2"
+            android:scrollbars="none"
+            android:verticalSpacing="5dp" />
+    </android.widgets.SwipeRefreshLayout>
 
 </LinearLayout>
