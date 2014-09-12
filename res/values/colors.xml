@@ -1,5 +1,7 @@
 <resources>
 
+    <color name="odoo_green_dark">#669900</color>
+    <color name="odoo_red_dark">#CC0000</color>
     <color name="theme_primary">#a24689</color>
     <color name="theme_primary_dark">#303f9f</color>
     <color name="theme_primary_light">#7986cb</color>

@@ -127,17 +127,17 @@ public class NoteDetail extends BaseFragment {
 		case R.id.menu_note_audio:
 			// mAttachment.requestAttachment(Types.AUDIO);
 			intent.setType("audio/*");
-//			startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
+			// startActivityForResult(intent, mAttachment.REQUEST_AUDIO);
 			break;
 		case R.id.menu_note_image:
 			// mAttachment.requestAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
 			intent.setType("image/*");
-//			startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
+			// startActivityForResult(intent, mAttachment.REQUEST_IMAGE);
 			break;
 		case R.id.menu_note_file:
 			// mAttachment.requestAttachment(Types.FILE);
 			intent.setType("application/file");
-//			startActivityForResult(intent, mAttachment.REQUEST_FILE);
+			// startActivityForResult(intent, mAttachment.REQUEST_FILE);
 			break;
 		case R.id.menu_note_detail_save:
 			mEditMode = false;

@@ -116,6 +116,7 @@ public abstract class OContentProvider extends ContentProvider implements
 	private HashMap<String, List<Integer>> getManyToManyRecords(
 			ContentValues values) {
 		HashMap<String, List<Integer>> ids = new HashMap<String, List<Integer>>();
+		model.prepareColumns();
 		for (OColumn col : model.getRelationColumns()) {
 			if (col.getRelationType() == RelationType.ManyToMany) {
 				if (values.containsKey(col.getName())) {

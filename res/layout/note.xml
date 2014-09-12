@@ -6,8 +6,6 @@
     android:clipToPadding="false"
     android:orientation="vertical" >
 
-    <!-- <include layout="@layout/note_quick_controls" /> -->
-
     <include
         android:id="@+id/loadingProgress"
         layout="@layout/listview_data_loading_progress"

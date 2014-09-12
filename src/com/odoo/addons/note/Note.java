@@ -21,6 +21,7 @@ import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.note.models.NoteNote;
+import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.note.R;
 import com.odoo.orm.ODataRow;
@@ -39,17 +40,21 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		LoaderCallbacks<Cursor>, OnRefreshListener, SyncStatusObserverListener,
 		OnViewBindListener {
 
+	public static final String KEY_STAGE_ID = "stage_id";
+	public static final String KEY_NOTE_FILTER = "note_filter";
 	public static final String TAG = Note.class.getSimpleName();
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
 	private View mView = null;
 	private Menu mMenu = null;
 	private Keys mCurrentKey = Keys.Note;
+	private Integer mStageId = 0;
+	private ODataRow stage;
 	private HeaderGridView mListControl = null;
 	private OCursorListAdapter mAdapter = null;
 	Context mContext = null;
 
 	public enum Keys {
-		Note, Archive, Reminders
+		Note, Archive, Reminders, Trash
 	}
 
 	@Override
@@ -58,8 +63,8 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		setHasOptionsMenu(true);
 		mContext = getActivity();
 		scope = new AppScope(mContext);
-
-		mView = inflater.inflate(R.layout.note_layout, container, false);
+		checkArguments();
+		mView = inflater.inflate(R.layout.note, container, false);
 		return mView;
 	}
 
@@ -71,14 +76,13 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		mListControl = (HeaderGridView) view.findViewById(R.id.listRecords);
 		// Adding header view
 		View header = getActivity().getLayoutInflater().inflate(
-				R.layout.note_quick_controls, null);
+				R.layout.note_quick_controls, null, false);
 		mListControl.addHeaderView(header, null, true);
 		mAdapter = new OCursorListAdapter(mContext, null,
 				R.layout.note_custom_view_note);
 		mAdapter.setOnViewBindListener(this);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
-		// mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
 		getLoaderManager().initLoader(0, null, this);
 	}
 
@@ -98,29 +102,33 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		menu.add(new DrawerItem(TAG, "Archive", count(context, Keys.Archive),
 				R.drawable.ic_action_archive, object(Keys.Archive)));
 		menu.add(new DrawerItem(TAG, "Trash", count(context, Keys.Note),
-				R.drawable.ic_action_trash, object(Keys.Note)));
+				R.drawable.ic_action_trash, object(Keys.Trash)));
 		return menu;
 	}
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		mCurrentKey = Keys.valueOf(arg.getString("note"));
+		mCurrentKey = Keys.valueOf(arg.getString(KEY_NOTE_FILTER));
+		mStageId = arg.getInt(KEY_STAGE_ID);
+		stage = new NoteStage(getActivity()).select(mStageId);
 	}
 
 	private int count(Context context, Keys key) {
 		int count = 0;
+		NoteNote db = new NoteNote(context);
 		switch (key) {
 		case Note:
-			count = new NoteNote(context).select("open = ? AND reminder = ?",
-					new Object[] { true, "" }).size();
+			count = db.count("open = ? AND reminder = ?", new Object[] { true,
+					"" });
 			break;
 		case Archive:
-			count = new NoteNote(context).select("open = ?",
-					new Object[] { false }).size();
+			count = db.count("open = ?", new Object[] { false });
 			break;
 		case Reminders:
-			count = new NoteNote(context).select("reminder != ?",
-					new Object[] { "" }).size();
+			count = db.count("reminder != ?", new Object[] { "" });
+			break;
+		case Trash:
+			count = db.count("trashed != ?", new Object[] { 1 });
 			break;
 		default:
 			break;
@@ -129,11 +137,11 @@ public class Note extends BaseFragment implements OnItemClickListener,
 	}
 
 	private Fragment object(Keys value) {
-		Note note = new Note();
+		Fragment f = (value == Keys.Note) ? new NotesPager() : new Note();
 		Bundle args = new Bundle();
-		args.putString("note", value.toString());
-		note.setArguments(args);
-		return note;
+		args.putString(KEY_NOTE_FILTER, value.toString());
+		f.setArguments(args);
+		return f;
 	}
 
 	@Override
@@ -155,14 +163,26 @@ public class Note extends BaseFragment implements OnItemClickListener,
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		String selection = null;
+		String[] arguments = null;
+		if (mCurrentKey == Keys.Note) {
+			selection = "stage_id = ? ";
+			List<String> args = new ArrayList<String>();
+			args.add(mStageId + "");
+			if (stage.getInt("sequence") == 0) {
+				selection += " or stage_id = ?";
+				args.add("0");
+			}
+			arguments = args.toArray(new String[args.size()]);
+		}
 		return new CursorLoader(mContext, db().uri(), new String[] { "name",
-				"short_memo", "color" }, null, null, null);
+				"short_memo", "color" }, selection, arguments, "sequence");
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		mAdapter.changeCursor(cursor);
-		if (cursor.getCount() == 0) {
+		if (db().isEmptyTable()) {
 			setSwipeRefreshing(true);
 			scope.main().requestSync(NoteProvider.AUTHORITY);
 		}

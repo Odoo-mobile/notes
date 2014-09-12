@@ -1,16 +1,15 @@
 <odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/note_bg_color"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:selectableItemBackground"
     android:orientation="vertical"
     odoo:model="note.note" >
 
     <LinearLayout
-        android:id="@+id/note_bg_color"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffffff"
+        android:background="?android:selectableItemBackground"
         android:orientation="vertical"
         android:padding="10dp" >
 

@@ -42,6 +42,8 @@ public class NoteNote extends OModel {
 	@Odoo.Functional(store = true, depends = { "memo" }, method = "storeShortMemo")
 	OColumn short_memo = new OColumn("Short Memo", OVarchar.class, 100)
 			.setLocalColumn();
+	OColumn trashed = new OColumn("Trashed", OInteger.class, 5)
+			.setLocalColumn().setDefault(0);
 
 	public NoteNote(Context context) {
 		super(context, "note.note");
