@@ -3,10 +3,10 @@ package com.odoo.addons.note;
 import android.graphics.Color;
 
 public class NoteUtil {
-	private static String[] background_colors = { "#ffffff", "#cccccc",
+	private static String[] background_colors = { "#fdf400", "#cccccc",
 			"#ffc7c7", "#fff1c7", "#e3ffc7", "#c7ffd5", "#c7ffff", "#c7d5ff",
 			"#e3c7ff", "#ffc7f1" };
-	private static String[] text_colors = { "#5a5a5a", "#424242", "#7a3737",
+	private static String[] text_colors = { "#312f00", "#424242", "#7a3737",
 			"#756832", "#5d6937", "#1a7759", "#1a5d83", "#3b3e75", "#4c3668",
 			"#6d2c70" };
 

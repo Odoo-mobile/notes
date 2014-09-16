@@ -2,6 +2,7 @@ package com.odoo.orm;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 
 public class OContentResolver {
@@ -35,5 +36,15 @@ public class OContentResolver {
 		Uri uri = mModel.uri().buildUpon().appendPath(id + "").build();
 		mContext.getContentResolver().update(uri, vals, null, null);
 
+	}
+
+	public Cursor query(int id) {
+		return query(OColumn.ROW_ID + " = ? ", new String[] { id + "" }, null);
+	}
+
+	public Cursor query(String selection, String[] args, String sort) {
+		Uri uri = mModel.uri();
+		return mContext.getContentResolver().query(uri, mModel.projection(),
+				selection, args, sort);
 	}
 }

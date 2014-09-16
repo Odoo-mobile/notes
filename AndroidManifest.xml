@@ -147,6 +147,12 @@
             android:exported="false"
             android:multiprocess="true" />
         <!-- /Base Providers -->
+
+        <activity
+            android:name="com.odoo.addons.note.NoteDetailActivity"
+            android:theme="@style/NoteDetailActivity" >
+        </activity>
+
         <!-- Contact service -->
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"

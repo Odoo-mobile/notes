@@ -23,4 +23,12 @@
         <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
     </style>
 
+    <style name="NoteDetailActivity" parent="android:Theme.Holo.Light">
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:actionBarStyle">@style/CustomActionbar</item>
+    </style>
+
 </resources>

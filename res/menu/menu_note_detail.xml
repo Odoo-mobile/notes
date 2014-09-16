@@ -1,48 +1,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_note_detail_edit"
-        android:icon="@drawable/ic_menu_edit"
+        android:id="@+id/menu_note_color"
+        android:icon="@drawable/ic_action_bg_color"
         android:showAsAction="always"
-        android:title="Edit">
+        android:title="Color">
     </item>
     <item
-        android:id="@+id/menu_note_detail_save"
-        android:icon="@drawable/ic_menu_save"
+        android:id="@+id/menu_note_photes"
+        android:icon="@drawable/ic_action_camera"
         android:showAsAction="always"
-        android:title="Save">
+        android:title="Photo">
     </item>
     <item
-        android:id="@+id/menu_note_detail_delete"
-        android:icon="@drawable/ic_menu__discard"
+        android:id="@+id/menu_note_archive"
+        android:icon="@drawable/ic_action_archive"
         android:showAsAction="always"
-        android:title="Delete">
+        android:title="Archive">
     </item>
-    <!--
-    <item
-        android:id="@+id/menu_note_attach"
-        android:icon="@drawable/ic_menu_action_content_new_attachment"
-        android:showAsAction="always"
-        android:title="Attachement">
-        <menu>
-            <item
-                android:id="@+id/menu_note_audio"
-                android:icon="@drawable/ic_action_device_access_volume_on"
-                android:title="Audio">
-            </item>
-            <item
-                android:id="@+id/menu_note_image"
-                android:icon="@drawable/ic_action_device_access_camera"
-                android:title="Image">
-            </item>
-            <item
-                android:id="@+id/menu_note_file"
-                android:icon="@drawable/ic_menu_action_content_new_attachment"
-                android:title="File">
-            </item>
-        </menu>
-    </item>
-    -->
     <item
         android:id="@+id/menu_note_operation"
         android:icon="@drawable/ic_action_overflow"
@@ -50,29 +25,20 @@
         android:title="More">
         <menu>
             <item
-                android:id="@+id/menu_note_forward_asmail"
-                android:icon="@drawable/ic_menu_forward"
-                android:title="Forward as mail">
+                android:id="@+id/menu_note_delete"
+                android:title="Delete">
+            </item>
+            <item
+                android:id="@+id/menu_note_make_copy"
+                android:title="Make a copy">
+            </item>
+            <item
+                android:id="@+id/menu_note_share"
+                android:title="Share">
             </item>
             <item
                 android:id="@+id/menu_note_followers"
-                android:icon="@drawable/ic_menu_add_group"
                 android:title="Followers">
-            </item>
-            <item
-                android:id="@+id/menu_note_audio"
-                android:icon="@drawable/ic_action_device_access_volume_on"
-                android:title="Audio">
-            </item>
-            <item
-                android:id="@+id/menu_note_image"
-                android:icon="@drawable/ic_action_device_access_camera"
-                android:title="Image">
-            </item>
-            <item
-                android:id="@+id/menu_note_file"
-                android:icon="@drawable/ic_menu_action_content_new_attachment"
-                android:title="File">
             </item>
         </menu>
     </item>

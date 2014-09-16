@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,7 @@ import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.note.R;
+import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
@@ -34,18 +36,17 @@ import com.odoo.util.OControls;
 import com.odoo.util.StringUtils;
 import com.odoo.util.controls.HeaderGridView;
 import com.odoo.util.drawer.DrawerItem;
-import com.odoo.util.logger.OLog;
 
 public class Note extends BaseFragment implements OnItemClickListener,
 		LoaderCallbacks<Cursor>, OnRefreshListener, SyncStatusObserverListener,
 		OnViewBindListener {
 
 	public static final String KEY_STAGE_ID = "stage_id";
+	public static final String KEY_NOTE_ID = "note_id";
 	public static final String KEY_NOTE_FILTER = "note_filter";
 	public static final String TAG = Note.class.getSimpleName();
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
 	private View mView = null;
-	private Menu mMenu = null;
 	private Keys mCurrentKey = Keys.Note;
 	private Integer mStageId = 0;
 	private ODataRow stage;
@@ -149,7 +150,6 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		super.onCreateOptionsMenu(menu, inflater);
 		menu.clear();
 		inflater.inflate(R.menu.menu_note, menu);
-		mMenu = menu;
 	}
 
 	@Override
@@ -157,8 +157,11 @@ public class Note extends BaseFragment implements OnItemClickListener,
 			long arg3) {
 		Cursor cr = mAdapter.getCursor();
 		cr.moveToPosition(position - 2); // -2 because of header
-		OLog.log("open clicked : " + cr.getPosition() + " : "
-				+ cr.getString(cr.getColumnIndex("name")));
+		Bundle bundle = new Bundle();
+		bundle.putInt(KEY_NOTE_ID, cr.getInt(cr.getColumnIndex(OColumn.ROW_ID)));
+		Intent intent = new Intent(getActivity(), NoteDetailActivity.class);
+		intent.putExtras(bundle);
+		startActivity(intent);
 	}
 
 	@Override
