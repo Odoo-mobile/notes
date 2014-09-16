@@ -457,14 +457,18 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 			}
 
 		}
-		if (mFragment.findFragmentByTag("main_fragment") != null) {
+		Fragment oldFragment = mFragment.findFragmentByTag("main_fragment");
+		FragmentTransaction tran = mFragment.beginTransaction();
+		if (oldFragment != null) {
+			tran.detach(oldFragment);
 			mFragment.popBackStack("main_fragment",
 					FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			mFragment.popBackStack(null,
 					FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		}
-		FragmentTransaction tran = mFragment.beginTransaction().replace(
-				container_id, fragment, "main_fragment");
+		tran.replace(container_id, fragment, "main_fragment");
+		if (oldFragment != null)
+			tran.attach(fragment);
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		if (addToBackState) {
 			tran.addToBackStack(null);

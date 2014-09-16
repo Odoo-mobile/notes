@@ -11,7 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
@@ -26,7 +26,6 @@ import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.drawer.DrawerItem;
-import com.odoo.util.logger.OLog;
 
 public class NotesPager extends BaseFragment implements OnPageChangeListener {
 	private Note note;
@@ -53,7 +52,7 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// super.onViewCreated(view, savedInstanceState);
+		super.onViewCreated(view, savedInstanceState);
 		Bundle bundle = getArguments();
 		if (bundle.containsKey(Note.KEY_NOTE_FILTER)) {
 			mKey = Note.Keys.valueOf(bundle.getString(Note.KEY_NOTE_FILTER));
@@ -72,8 +71,8 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 		mPagger = (ViewPager) view.findViewById(R.id.pager);
 		mPagger.setOnPageChangeListener(this);
 		mPagger.setOffscreenPageLimit(2);
-		mAdapter = new NoteStagePagerAdapter(mKey, cursor, getActivity()
-				.getSupportFragmentManager());
+		mAdapter = new NoteStagePagerAdapter(mKey, cursor,
+				getChildFragmentManager());
 		mPagger.setAdapter(mAdapter);
 	}
 
@@ -82,15 +81,13 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 				projection, null, null, "sequence");
 	}
 
-	private class NoteStagePagerAdapter extends FragmentPagerAdapter {
+	private class NoteStagePagerAdapter extends FragmentStatePagerAdapter {
 
 		private Note.Keys note_filter;
-		private FragmentManager frag;
 
 		public NoteStagePagerAdapter(Note.Keys key, Cursor cursor,
 				FragmentManager fm) {
 			super(fm);
-			frag = fm;
 			note_filter = key;
 		}
 
@@ -110,7 +107,6 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 			bundle.putString(Note.KEY_NOTE_FILTER, note_filter.toString());
 			bundle.putInt("index", index);
 			note.setArguments(bundle);
-			note.setRetainInstance(false);
 			return note;
 		}
 
@@ -168,7 +164,6 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 
 	@Override
 	public void onPageSelected(int index) {
-		OLog.log("Selected page : " + index);
 	}
 
 }
