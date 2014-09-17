@@ -90,6 +90,11 @@ public class Note extends BaseFragment implements OnItemClickListener,
 					R.layout.note_quick_controls, null, false);
 			mListControl.addHeaderView(header, null, true);
 			break;
+		case Trash:
+			View trash_header = getActivity().getLayoutInflater().inflate(
+					R.layout.note_trash_auto_delete_header, null, false);
+			mListControl.addHeaderView(trash_header, null, true);
+			break;
 		}
 		mAdapter = new OCursorListAdapter(mContext, null,
 				R.layout.note_custom_view_note);
@@ -260,56 +265,75 @@ public class Note extends BaseFragment implements OnItemClickListener,
 
 	private void bindRowControls(final View view, final ODataRow row) {
 		final int row_id = row.getInt(OColumn.ROW_ID);
-		/*
-		 * Updating note color
-		 */
-		view.findViewById(R.id.note_bg_color_selector).setOnClickListener(
-				new OnClickListener() {
+		if (mCurrentKey != Keys.Archive && mCurrentKey != Keys.Trash) {
+			/*
+			 * Updating note color
+			 */
+			view.findViewById(R.id.note_bg_color_selector).setOnClickListener(
+					new OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-						int color = row.getInt("color");
-						String selected_color = NoteUtil.getBackgroundColors()[color];
-						NoteUtil.colorDialog(getActivity(), selected_color,
-								new OnColorSelectListener() {
+						@Override
+						public void onClick(View v) {
+							int color = row.getInt("color");
+							String selected_color = NoteUtil
+									.getBackgroundColors()[color];
+							NoteUtil.colorDialog(getActivity(), selected_color,
+									new OnColorSelectListener() {
 
-									@Override
-									public void colorSelected(
-											ODataRow color_data) {
-										int index = color_data.getInt("index");
-										OValues values = new OValues();
-										values.put("color", index);
-										values.put("is_dirty", true);
-										db().resolver().update(row_id, values);
-										restartLoader();
-									}
-								}).show();
-					}
-				});
-		/*
-		 * Moving note to stage
-		 */
-		view.findViewById(R.id.note_move).setOnClickListener(
-				new OnClickListener() {
+										@Override
+										public void colorSelected(
+												ODataRow color_data) {
+											int index = color_data
+													.getInt("index");
+											OValues values = new OValues();
+											values.put("color", index);
+											values.put("is_dirty", true);
+											db().resolver().update(row_id,
+													values);
+											restartLoader();
+										}
+									}).show();
+						}
+					});
+			/*
+			 * Moving note to stage
+			 */
+			view.findViewById(R.id.note_move).setOnClickListener(
+					new OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-						NoteUtil.noteStages(getActivity(),
-								new OnStageSelectListener() {
+						@Override
+						public void onClick(View v) {
+							NoteUtil.noteStages(getActivity(),
+									new OnStageSelectListener() {
 
-									@Override
-									public void stageSelected(ODataRow row) {
-										int stage_id = row
-												.getInt(OColumn.ROW_ID);
-										OValues values = new OValues();
-										values.put("stage_id", stage_id);
-										values.put("is_dirty", true);
-										db().resolver().update(row_id, values);
-										restartLoader();
-									}
-								}).show();
-					}
-				});
+										@Override
+										public void stageSelected(ODataRow row) {
+											int stage_id = row
+													.getInt(OColumn.ROW_ID);
+											OValues values = new OValues();
+											values.put("stage_id", stage_id);
+											values.put("is_dirty", true);
+											db().resolver().update(row_id,
+													values);
+											restartLoader();
+										}
+									}).show();
+						}
+					});
+		} else {
+			view.findViewById(R.id.note_move).setVisibility(View.GONE);
+			view.findViewById(R.id.note_bg_color_selector).setVisibility(
+					View.GONE);
+		}
+		if (mCurrentKey == Keys.Trash) {
+			view.findViewById(R.id.note_archive).setVisibility(View.GONE);
+			OControls.setImage(view, R.id.note_delete,
+					R.drawable.ic_action_restore);
+		}
+		if (mCurrentKey == Keys.Archive) {
+			OControls.setImage(view, R.id.note_archive,
+					R.drawable.ic_action_unarchive);
+		}
 		view.findViewById(R.id.note_archive).setOnClickListener(
 				new OnClickListener() {
 
@@ -383,6 +407,9 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		OValues values = new OValues();
 		values.put("trashed", trashed);
 		values.put("is_dirty", false);
+		if (mCurrentKey == Keys.Trash) {
+			values.put("open", "false");
+		}
 		db().resolver().update(row_id, values);
 		restartLoader();
 	}
