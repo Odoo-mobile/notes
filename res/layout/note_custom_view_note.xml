@@ -30,6 +30,54 @@
             android:textSize="8sp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:background="#33000000"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/note_bg_color_selector"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_action_bg_color" />
+
+        <ImageView
+            android:id="@+id/note_archive"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_action_archive" />
+
+        <ImageView
+            android:id="@+id/note_delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_action_trash" />
+
+        <ImageView
+            android:id="@+id/note_move"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_action_move" />
+    </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"

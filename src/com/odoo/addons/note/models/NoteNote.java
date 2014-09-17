@@ -73,9 +73,6 @@ public class NoteNote extends OModel {
 		OColumn name = new OColumn("Name", OText.class).setRequired(true);
 		OColumn sequence = new OColumn("Sequence", OInteger.class);
 
-		// OColumn stage_color = new OColumn("Color", OInteger.class)
-		// .setLocalColumn();
-
 		public NoteStage(Context context) {
 			super(context, "note.stage");
 			mContext = context;

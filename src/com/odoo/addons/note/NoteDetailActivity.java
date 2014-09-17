@@ -48,6 +48,7 @@ public class NoteDetailActivity extends Activity {
 		OControls.setText(findViewById(R.id.note_detail_view), R.id.note_name,
 				note_cr.getString(note_cr.getColumnIndex("name")));
 		OWebTextView memo = (OWebTextView) findViewById(R.id.note_memo);
+		memo.setTextColor(NoteUtil.getTextColor(color));
 		memo.setHtmlContent(note_cr.getString(note_cr.getColumnIndex("memo")));
 
 	}

@@ -7,16 +7,16 @@
         android:title="Color">
     </item>
     <item
-        android:id="@+id/menu_note_photes"
-        android:icon="@drawable/ic_action_camera"
+        android:id="@+id/menu_note_attachment"
+        android:icon="@drawable/ic_action_file"
         android:showAsAction="always"
-        android:title="Photo">
+        android:title="Attach file">
     </item>
     <item
         android:id="@+id/menu_note_archive"
         android:icon="@drawable/ic_action_archive"
         android:showAsAction="always"
-        android:title="Archive">
+        android:title="Archive Note">
     </item>
     <item
         android:id="@+id/menu_note_operation"

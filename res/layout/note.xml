@@ -29,7 +29,8 @@
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
             android:horizontalSpacing="5dp"
-            android:numColumns="2"
+            android:numColumns="1"
+            android:paddingTop="10dp"
             android:scrollbars="none"
             android:verticalSpacing="5dp" />
     </android.widgets.SwipeRefreshLayout>

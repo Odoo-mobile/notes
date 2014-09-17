@@ -74,6 +74,7 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 		mAdapter = new NoteStagePagerAdapter(mKey, cursor,
 				getChildFragmentManager());
 		mPagger.setAdapter(mAdapter);
+		mPagger.setCurrentItem(1);
 	}
 
 	private void initCR() {
