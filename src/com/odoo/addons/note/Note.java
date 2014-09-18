@@ -78,6 +78,7 @@ public class Note extends BaseFragment implements OnItemClickListener,
 	private PackageManager mPackageManager = null;
 	private Attachments mAttachment;
 	private String mCurSearch = null;
+	private Boolean mSynced = false;
 
 	public enum Keys {
 		Note, Archive, Reminders, Trash
@@ -346,9 +347,10 @@ public class Note extends BaseFragment implements OnItemClickListener,
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		mAdapter.changeCursor(cursor);
-		if (db().isEmptyTable()) {
+		if (db().isEmptyTable() && !mSynced) {
 			setSwipeRefreshing(true);
 			scope.main().requestSync(NoteProvider.AUTHORITY);
+			mSynced = true;
 		}
 		OControls.setGone(mView, R.id.loadingProgress);
 	}

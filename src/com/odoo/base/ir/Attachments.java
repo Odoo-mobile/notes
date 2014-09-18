@@ -42,6 +42,7 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.util.Base64Helper;
+import com.odoo.util.ODate;
 
 public class Attachments implements OnClickListener {
 	public static final String TAG = Attachments.class.getSimpleName();
@@ -403,6 +404,8 @@ public class Attachments implements OnClickListener {
 				.getExtensionFromMimeType(mCR.getType(uri)));
 		values.put("file_type", (type == null) ? uri.getScheme() : type);
 		values.put("type", type);
+		if (mAttachment.getColumn("write_date") != null)
+			values.put("write_date", ODate.getUTCDate(ODate.DEFAULT_FORMAT));
 		return values;
 	}
 
