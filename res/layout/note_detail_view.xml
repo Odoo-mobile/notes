@@ -12,20 +12,27 @@
         android:orientation="vertical"
         android:padding="20dp" >
 
-        <TextView
+        <EditText
             android:id="@+id/note_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
             android:fontFamily="@string/font_fontFamily_condensed"
+            android:hint="Title"
+            android:padding="5dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#312f00" />
 
-        <odoo.controls.OWebTextView
+        <EditText
             android:id="@+id/note_memo"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             android:fontFamily="@string/font_fontFamily_light"
+            android:gravity="top"
+            android:hint="Note description"
+            android:minLines="10"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#312f00" />
     </LinearLayout>

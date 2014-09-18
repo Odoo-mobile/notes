@@ -260,8 +260,14 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
+		Fragment fragment = mFragment.findFragmentById(R.id.fragment_container);
+		if (fragment == null) {
+			fragment = mFragment
+					.findFragmentById(R.id.fragment_detail_container);
+		}
+		if (fragment != null) {
+			fragment.onActivityResult(requestCode, resultCode, data);
+		}
 		switch (requestCode) {
 		case RESULT_SETTINGS:
 			updateSyncSettings();

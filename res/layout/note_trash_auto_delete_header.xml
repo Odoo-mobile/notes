@@ -11,7 +11,7 @@
         android:paddingBottom="10dp"
         android:paddingLeft="3dp"
         android:paddingTop="10dp"
-        android:text="Notes in Trash are deleted after 7 days"
+        android:text="7 days old notes are deleted on next sync"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#414141" />
 

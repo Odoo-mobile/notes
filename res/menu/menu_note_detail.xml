@@ -8,7 +8,7 @@
     </item>
     <item
         android:id="@+id/menu_note_attachment"
-        android:icon="@drawable/ic_action_file"
+        android:icon="@drawable/ic_action_attach"
         android:showAsAction="always"
         android:title="Attach file">
     </item>
@@ -36,10 +36,12 @@
                 android:id="@+id/menu_note_share"
                 android:title="Share">
             </item>
-            <item
+            <!--
+                 <item
                 android:id="@+id/menu_note_followers"
                 android:title="Followers">
             </item>
+            -->
         </menu>
     </item>
 

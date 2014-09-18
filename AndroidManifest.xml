@@ -151,6 +151,15 @@
         <activity
             android:name="com.odoo.addons.note.NoteDetailActivity"
             android:theme="@style/NoteDetailActivity" >
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes" >
+                <action android:name="android.intent.action.SEND" />
+
+                <data android:mimeType="text/plain" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <!-- Contact service -->

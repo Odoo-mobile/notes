@@ -5,23 +5,33 @@ import java.util.List;
 
 import odoo.controls.undobar.UndoBar;
 import odoo.controls.undobar.UndoBar.UndoBarListener;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
@@ -30,23 +40,28 @@ import com.odoo.addons.note.dialogs.NoteStagesDialog.OnStageSelectListener;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.providers.note.NoteProvider;
+import com.odoo.base.ir.Attachments;
+import com.odoo.base.ir.Attachments.Types;
 import com.odoo.note.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.support.fragment.OnSearchViewChangeListener;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.support.listview.OCursorListAdapter.OnViewBindListener;
 import com.odoo.util.OControls;
+import com.odoo.util.ODate;
 import com.odoo.util.StringUtils;
 import com.odoo.util.controls.HeaderGridView;
 import com.odoo.util.drawer.DrawerItem;
 
 public class Note extends BaseFragment implements OnItemClickListener,
 		LoaderCallbacks<Cursor>, OnRefreshListener, SyncStatusObserverListener,
-		OnViewBindListener, UndoBarListener {
+		OnViewBindListener, UndoBarListener, OnClickListener,
+		OnSearchViewChangeListener {
 
 	public static final String KEY_STAGE_ID = "stage_id";
 	public static final String KEY_NOTE_ID = "note_id";
@@ -59,7 +74,10 @@ public class Note extends BaseFragment implements OnItemClickListener,
 	private ODataRow stage;
 	private HeaderGridView mListControl = null;
 	private OCursorListAdapter mAdapter = null;
-	Context mContext = null;
+	private Context mContext = null;
+	private PackageManager mPackageManager = null;
+	private Attachments mAttachment;
+	private String mCurSearch = null;
 
 	public enum Keys {
 		Note, Archive, Reminders, Trash
@@ -73,6 +91,7 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		scope = new AppScope(mContext);
 		checkArguments();
 		mView = inflater.inflate(R.layout.note, container, false);
+		mAttachment = new Attachments(mContext);
 		return mView;
 	}
 
@@ -88,6 +107,7 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		case Reminders:
 			View header = getActivity().getLayoutInflater().inflate(
 					R.layout.note_quick_controls, null, false);
+			initHeaderControls(header);
 			mListControl.addHeaderView(header, null, true);
 			break;
 		case Trash:
@@ -102,6 +122,106 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
 		getLoaderManager().initLoader(0, null, this);
+	}
+
+	/*
+	 * Handling header controls
+	 */
+	private void initHeaderControls(View header) {
+		// Quick note create
+		EditText edtQuickNote = (EditText) header
+				.findViewById(R.id.edtNoteQuickMemo);
+		// edtQuickNote.setImeActionLabel("Create Note", 456789);
+		edtQuickNote.setOnEditorActionListener(new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+						|| (actionId == EditorInfo.IME_ACTION_DONE)) {
+					if (TextUtils.isEmpty(v.getText())) {
+						Toast.makeText(getActivity(), "Empty note discarded",
+								Toast.LENGTH_LONG).show();
+					} else {
+						String note = v.getText().toString();
+						((NoteNote) db()).quickCreateNote(note, mStageId);
+						Toast.makeText(getActivity(), "Note created",
+								Toast.LENGTH_LONG).show();
+						restartLoader();
+						v.setText("");
+					}
+				}
+				return false;
+			}
+		});
+
+		// Speech to note
+		header.findViewById(R.id.imgAttachSpeechToText)
+				.setOnClickListener(this);
+
+		// Attach image
+		header.findViewById(R.id.imgAttachImage).setOnClickListener(this);
+		// Attach file
+		header.findViewById(R.id.imgAttachFile).setOnClickListener(this);
+		// Create note
+		header.findViewById(R.id.imgCreateQuickNote).setOnClickListener(this);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.imgAttachSpeechToText:
+			requestSpeechToText();
+			break;
+		case R.id.imgAttachImage:
+			mAttachment.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
+			break;
+		case R.id.imgAttachFile:
+			mAttachment.newAttachment(Types.FILE);
+			break;
+		case R.id.imgCreateQuickNote:
+			Bundle bundle = new Bundle();
+			bundle.putInt(KEY_STAGE_ID, mStageId);
+			Intent intent = new Intent(getActivity(), NoteDetailActivity.class);
+			intent.putExtras(bundle);
+			startActivity(intent);
+			break;
+		}
+
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			OValues attachment = mAttachment.handleResult(requestCode, data);
+			if (attachment != null) {
+				((NoteNote) db()).addAttachment(attachment, mStageId);
+			}
+			if (requestCode == REQUEST_SPEECH_TO_TEXT) {
+				ArrayList<String> matches = data
+						.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+				((NoteNote) db()).quickCreateNote(matches.get(0), mStageId);
+			}
+			Toast.makeText(mContext, "Note created", Toast.LENGTH_LONG).show();
+			restartLoader();
+		}
+	}
+
+	private void requestSpeechToText() {
+		mPackageManager = mContext.getPackageManager();
+		List<ResolveInfo> activities = mPackageManager.queryIntentActivities(
+				new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+		if (activities.size() == 0) {
+			Toast.makeText(mContext, "No audio recorder present.",
+					Toast.LENGTH_LONG).show();
+		} else {
+			Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+			intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+					RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+			intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "speak now...");
+			getActivity()
+					.startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
+		}
 	}
 
 	@Override
@@ -168,13 +288,18 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		super.onCreateOptionsMenu(menu, inflater);
 		menu.clear();
 		inflater.inflate(R.menu.menu_note, menu);
+		setHasSearchView(this, menu, R.id.menu_note_search);
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int position,
 			long arg3) {
 		Cursor cr = mAdapter.getCursor();
-		cr.moveToPosition(position - mListControl.getNumColumns());
+		int offset = mListControl.getNumColumns();
+		if (mCurrentKey != Keys.Note && mCurrentKey != Keys.Trash) {
+			offset = 0;
+		}
+		cr.moveToPosition(position - offset);
 		Bundle bundle = new Bundle();
 		bundle.putInt(KEY_NOTE_ID, cr.getInt(cr.getColumnIndex(OColumn.ROW_ID)));
 		Intent intent = new Intent(getActivity(), NoteDetailActivity.class);
@@ -193,27 +318,29 @@ public class Note extends BaseFragment implements OnItemClickListener,
 			args.add(mStageId + "");
 			args.add("true");
 			args.add("0");
-			if (stage.getInt("sequence") == 0) {
-				selection += " or stage_id = ?";
-				args.add("0");
-			}
-			arguments = args.toArray(new String[args.size()]);
+			break;
+		case Reminders:
+			selection = " reminder != ?";
+			args.add("0");
 			break;
 		case Archive:
 			selection = "open = ? and trashed = ?";
 			args.add("false");
 			args.add("0");
-			arguments = args.toArray(new String[args.size()]);
 			break;
 		case Trash:
 			selection = " trashed = ?";
 			args.add("1");
-			arguments = args.toArray(new String[args.size()]);
 			break;
 		}
+		if (mCurSearch != null) {
+			selection += " and name like ?";
+			args.add("%" + mCurSearch + "%");
+		}
+		arguments = args.toArray(new String[args.size()]);
 		return new CursorLoader(mContext, db().uri(), new String[] { "name",
 				"short_memo", "color", "open", "trashed" }, selection,
-				arguments, "sequence");
+				arguments, OColumn.ROW_ID + " DESC");
 	}
 
 	@Override
@@ -265,6 +392,9 @@ public class Note extends BaseFragment implements OnItemClickListener,
 
 	private void bindRowControls(final View view, final ODataRow row) {
 		final int row_id = row.getInt(OColumn.ROW_ID);
+		int counter = ((NoteNote) db()).getAttachments(row_id).getCount();
+		String str = (counter > 0) ? counter + " attachment" : "";
+		OControls.setText(view, R.id.note_attachment_counter, str);
 		if (mCurrentKey != Keys.Archive && mCurrentKey != Keys.Trash) {
 			/*
 			 * Updating note color
@@ -407,6 +537,7 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		OValues values = new OValues();
 		values.put("trashed", trashed);
 		values.put("is_dirty", false);
+		values.put("trashed_date", ODate.getUTCDate(ODate.DEFAULT_FORMAT));
 		if (mCurrentKey == Keys.Trash) {
 			values.put("open", "false");
 		}
@@ -435,6 +566,23 @@ public class Note extends BaseFragment implements OnItemClickListener,
 					: "false";
 			toggleArchiveNote(note_id, open);
 		}
+	}
+
+	@Override
+	public boolean onSearchViewTextChange(String newFilter) {
+		if (mCurSearch == null && newFilter == null)
+			return true;
+		if (mCurSearch != null && mCurSearch.equals(newFilter))
+			return true;
+
+		mCurSearch = newFilter;
+		getLoaderManager().restartLoader(0, null, this);
+		return true;
+	}
+
+	@Override
+	public void onSearchViewClose() {
+
 	}
 
 }

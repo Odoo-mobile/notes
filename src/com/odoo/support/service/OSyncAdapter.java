@@ -304,7 +304,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		Cursor c = mContentResolver
 				.query(model.uri(),
 						model.projection(),
-						"is_active = ? or is_active = 0 and is_dirty = ? or is_dirty = 0 and odoo_name = ?",
+						"is_active = ? or is_active = 0 and is_dirty = ? or is_dirty = 1 and odoo_name = ?",
 						new String[] { "false", "true", account.name }, null);
 		assert c != null;
 		Log.i(TAG, "Found " + c.getCount()
@@ -390,7 +390,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 						.newUpdate(model.uri().buildUpon()
 								.appendPath(Integer.toString(local_id)).build());
 				builder.withValue("id", newId);
-				builder.withValue("is_dirty", false);
+				builder.withValue("is_dirty", "false");
 				batch.add(builder.build());
 				mContentResolver.applyBatch(model.authority(), batch);
 				mContentResolver.notifyChange(model.uri(), null, false);

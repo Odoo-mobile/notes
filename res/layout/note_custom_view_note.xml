@@ -28,6 +28,15 @@
             android:fontFamily="@string/font_fontFamily_light"
             android:lines="5"
             android:textSize="8sp" />
+
+        <TextView
+            android:id="@+id/note_attachment_counter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@string/font_fontFamily_condensed"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#aaaaaa" />
     </LinearLayout>
 
     <LinearLayout

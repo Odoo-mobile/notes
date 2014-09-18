@@ -1,9 +1,11 @@
 package com.odoo.addons.note;
 
+import java.util.HashMap;
 import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -38,6 +40,7 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 	private Cursor cursor = null;
 	private String[] projection = new String[] { "name" };
 	private Context mContext;
+	private HashMap<String, Fragment> mFragments = new HashMap<String, Fragment>();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -74,7 +77,6 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 		mAdapter = new NoteStagePagerAdapter(mKey, cursor,
 				getChildFragmentManager());
 		mPagger.setAdapter(mAdapter);
-		mPagger.setCurrentItem(1);
 	}
 
 	private void initCR() {
@@ -108,6 +110,7 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 			bundle.putString(Note.KEY_NOTE_FILTER, note_filter.toString());
 			bundle.putInt("index", index);
 			note.setArguments(bundle);
+			mFragments.put("index_" + index, note);
 			return note;
 		}
 
@@ -167,4 +170,17 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 	public void onPageSelected(int index) {
 	}
 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		int current = mPagger.getCurrentItem();
+		Fragment note = mFragments.get("index_" + current);
+		if (note != null)
+			note.onActivityResult(requestCode, resultCode, data);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		cursor.close();
+	}
 }

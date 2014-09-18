@@ -20,7 +20,7 @@
             android:weightSum="1" >
 
             <EditText
-                android:id="@+id/edtNoteQuickTitle"
+                android:id="@+id/edtNoteQuickMemo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -30,17 +30,6 @@
                 android:inputType="text"
                 android:padding="10dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ImageView
-                android:id="@+id/imgShowQuickNote"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="@drawable/oe_background_selector"
-                android:clickable="true"
-                android:padding="3dp"
-                android:src="@drawable/ic_action_content_new"
-                android:tint="@color/dark_icon"
-                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -71,14 +60,14 @@
                 android:tint="@color/dark_icon" />
 
             <ImageView
-                android:id="@+id/imgAttachAudio"
+                android:id="@+id/imgAttachFile"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="?android:selectableItemBackground"
                 android:clickable="true"
                 android:padding="5dp"
-                android:src="@drawable/ic_action_audio"
+                android:src="@drawable/ic_action_file"
                 android:tint="@color/dark_icon" />
 
             <ImageView
