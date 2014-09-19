@@ -1,6 +1,8 @@
 package com.odoo.addons.note.services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,12 +13,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Bundle;
 
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.base.ir.Attachments;
 import com.odoo.base.ir.IrAttachment;
+import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.support.OUser;
@@ -24,6 +28,7 @@ import com.odoo.support.service.OSyncAdapter;
 import com.odoo.support.service.OSyncFinishListener;
 import com.odoo.support.service.OSyncService;
 import com.odoo.util.JSONUtils;
+import com.odoo.util.ODate;
 
 public class NoteService extends OSyncService implements OSyncFinishListener {
 
@@ -33,10 +38,28 @@ public class NoteService extends OSyncService implements OSyncFinishListener {
 	@Override
 	public OSyncAdapter getSyncAdapter() {
 		service = this;
-		// TODO: Add logic for trashed note to check for 7 days.
-		return new OSyncAdapter(getApplicationContext(), new NoteNote(
-				getApplicationContext()), this, true).syncDataLimit(50)
-				.onSyncFinish(this);
+		NoteNote note = new NoteNote(getApplicationContext());
+		Cursor cr = note.resolver().query("trashed = ? ", new String[] { "1" },
+				null);
+		if (cr.moveToFirst()) {
+			Date cur_date = ODate.convertToDate(
+					ODate.getUTCDate(ODate.DEFAULT_FORMAT),
+					ODate.DEFAULT_FORMAT, false);
+			do {
+				String rec_date = cr.getString(cr
+						.getColumnIndex("trashed_date"));
+				if (!rec_date.equals("false")) {
+					Date r_date = ODate.convertToDate(rec_date,
+							ODate.DEFAULT_FORMAT, false);
+					int days = ODate.getDateDiff(cur_date, r_date);
+					if (days >= 7) {
+						note.delete(cr.getInt(cr.getColumnIndex(OColumn.ROW_ID)));
+					}
+				}
+			} while (cr.moveToNext());
+		}
+		return new OSyncAdapter(getApplicationContext(), note, this, true)
+				.syncDataLimit(50).onSyncFinish(this);
 	}
 
 	@Override
@@ -69,7 +92,10 @@ public class NoteService extends OSyncService implements OSyncFinishListener {
 					row.put("res_id", note.selectServerId(note_id));
 					attachment_id = attachment.pushToServer(row);
 					if (note_attachments.containsKey(note_id)) {
-						note_attachments.get(note_id).add(attachment_id);
+						List<Integer> old_ids = new ArrayList<Integer>();
+						old_ids.addAll(note_attachments.get(note_id));
+						old_ids.add(attachment_id);
+						note_attachments.put(note_id, old_ids);
 					} else {
 						note_attachments.put(note_id,
 								Arrays.asList(new Integer[] { attachment_id }));

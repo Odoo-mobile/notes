@@ -57,7 +57,6 @@ import com.odoo.util.ODate;
 import com.odoo.util.StringUtils;
 import com.odoo.util.controls.HeaderGridView;
 import com.odoo.util.drawer.DrawerItem;
-import com.odoo.util.logger.OLog;
 
 public class Note extends BaseFragment implements OnItemClickListener,
 		LoaderCallbacks<Cursor>, OnRefreshListener, SyncStatusObserverListener,
@@ -197,7 +196,6 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		if (resultCode == Activity.RESULT_OK) {
 			OValues attachment = mAttachment.handleResult(requestCode, data);
 			if (attachment != null) {
-				OLog.log(attachment.toString());
 				((NoteNote) db()).addAttachment(attachment, mStageId);
 			}
 			if (requestCode == REQUEST_SPEECH_TO_TEXT) {
@@ -237,9 +235,9 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
 		menu.add(new DrawerItem(TAG, "Notes", count(context, Keys.Note),
 				R.drawable.ic_action_notes, object(Keys.Note)));
-		menu.add(new DrawerItem(TAG, "Reminders",
-				count(context, Keys.Reminders), R.drawable.ic_action_reminder,
-				object(Keys.Reminders)));
+//		menu.add(new DrawerItem(TAG, "Reminders",
+//				count(context, Keys.Reminders), R.drawable.ic_action_reminder,
+//				object(Keys.Reminders)));
 		menu.add(new DrawerItem(TAG, "Archive", count(context, Keys.Archive),
 				R.drawable.ic_action_archive, object(Keys.Archive)));
 		menu.add(new DrawerItem(TAG, "Trash", count(context, Keys.Trash),

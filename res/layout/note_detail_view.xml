@@ -48,6 +48,21 @@
                 android:minLines="10"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#312f00" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="5dp"
+                android:background="#11000000" />
+
+            <TextView
+                android:id="@+id/last_update_on"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@string/font_fontFamily_light"
+                android:gravity="right"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
     </LinearLayout>
 

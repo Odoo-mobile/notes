@@ -1,5 +1,7 @@
 package com.odoo.addons.note;
 
+import java.util.TimeZone;
+
 import odoo.controls.misc.ONoteAttachmentView;
 import odoo.controls.misc.ONoteAttachmentView.AttachmentViewListener;
 import android.app.Activity;
@@ -22,6 +24,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.addons.note.dialogs.NoteColorDialog.OnColorSelectListener;
@@ -44,6 +47,7 @@ public class NoteDetailActivity extends Activity implements
 	private NoteStage mStage;
 	private Cursor note_cr = null;
 	private EditText /* name, */memo;
+	private TextView last_update_on;
 	private Boolean isDirty = false;
 	private Integer mStageId = 0;
 	private Integer color = 0;
@@ -91,10 +95,17 @@ public class NoteDetailActivity extends Activity implements
 			initControls(color);
 			Cursor cr = mNote.getAttachments(note_cr.getInt(note_cr
 					.getColumnIndex(OColumn.ROW_ID)));
-			if (cr.getCount() > 0)
+			mAttachmentView.removeAllViews();
+			mAttachmentView.setVisibility(View.GONE);
+			if (cr.getCount() > 0) {
+				mAttachmentView.setVisibility(View.VISIBLE);
 				mAttachmentView.createView(cr);
-			else
-				mAttachmentView.setVisibility(View.GONE);
+			}
+			String edited_date = note_cr.getString(note_cr
+					.getColumnIndex("local_write_date"));
+			edited_date = ODate.getDate(this, edited_date, TimeZone
+					.getDefault().getID(), "d MMM, h:m a");
+			last_update_on.setText("Edited " + edited_date);
 			createView();
 		}
 
@@ -129,16 +140,17 @@ public class NoteDetailActivity extends Activity implements
 
 	private void initControls(int color) {
 		int background_color = NoteUtil.getBackgroundColor(color);
+		last_update_on = (TextView) findViewById(R.id.last_update_on);
 		findViewById(R.id.note_detail_view)
 				.setBackgroundColor(background_color);
 		// name = (EditText) findViewById(R.id.note_name);
 		memo = (EditText) findViewById(R.id.note_memo);
 		// name.setTextColor(NoteUtil.getTextColor(color));
 		memo.setTextColor(NoteUtil.getTextColor(color));
+		last_update_on.setTextColor(NoteUtil.getTextColor(color));
 		mAttachmentView = (ONoteAttachmentView) findViewById(R.id.note_attachments);
 		mAttachmentView.setMaximumCols(3);
 		mAttachmentView.setAttachmentViewListener(this);
-		mAttachmentView.removeAllViews();
 	}
 
 	private void createView() {
@@ -307,6 +319,7 @@ public class NoteDetailActivity extends Activity implements
 					note_id = note_cr.getInt(note_cr
 							.getColumnIndex(OColumn.ROW_ID));
 					mNote.addAttachment(vals, mStageId, note_id);
+					updateNote(note_id);
 				}
 				initData(note_id, getIntent().getExtras());
 			}
@@ -356,6 +369,7 @@ public class NoteDetailActivity extends Activity implements
 										IrAttachment attachment = new IrAttachment(
 												mContext);
 										attachment.delete(attachment_id);
+										updateNote(note_id);
 										Toast.makeText(mContext,
 												"Attachment removed",
 												Toast.LENGTH_LONG).show();
@@ -368,5 +382,11 @@ public class NoteDetailActivity extends Activity implements
 					}
 				});
 		return v;
+	}
+
+	private void updateNote(int note_id) {
+		OValues values = new OValues();
+		values.put(OColumn.ROW_ID, note_id);
+		mNote.update(values, note_id);
 	}
 }
