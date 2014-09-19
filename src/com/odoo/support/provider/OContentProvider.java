@@ -295,6 +295,12 @@ public abstract class OContentProvider extends ContentProvider implements
 		query.setProjectionMap(projectionMap);
 		StringBuffer whr = new StringBuffer();
 		String where = null;
+		if (selection == null) {
+			selection = " is_active = 'true'";
+		} else {
+			if (!selection.contains("is_active"))
+				selection += " and is_active = 'true'";
+		}
 		if (selection != null && selectionArgs != null) {
 			if (withAlias) {
 				// Check for and

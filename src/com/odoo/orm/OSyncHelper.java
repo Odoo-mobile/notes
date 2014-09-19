@@ -42,7 +42,6 @@ import com.odoo.orm.ORelationRecordList.ORelationRecords;
 import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
-import com.odoo.util.logger.OLog;
 
 /**
  * The Class OSyncHelper.
@@ -493,7 +492,6 @@ public class OSyncHelper {
 					// Relation columns
 					switch (col.getRelationType()) {
 					case ManyToOne:
-						OLog.log(col.getName() + " model :  "+model.getModelName());
 						ODataRow m2o = row.getM2ORecord(col.getName()).browse();
 						if (m2o != null)
 							values.put(col.getName(), m2o.getInt("id"));

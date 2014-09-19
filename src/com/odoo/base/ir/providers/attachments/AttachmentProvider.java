@@ -18,10 +18,26 @@ public class AttachmentProvider extends OContentProvider {
 	@Override
 	public Uri insert(Uri uri, ContentValues initialValues) {
 		// Updating res_id to its local id
-		int res_id = initialValues.getAsInteger("res_id");
-		NoteNote note = new NoteNote(getContext());
-		initialValues.put("res_id", note.selectRowId(res_id));
+		if (initialValues.containsKey("id")
+				&& initialValues.getAsInteger("id") != 0) {
+			int res_id = initialValues.getAsInteger("res_id");
+			NoteNote note = new NoteNote(getContext());
+			initialValues.put("res_id", note.selectRowId(res_id));
+		}
 		return super.insert(uri, initialValues);
+	}
+
+	@Override
+	public int update(Uri uri, ContentValues values, String where,
+			String[] whereArgs) {
+		// Updating res_id to its local id
+		if (values.containsKey("id") && values.getAsInteger("id") != 0) {
+			int res_id = values.getAsInteger("res_id");
+			NoteNote note = new NoteNote(getContext());
+			values.put("res_id", note.selectRowId(res_id));
+			values.put("is_dirty", "false");
+		}
+		return super.update(uri, values, where, whereArgs);
 	}
 
 	@Override

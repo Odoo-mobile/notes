@@ -57,6 +57,7 @@ import com.odoo.util.ODate;
 import com.odoo.util.StringUtils;
 import com.odoo.util.controls.HeaderGridView;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.util.logger.OLog;
 
 public class Note extends BaseFragment implements OnItemClickListener,
 		LoaderCallbacks<Cursor>, OnRefreshListener, SyncStatusObserverListener,
@@ -196,6 +197,7 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		if (resultCode == Activity.RESULT_OK) {
 			OValues attachment = mAttachment.handleResult(requestCode, data);
 			if (attachment != null) {
+				OLog.log(attachment.toString());
 				((NoteNote) db()).addAttachment(attachment, mStageId);
 			}
 			if (requestCode == REQUEST_SPEECH_TO_TEXT) {
@@ -384,11 +386,16 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		int color_number = row.getInt("color");
 		view.findViewById(R.id.note_bg_color).setBackgroundColor(
 				NoteUtil.getBackgroundColor(color_number));
-		OControls.setTextViewsColor(view, new int[] { R.id.note_name,
-				R.id.note_memo }, NoteUtil.getTextColor(color_number));
-		OControls.setText(view, R.id.note_name, row.getString("name"));
+		/*
+		 * OControls.setTextViewsColor(view, new int[] { R.id.note_name,
+		 * R.id.note_memo }, NoteUtil.getTextColor(color_number));
+		 * OControls.setText(view, R.id.note_name, row.getString("name"));
+		 */
 		OControls.setText(view, R.id.note_memo,
 				StringUtils.htmlToString(row.getString("short_memo")));
+		OControls.setTextViewsColor(view, new int[] {
+				R.id.note_attachment_counter, R.id.note_memo },
+				NoteUtil.getTextColor(color_number));
 		bindRowControls(view, row);
 	}
 

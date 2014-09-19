@@ -80,6 +80,10 @@ public class NoteNote extends OModel {
 	}
 
 	public int addAttachment(OValues values, Integer stage_id) {
+		return addAttachment(values, stage_id, null);
+	}
+
+	public int addAttachment(OValues values, Integer stage_id, Integer noteId) {
 		String file_type = " ";
 		if (values.getString("file_type").contains("audio")) {
 			file_type = "audio ";
@@ -88,12 +92,15 @@ public class NoteNote extends OModel {
 			file_type = "image ";
 		}
 		String name = "attached " + file_type + "file ";
-		int note_id = _quickCreateNote(name,
-				name + "<b>" + values.getString("name") + "</b>", stage_id);
+		Integer note_id = noteId;
+		if (noteId == null)
+			note_id = _quickCreateNote(name,
+					name + "<b>" + values.getString("name") + "</b>", stage_id);
 		IrAttachment attachment = new IrAttachment(mContext);
 		values.put("res_id", note_id);
 		values.put("res_model", getModelName());
 		values.put("company_id", user().getCompany_id());
+		values.put("is_active", "true");
 		attachment.resolver().insert(values);
 		return note_id;
 	}

@@ -86,4 +86,19 @@ public class IrAttachment extends OModel {
 	public OContentProvider getContentProvider() {
 		return new AttachmentProvider();
 	}
+
+	@Override
+	public Boolean canCreateOnServer() {
+		return false;
+	}
+
+	@Override
+	public Boolean canUpdateToServer() {
+		return false;
+	}
+
+	@Override
+	public Boolean checkForLocalLatestUpdate() {
+		return false;
+	}
 }

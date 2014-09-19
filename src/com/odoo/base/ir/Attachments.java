@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.v4.app.NotificationCompat;
@@ -88,8 +89,15 @@ public class Attachments implements OnClickListener {
 				Uri file_uri = Uri.parse(uri);
 				if (fileExists(file_uri)) {
 					_open(file_uri);
-				} else if (attachment.getInt("id") != 0) {
-					_download(attachment);
+				} else if (isKitKat()) {
+					String kitkatDoc = getKitKatDocPath(file_uri);
+					if (kitkatDoc != null) {
+						file_uri = Uri.fromFile(new File(kitkatDoc));
+						_open(file_uri);
+					} else if (attachment.getInt("id") != 0)
+						_download(attachment);
+					else
+						noFileFound();
 				} else {
 					noFileFound();
 				}
@@ -292,6 +300,28 @@ public class Attachments implements OnClickListener {
 
 	private boolean fileExists(Uri uri) {
 		return new File(uri.getPath()).exists();
+	}
+
+	@SuppressLint("NewApi")
+	private String getKitKatDocPath(Uri uri) {
+		String wholeID = DocumentsContract.getDocumentId(uri);
+		String id = wholeID.split(":")[1];
+		String[] column = { MediaStore.Images.Media.DATA };
+		String sel = MediaStore.Images.Media._ID + "=?";
+		Cursor cursor = mContext.getContentResolver().query(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, column, sel,
+				new String[] { id }, null);
+		String filePath = null;
+		int columnIndex = cursor.getColumnIndex(column[0]);
+		if (cursor.moveToFirst()) {
+			filePath = cursor.getString(columnIndex);
+		}
+		cursor.close();
+		return filePath;
+	}
+
+	private boolean isKitKat() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 	}
 
 	@SuppressLint("InlinedApi")

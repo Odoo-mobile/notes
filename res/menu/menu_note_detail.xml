@@ -8,9 +8,9 @@
     </item>
     <item
         android:id="@+id/menu_note_attachment"
-        android:icon="@drawable/ic_action_attach"
+        android:icon="@drawable/ic_action_camera"
         android:showAsAction="always"
-        android:title="Attach file">
+        android:title="Attach Image">
     </item>
     <item
         android:id="@+id/menu_note_archive"
