@@ -162,8 +162,10 @@ public class Note extends BaseFragment implements OnItemClickListener,
 
 		// Attach image
 		header.findViewById(R.id.imgAttachImage).setOnClickListener(this);
-		// Attach file
-		header.findViewById(R.id.imgAttachFile).setOnClickListener(this);
+		/*
+		 * // Attach file
+		 * header.findViewById(R.id.imgAttachFile).setOnClickListener(this);
+		 */
 		// Create note
 		header.findViewById(R.id.imgCreateQuickNote).setOnClickListener(this);
 	}
@@ -177,9 +179,10 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		case R.id.imgAttachImage:
 			mAttachment.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
 			break;
-		case R.id.imgAttachFile:
-			mAttachment.newAttachment(Types.FILE);
-			break;
+		/*
+		 * case R.id.imgAttachFile: mAttachment.newAttachment(Types.FILE);
+		 * break;
+		 */
 		case R.id.imgCreateQuickNote:
 			Bundle bundle = new Bundle();
 			bundle.putInt(KEY_STAGE_ID, mStageId);
@@ -235,9 +238,9 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
 		menu.add(new DrawerItem(TAG, "Notes", count(context, Keys.Note),
 				R.drawable.ic_action_notes, object(Keys.Note)));
-//		menu.add(new DrawerItem(TAG, "Reminders",
-//				count(context, Keys.Reminders), R.drawable.ic_action_reminder,
-//				object(Keys.Reminders)));
+		menu.add(new DrawerItem(TAG, "Reminders",
+				count(context, Keys.Reminders), R.drawable.ic_action_reminder,
+				object(Keys.Reminders)));
 		menu.add(new DrawerItem(TAG, "Archive", count(context, Keys.Archive),
 				R.drawable.ic_action_archive, object(Keys.Archive)));
 		menu.add(new DrawerItem(TAG, "Trash", count(context, Keys.Trash),
@@ -265,7 +268,7 @@ public class Note extends BaseFragment implements OnItemClickListener,
 					"0" });
 			break;
 		case Reminders:
-			count = db.count("reminder != ?", new Object[] { "" });
+			count = db.count("reminder != ?", new Object[] { "0" });
 			break;
 		case Trash:
 			count = db.count("trashed = ?", new Object[] { "1" });
@@ -297,7 +300,8 @@ public class Note extends BaseFragment implements OnItemClickListener,
 			long arg3) {
 		Cursor cr = mAdapter.getCursor();
 		int offset = mListControl.getNumColumns();
-		if (mCurrentKey != Keys.Note && mCurrentKey != Keys.Trash) {
+		if (mCurrentKey != Keys.Note && mCurrentKey != Keys.Trash
+				&& mCurrentKey != Keys.Reminders) {
 			offset = 0;
 		}
 		cr.moveToPosition(position - offset);

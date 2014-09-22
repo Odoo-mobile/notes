@@ -348,6 +348,8 @@ public class OSyncHelper {
 				if (updateToServerRecordList.size() > 0) {
 					updateRecordOnServer(model, updateToServerRecordList);
 				}
+				Log.v(TAG, newORUpdateRecords.length()
+						+ " records new/update in local");
 				newResult.accumulate("records", newORUpdateRecords);
 				model.checkInActiveRecord(false);
 			}

@@ -15,6 +15,7 @@ import android.annotation.TargetApi;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderOperation.Builder;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncResult;
@@ -52,6 +53,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	private ORelationRecordList mRelationRecordList = new ORelationRecordList();
 	private OSyncHelper mSync = null;
 	private OSyncService mSyncService = null;
+	private OnBatchCreateListener mOnBatchCreateListener = null;
 
 	/** The finished models. */
 	private List<String> mFinishedModels = new ArrayList<String>();
@@ -474,9 +476,10 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 	private ContentProviderOperation createBatch(Account account, OModel model,
 			JSONObject original_record, SyncResult syncResult) {
 		ContentProviderOperation.Builder batch = null;
+		boolean update = false;
 		try {
 			int id = original_record.getInt("id");
-			boolean update = model.hasRecord(id);
+			update = model.hasRecord(id);
 			batch = (update) ? ContentProviderOperation.newUpdate(model.uri()
 					.buildUpon()
 					.appendPath(Integer.toString(model.selectRowId(id)))
@@ -636,11 +639,23 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 		batch.withValue("is_dirty", "false");
 		batch.withValue("local_write_date", ODate.getDate());
 		batch.withValue("odoo_name", account.name);
+		if (mOnBatchCreateListener != null) {
+			batch = mOnBatchCreateListener.updateBatch(batch, model, update);
+		}
 		return batch.build();
 	}
 
 	public OSyncAdapter onSyncFinish(OSyncFinishListener syncFinish) {
 		mOSyncFinishListeners.put(mModel.getModelName(), syncFinish);
 		return this;
+	}
+
+	public OSyncAdapter setOnBatchCreateListener(OnBatchCreateListener listener) {
+		mOnBatchCreateListener = listener;
+		return this;
+	}
+
+	public interface OnBatchCreateListener {
+		public Builder updateBatch(Builder batch, OModel model, Boolean update);
 	}
 }

@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -27,6 +29,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -51,8 +54,9 @@ public class Attachments implements OnClickListener {
 	public static final String KEY_TYPE = "type";
 	public static final int REQUEST_CAMERA = 111;
 	public static final int REQUEST_IMAGE = 112;
-	public static final int REQUEST_FILE = 115;
 	public static final int REQUEST_AUDIO = 113;
+	public static final int REQUEST_FILE = 114;
+	private static final int SINGLE_ATTACHMENT_STREAM = 115;
 	private String KEY_FILE_URI = "file_uri";
 	private String KEY_FILE_NAME = "datas_fname";
 	private String KEY_FILE_TYPE = "file_type";
@@ -402,6 +406,10 @@ public class Attachments implements OnClickListener {
 		case REQUEST_CAMERA:
 			attachment = getURIDetails(newImageUri);
 			break;
+		case SINGLE_ATTACHMENT_STREAM:
+			Uri uri = data.getParcelableExtra(Intent.EXTRA_STREAM);
+			attachment = getURIDetails(uri);
+			break;
 		default:
 			return null;
 		}
@@ -464,6 +472,25 @@ public class Attachments implements OnClickListener {
 		default:
 		}
 		dialog.cancel();
+	}
+
+	public List<OValues> handleIntentRequest(Intent intent) {
+		List<OValues> attachments = new ArrayList<OValues>();
+		String action = intent.getAction();
+		// Handling single attachment request
+		if (Intent.ACTION_SEND.equals(action)) {
+			attachments.add(handleResult(SINGLE_ATTACHMENT_STREAM, intent));
+		}
+
+		// Handling multiple attachments request
+		if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+			for (Parcelable attach : intent
+					.getParcelableArrayListExtra(Intent.EXTRA_STREAM)) {
+				Uri uri = (Uri) attach;
+				attachments.add(getURIDetails(uri));
+			}
+		}
+		return attachments;
 	}
 
 }

@@ -1,10 +1,10 @@
 package com.odoo.addons.note;
 
+import java.util.List;
 import java.util.TimeZone;
 
 import odoo.controls.misc.ONoteAttachmentView;
 import odoo.controls.misc.ONoteAttachmentView.AttachmentViewListener;
-import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 import com.odoo.addons.note.dialogs.NoteColorDialog.OnColorSelectListener;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
+import com.odoo.addons.note.reminder.NoteReminder;
 import com.odoo.base.ir.Attachments;
 import com.odoo.base.ir.Attachments.Types;
 import com.odoo.base.ir.IrAttachment;
@@ -40,9 +42,9 @@ import com.odoo.orm.OValues;
 import com.odoo.util.OControls;
 import com.odoo.util.ODate;
 
-public class NoteDetailActivity extends Activity implements
+public class NoteDetailActivity extends FragmentActivity implements
 		AttachmentViewListener {
-
+	public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
 	private NoteNote mNote;
 	private NoteStage mStage;
 	private Cursor note_cr = null;
@@ -58,6 +60,8 @@ public class NoteDetailActivity extends Activity implements
 	private Integer trashed = 0;
 	private ONoteAttachmentView mAttachmentView;
 	private Context mContext;
+	private NoteReminder mReminder;
+	private String reminderDate = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +84,25 @@ public class NoteDetailActivity extends Activity implements
 		Integer note_id = (extra.containsKey(Note.KEY_NOTE_ID)) ? extra
 				.getInt(Note.KEY_NOTE_ID) : null;
 		initData(note_id, extra);
+		if (getIntent().getAction() != null) {
+			List<OValues> attachments = attachment
+					.handleIntentRequest(getIntent());
+			note_id = null;
+			if (attachments.size() > 0) {
+				for (OValues v : attachments) {
+					note_id = mNote.addAttachment(v, mStageId, note_id);
+				}
+				initData(note_id, extra);
+				isDirty = true;
+			}
+		}
+		initReminderControls();
+	}
 
+	private void initReminderControls() {
+		mReminder = new NoteReminder(this, getSupportFragmentManager());
+		mReminder.initControls(findViewById(R.id.reminder_controls),
+				reminderDate);
 	}
 
 	private void initData(Integer note_id, Bundle extra) {
@@ -93,6 +115,11 @@ public class NoteDetailActivity extends Activity implements
 			trashed = note_cr.getInt(note_cr.getColumnIndex("trashed"));
 			color = note_cr.getInt(note_cr.getColumnIndex("color"));
 			initControls(color);
+
+			String reminder = note_cr.getString(note_cr
+					.getColumnIndex("reminder"));
+			if (!reminder.equals("0"))
+				reminderDate = reminder;
 			Cursor cr = mNote.getAttachments(note_cr.getInt(note_cr
 					.getColumnIndex(OColumn.ROW_ID)));
 			mAttachmentView.removeAllViews();
@@ -106,6 +133,7 @@ public class NoteDetailActivity extends Activity implements
 			edited_date = ODate.getDate(this, edited_date, TimeZone
 					.getDefault().getID(), "d MMM, h:m a");
 			last_update_on.setText("Edited " + edited_date);
+
 			createView();
 		}
 
@@ -127,14 +155,13 @@ public class NoteDetailActivity extends Activity implements
 			Cursor cr = mStage.resolver().query(null, null, "sequence");
 			if (cr.moveToFirst()) {
 				mStageId = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+				initControls(color);
 			} else {
 				Toast.makeText(this, "Sorry No stages found !",
 						Toast.LENGTH_LONG).show();
 				finish();
 			}
 		}
-
-		// note_name = name.getText().toString();
 		note_memo = memo.getText().toString();
 	}
 
@@ -200,34 +227,51 @@ public class NoteDetailActivity extends Activity implements
 		values.put("short_memo", mNote.storeShortMemo(values));
 		values.put("color", color);
 		values.put("open", open + "");
+		String reminder = "0";
+		if (mReminder.hasReminder()) {
+			reminder = mReminder.getDateString();
+		}
+		values.put("reminder", reminder);
 
 		if (note_cr == null) {
 			// creating new note
 			values.put("sequence", 0);
-			mNote.resolver().insert(values);
+			int newNote_id = mNote.resolver().insert(values);
+			if (mReminder.hasReminder()) {
+				mReminder.setReminder(newNote_id, mReminder.getCal());
+			}
 		} else {
 			// Updating note
 			toast = "Note updated";
 			int note_id = note_cr
 					.getInt(note_cr.getColumnIndex(OColumn.ROW_ID));
+			if (mReminder.hasReminder()) {
+				if (reminderDate == null) {
+					reminderDate = "";
+				}
+				if (!reminderDate.equals(mReminder.getDateString())) {
+					mReminder.setReminder(note_id, mReminder.getCal());
+				}
+			}
 			mNote.resolver().update(note_id, values);
 		}
 		Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
+		mReminder.setHasReminder(false);
+		reminderDate = null;
 		onBackPressed();
 	}
 
 	private boolean isDirty() {
-		if (/*
-			 * TextUtils.isEmpty(name.getText()) &&
-			 */TextUtils.isEmpty(memo.getText())) {
+		if (TextUtils.isEmpty(memo.getText())) {
 			isDirty = false;
 			Toast.makeText(this, "Empty note discarded", Toast.LENGTH_LONG)
 					.show();
 		} else {
-			if (/*
-				 * note_name.length() != name.getText().toString().length() ||
-				 */note_memo.length() != memo.getText().toString().length()) {
+			if (note_memo.length() != memo.getText().toString().length()) {
 				isDirty = true;
+			}
+			if (!isDirty) {
+				isDirty = (mReminder.hasReminder() || (reminderDate != null));
 			}
 		}
 		return isDirty;

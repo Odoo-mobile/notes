@@ -160,8 +160,30 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes" >
+                <action android:name="android.intent.action.SEND" />
+
+                <data android:mimeType="image/*" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes" >
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <data android:mimeType="image/*" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
+        <receiver android:name="com.odoo.addons.note.reminder.ReminderReceiver" >
+        </receiver>
+        <receiver android:name="com.odoo.addons.note.reminder.ReminderActionReceiver" >
+        </receiver>
         <!-- Contact service -->
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"

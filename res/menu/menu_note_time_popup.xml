@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/time_morning"
+        android:title="09:00 AM">
+    </item>
+    <item
+        android:id="@+id/time_afternoon"
+        android:title="01:00 PM">
+    </item>
+    <item
+        android:id="@+id/time_evening"
+        android:title="05:00 PM">
+    </item>
+    <item
+        android:id="@+id/time_night"
+        android:title="08:00 PM">
+    </item>
+    <item
+        android:id="@+id/time_select_time"
+        android:title="Pick time">
+    </item>
+
+</menu>

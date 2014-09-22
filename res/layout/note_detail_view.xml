@@ -14,7 +14,8 @@
         <odoo.controls.misc.ONoteAttachmentView
             android:id="@+id/note_attachments"
             android:layout_width="match_parent"
-            android:layout_height="200dp" >
+            android:layout_height="200dp"
+            android:visibility="gone" >
         </odoo.controls.misc.ONoteAttachmentView>
 
         <LinearLayout
@@ -52,9 +53,13 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginBottom="15dp"
+                android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
                 android:background="#11000000" />
+
+            <include
+                android:id="@+id/reminder_controls"
+                layout="@layout/note_reminder_controls" />
 
             <TextView
                 android:id="@+id/last_update_on"

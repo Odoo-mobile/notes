@@ -12,6 +12,7 @@ import odoo.ODomain;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.content.ContentProviderOperation.Builder;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -22,15 +23,18 @@ import com.odoo.base.ir.Attachments;
 import com.odoo.base.ir.IrAttachment;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OModel;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.support.OUser;
 import com.odoo.support.service.OSyncAdapter;
+import com.odoo.support.service.OSyncAdapter.OnBatchCreateListener;
 import com.odoo.support.service.OSyncFinishListener;
 import com.odoo.support.service.OSyncService;
 import com.odoo.util.JSONUtils;
 import com.odoo.util.ODate;
 
-public class NoteService extends OSyncService implements OSyncFinishListener {
+public class NoteService extends OSyncService implements OSyncFinishListener,
+		OnBatchCreateListener {
 
 	public static final String TAG = NoteService.class.getSimpleName();
 	private OSyncService service;
@@ -59,7 +63,17 @@ public class NoteService extends OSyncService implements OSyncFinishListener {
 			} while (cr.moveToNext());
 		}
 		return new OSyncAdapter(getApplicationContext(), note, this, true)
-				.syncDataLimit(50).onSyncFinish(this);
+				.setOnBatchCreateListener(this).syncDataLimit(50)
+				.onSyncFinish(this);
+	}
+
+	@Override
+	public Builder updateBatch(Builder batch, OModel model, Boolean update) {
+		if (update && model.getModelName().equals("note.note")) {
+			batch.withValue("trashed", 0);
+			batch.withValue("open", "false");
+		}
+		return batch;
 	}
 
 	@Override
