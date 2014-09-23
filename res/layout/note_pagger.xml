@@ -12,12 +12,13 @@
         android:layout_height="match_parent" >
 
         <android.support.v4.view.PagerTabStrip
-            style="?android:attr/textAppearanceMediumInverse"
+            android:id="@+id/pager_title_strip"
+            style="?android:attr/textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:background="@color/odoo_purple_tran"
-            android:padding="10dp" />
+            android:background="#dedede"
+            android:padding="7dp" />
     </android.support.v4.view.ViewPager>
 
 </LinearLayout>

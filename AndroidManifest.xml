@@ -184,7 +184,8 @@
         </receiver>
         <receiver android:name="com.odoo.addons.note.reminder.ReminderActionReceiver" >
         </receiver>
-        <!-- Contact service -->
+        <!--
+        Contact service 
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"
             android:exported="true"
@@ -200,13 +201,14 @@
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
         </service>
-        <!-- Note Provider -->
+         Note Provider
+        -->
         <provider
             android:name="com.odoo.addons.note.providers.note.NoteProvider"
             android:authorities="com.odoo.addons.note.providers.note"
             android:enabled="true"
             android:exported="false"
-            android:label="Note"
+            android:label="Notes"
             android:syncable="true" />
         <provider
             android:name="com.odoo.addons.note.providers.note.NoteStageProvider"

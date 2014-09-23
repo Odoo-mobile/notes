@@ -71,7 +71,6 @@ public class NoteService extends OSyncService implements OSyncFinishListener,
 	public Builder updateBatch(Builder batch, OModel model, Boolean update) {
 		if (update && model.getModelName().equals("note.note")) {
 			batch.withValue("trashed", 0);
-			batch.withValue("open", "false");
 		}
 		return batch;
 	}

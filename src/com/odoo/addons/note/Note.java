@@ -107,13 +107,17 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		case Note:
 		case Reminders:
 			View header = getActivity().getLayoutInflater().inflate(
-					R.layout.note_quick_controls, null, false);
+					R.layout.note_quick_controls, mListControl, false);
 			initHeaderControls(header);
 			mListControl.addHeaderView(header, null, true);
 			break;
+		case Archive:
+			mListControl.addHeaderView(new TextView(getActivity()), null, true);
+			break;
 		case Trash:
-			View trash_header = getActivity().getLayoutInflater().inflate(
-					R.layout.note_trash_auto_delete_header, null, false);
+			View trash_header = getActivity().getLayoutInflater()
+					.inflate(R.layout.note_trash_auto_delete_header,
+							mListControl, false);
 			mListControl.addHeaderView(trash_header, null, true);
 			break;
 		}
@@ -300,10 +304,6 @@ public class Note extends BaseFragment implements OnItemClickListener,
 			long arg3) {
 		Cursor cr = mAdapter.getCursor();
 		int offset = mListControl.getNumColumns();
-		if (mCurrentKey != Keys.Note && mCurrentKey != Keys.Trash
-				&& mCurrentKey != Keys.Reminders) {
-			offset = 0;
-		}
 		cr.moveToPosition(position - offset);
 		Bundle bundle = new Bundle();
 		bundle.putInt(KEY_NOTE_ID, cr.getInt(cr.getColumnIndex(OColumn.ROW_ID)));
@@ -357,6 +357,46 @@ public class Note extends BaseFragment implements OnItemClickListener,
 			mSynced = true;
 		}
 		OControls.setGone(mView, R.id.loadingProgress);
+		if (cursor.getCount() == 0) {
+			if (mListControl.findViewWithTag("empty_list_view") == null) {
+				View empty = LayoutInflater.from(getActivity()).inflate(
+						R.layout.note_empty_list, mListControl, false);
+				empty.setTag("empty_list_view");
+				switch (mCurrentKey) {
+				case Note:
+					OControls.setText(empty, R.id.empty_note_message,
+							"Notes you add in " + stage.getString("name")
+									+ " appear here");
+					OControls.setImage(empty, R.id.empty_note_icon,
+							R.drawable.empty_note);
+					break;
+				case Archive:
+					OControls.setText(empty, R.id.empty_note_message,
+							"Your archived notes appear here");
+					OControls.setImage(empty, R.id.empty_note_icon,
+							R.drawable.ic_action_archive);
+					break;
+				case Reminders:
+					OControls.setText(empty, R.id.empty_note_message,
+							"Notes with upcoming reminders appear here");
+					OControls.setImage(empty, R.id.empty_note_icon,
+							R.drawable.ic_action_reminder);
+					break;
+				case Trash:
+					OControls.setText(empty, R.id.empty_note_message,
+							"No notes in Trash");
+					OControls.setImage(empty, R.id.empty_note_icon,
+							R.drawable.ic_action_trash);
+					break;
+				}
+				mListControl.addHeaderView(empty, null, false);
+			}
+		} else {
+			if (mListControl.findViewWithTag("empty_list_view") != null) {
+				mListControl.removeHeaderView(mListControl
+						.findViewWithTag("empty_list_view"));
+			}
+		}
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.odoo.addons.note;
 import java.util.HashMap;
 import java.util.List;
 
+import odoo.controls.OControlHelper;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -14,11 +15,13 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
@@ -41,6 +44,7 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 	private String[] projection = new String[] { "name" };
 	private Context mContext;
 	private HashMap<String, Fragment> mFragments = new HashMap<String, Fragment>();
+	private PagerTabStrip mTabStrip;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,11 +76,22 @@ public class NotesPager extends BaseFragment implements OnPageChangeListener {
 		}
 		initCR();
 		mPagger = (ViewPager) view.findViewById(R.id.pager);
+		mTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_title_strip);
+		mTabStrip.setTabIndicatorColor(_c(R.color.odoo_purple));
 		mPagger.setOnPageChangeListener(this);
 		mPagger.setOffscreenPageLimit(2);
 		mAdapter = new NoteStagePagerAdapter(mKey, cursor,
 				getChildFragmentManager());
 		mPagger.setAdapter(mAdapter);
+		
+		for (int i = 0; i < mTabStrip.getChildCount(); ++i) {
+		    View nextChild = mTabStrip.getChildAt(i);
+		    if (nextChild instanceof TextView) {
+		       TextView textViewToConvert = (TextView) nextChild;
+		       textViewToConvert.setAllCaps(true);
+		       textViewToConvert.setTypeface(OControlHelper.lightFont());
+		    }
+		}
 	}
 
 	private void initCR() {
