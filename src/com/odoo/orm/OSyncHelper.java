@@ -818,8 +818,10 @@ public class OSyncHelper {
 	public JSONObject getFields(OModel model) {
 		JSONObject fields = new JSONObject();
 		try {
-			for (OColumn column : model.getColumns(false))
-				fields.accumulate("fields", column.getName());
+			for (OColumn column : model.getColumns(false)) {
+				if (!column.getName().equals("id"))
+					fields.accumulate("fields", column.getName());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
