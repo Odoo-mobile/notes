@@ -232,4 +232,18 @@ public class ODate {
 		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 		return dateFormat.format(utcCal.getTime());
 	}
+
+	public static int getDateDiff(Date dateOne, Date dateTwo) {
+		long timeOne = dateOne.getTime();
+		long timeTwo = dateTwo.getTime();
+		long oneDay = 1000 * 60 * 60 * 24;
+		long delta = (timeTwo - timeOne) / oneDay;
+
+		if (delta > 0) {
+			return (int) delta;
+		} else {
+			delta *= -1;
+			return (int) delta;
+		}
+	}
 }

@@ -1,0 +1,18 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="5dp"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@string/font_fontFamily_light"
+        android:paddingBottom="10dp"
+        android:paddingLeft="3dp"
+        android:paddingTop="10dp"
+        android:text="7 days old notes are deleted on next sync"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#414141" />
+
+</LinearLayout>

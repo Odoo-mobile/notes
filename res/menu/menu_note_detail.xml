@@ -1,0 +1,48 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_note_color"
+        android:icon="@drawable/ic_action_bg_color"
+        android:showAsAction="always"
+        android:title="Color">
+    </item>
+    <item
+        android:id="@+id/menu_note_attachment"
+        android:icon="@drawable/ic_action_camera"
+        android:showAsAction="always"
+        android:title="Attach Image">
+    </item>
+    <item
+        android:id="@+id/menu_note_archive"
+        android:icon="@drawable/ic_action_archive"
+        android:showAsAction="always"
+        android:title="Archive Note">
+    </item>
+    <item
+        android:id="@+id/menu_note_operation"
+        android:icon="@drawable/ic_action_overflow"
+        android:showAsAction="always"
+        android:title="More">
+        <menu>
+            <item
+                android:id="@+id/menu_note_delete"
+                android:title="Delete">
+            </item>
+            <item
+                android:id="@+id/menu_note_make_copy"
+                android:title="Make a copy">
+            </item>
+            <item
+                android:id="@+id/menu_note_share"
+                android:title="Share">
+            </item>
+            <!--
+                 <item
+                android:id="@+id/menu_note_followers"
+                android:title="Followers">
+            </item>
+            -->
+        </menu>
+    </item>
+
+</menu>

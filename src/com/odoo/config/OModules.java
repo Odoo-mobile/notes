@@ -18,6 +18,8 @@
  */
 package com.odoo.config;
 
+import com.odoo.addons.note.NotesPager;
+import com.odoo.support.OModule;
 import com.odoo.support.OModulesHelper;
 
 /**
@@ -25,5 +27,6 @@ import com.odoo.support.OModulesHelper;
  */
 public class OModules extends OModulesHelper {
 
+	OModule note = new OModule(NotesPager.class).setDefault();
 	// OModule partners = new OModule(PartnersCursorLoader.class).setDefault();
 }

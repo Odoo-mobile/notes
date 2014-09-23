@@ -115,8 +115,77 @@
             android:exported="false"
             android:multiprocess="true" />
 
+        <!-- Base Providers (Note: update authority as per your app package) -->
+        <provider
+            android:name="com.odoo.base.ir.providers.model.ModelProvider"
+            android:authorities="com.odoo.note.base.ir.providers.model"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.users.UsersProvider"
+            android:authorities="com.odoo.note.base.res.providers.users"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.ir.providers.attachments.AttachmentProvider"
+            android:authorities="com.odoo.note.base.ir.providers.attachments"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.country.CountryProvider"
+            android:authorities="com.odoo.note.base.res.providers.country"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.company.CompanyProvider"
+            android:authorities="com.odoo.note.base.res.providers.company"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.base.res.providers.partners.PartnersProvider"
+            android:authorities="com.odoo.note.base.res.providers.partners"
+            android:exported="false"
+            android:multiprocess="true" />
         <!-- /Base Providers -->
-        <!-- Contact service -->
+
+        <activity
+            android:name="com.odoo.addons.note.NoteDetailActivity"
+            android:theme="@style/NoteDetailActivity" >
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes" >
+                <action android:name="android.intent.action.SEND" />
+
+                <data android:mimeType="text/plain" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes" >
+                <action android:name="android.intent.action.SEND" />
+
+                <data android:mimeType="image/*" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes" >
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <data android:mimeType="image/*" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name="com.odoo.addons.note.reminder.ReminderReceiver" >
+        </receiver>
+        <receiver android:name="com.odoo.addons.note.reminder.ReminderActionReceiver" >
+        </receiver>
+        <!--
+        Contact service 
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"
             android:exported="true"
@@ -131,6 +200,42 @@
             <meta-data
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
+        </service>
+         Note Provider
+        -->
+        <provider
+            android:name="com.odoo.addons.note.providers.note.NoteProvider"
+            android:authorities="com.odoo.addons.note.providers.note"
+            android:enabled="true"
+            android:exported="false"
+            android:label="Notes"
+            android:syncable="true" />
+        <provider
+            android:name="com.odoo.addons.note.providers.note.NoteStageProvider"
+            android:authorities="com.odoo.addons.note.providers.note.notestage"
+            android:exported="false"
+            android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.addons.note.providers.note.NoteTagProvider"
+            android:authorities="com.odoo.addons.note.providers.note.notetag"
+            android:exported="false"
+            android:multiprocess="true" />
+        <!-- Note Service -->
+        <service
+            android:name="com.odoo.addons.note.services.NoteService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_note_data" />
+        </service>
+        <!-- Notification Service -->
+        <service
+            android:name="com.odoo.addons.note.services.NotificationService"
+            android:exported="true" >
         </service>
     </application>
 

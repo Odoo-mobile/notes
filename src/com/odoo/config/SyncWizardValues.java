@@ -29,6 +29,9 @@ public class SyncWizardValues implements SyncWizardHelper {
 	@Override
 	public List<SyncValue> syncValues() {
 		List<SyncValue> list = new ArrayList<SyncValue>();
+		// list.add(new SyncValue("Partners"));
+		// list.add(new SyncValue("All Partners", PartnersProvider.AUTHORITY,
+		// Type.CHECKBOX));
 		return list;
 	}
 }

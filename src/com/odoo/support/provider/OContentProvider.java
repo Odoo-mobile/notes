@@ -116,6 +116,7 @@ public abstract class OContentProvider extends ContentProvider implements
 	private HashMap<String, List<Integer>> getManyToManyRecords(
 			ContentValues values) {
 		HashMap<String, List<Integer>> ids = new HashMap<String, List<Integer>>();
+		model.prepareColumns();
 		for (OColumn col : model.getRelationColumns()) {
 			if (col.getRelationType() == RelationType.ManyToMany) {
 				if (values.containsKey(col.getName())) {
@@ -294,6 +295,12 @@ public abstract class OContentProvider extends ContentProvider implements
 		query.setProjectionMap(projectionMap);
 		StringBuffer whr = new StringBuffer();
 		String where = null;
+		if (selection == null) {
+			selection = " is_active = 'true'";
+		} else {
+			if (!selection.contains("is_active"))
+				selection += " and is_active = 'true'";
+		}
 		if (selection != null && selectionArgs != null) {
 			if (withAlias) {
 				// Check for and

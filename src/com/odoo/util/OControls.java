@@ -20,6 +20,20 @@ public class OControls {
 			textView.setText(Integer.parseInt(value.toString()));
 	}
 
+	public static void setTextViewsColor(View parent_view, int[] textview_ids,
+			int color) {
+		for (int id : textview_ids) {
+			TextView textView = (TextView) parent_view.findViewById(id);
+			textView.setTextColor(color);
+		}
+	}
+
+	public static void setTextViewColor(View parent_view, int textview_id,
+			int color) {
+		TextView textView = (TextView) parent_view.findViewById(textview_id);
+		textView.setTextColor(color);
+	}
+
 	public static String getText(View parent_view, int textview_id) {
 		TextView textView = (TextView) parent_view.findViewById(textview_id);
 		return textView.getText().toString();
