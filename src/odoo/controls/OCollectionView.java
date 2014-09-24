@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ListView;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public class OCollectionView extends ListView {
 

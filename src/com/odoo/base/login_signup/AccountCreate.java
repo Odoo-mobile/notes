@@ -24,7 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.odoo.App;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.ir.IrModel;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.OdooHelper;
 import com.odoo.support.OExceptionDialog;
 import com.odoo.support.OUser;

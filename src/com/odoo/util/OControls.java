@@ -8,7 +8,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public class OControls {
 

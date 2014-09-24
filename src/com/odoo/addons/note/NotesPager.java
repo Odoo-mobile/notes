@@ -26,7 +26,7 @@ import android.widget.TextView;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.providers.note.NoteProvider;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;

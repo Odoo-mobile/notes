@@ -8,7 +8,7 @@ import android.os.Bundle;
 import com.odoo.addons.note.Note;
 import com.odoo.addons.note.NoteDetailActivity;
 import com.odoo.addons.note.models.NoteNote;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.util.notification.NotificationBuilder;

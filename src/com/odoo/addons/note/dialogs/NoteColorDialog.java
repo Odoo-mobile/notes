@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.odoo.addons.note.NoteUtil;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.ODataRow;
 
 public class NoteColorDialog implements OnItemClickListener {

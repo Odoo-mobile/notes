@@ -48,7 +48,7 @@ import com.odoo.base.account.UserProfile;
 import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.support.OUser;
 import com.odoo.support.fragment.AsyncTaskListener;
 import com.odoo.support.fragment.FragmentListener;

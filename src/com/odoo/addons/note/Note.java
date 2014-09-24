@@ -42,7 +42,7 @@ import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.base.ir.Attachments;
 import com.odoo.base.ir.Attachments.Types;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;

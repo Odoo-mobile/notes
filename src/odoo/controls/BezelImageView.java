@@ -32,7 +32,7 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 /**
  * An {@link android.widget.ImageView} that draws its contents inside a mask and

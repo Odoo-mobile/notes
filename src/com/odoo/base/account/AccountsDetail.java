@@ -39,7 +39,7 @@ import android.view.ViewGroup;
 
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.login_signup.LoginSignup;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.support.AppScope;
 import com.odoo.support.OUser;

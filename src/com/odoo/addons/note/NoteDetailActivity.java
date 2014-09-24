@@ -35,7 +35,7 @@ import com.odoo.addons.note.reminder.NoteReminder;
 import com.odoo.base.ir.Attachments;
 import com.odoo.base.ir.Attachments.Types;
 import com.odoo.base.ir.IrAttachment;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;

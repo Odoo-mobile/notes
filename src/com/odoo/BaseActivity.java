@@ -34,7 +34,7 @@ import android.widget.TextView;
 
 import com.odoo.BaseActivity.SettingKeys;
 import com.odoo.auth.OdooAccountManager;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.support.OUser;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.Base64Helper;
