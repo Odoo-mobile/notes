@@ -46,7 +46,7 @@ import android.widget.ScrollView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.support.listview.OListAdapter;
 import com.odoo.support.listview.OListAdapter.OnSearchChange;

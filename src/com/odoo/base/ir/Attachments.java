@@ -41,7 +41,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.odoo.App;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;

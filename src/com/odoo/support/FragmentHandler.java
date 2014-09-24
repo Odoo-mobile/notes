@@ -23,7 +23,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 import com.odoo.MainActivity;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 /**
  * The Class FragmentHandler.

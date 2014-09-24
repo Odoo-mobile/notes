@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public class UndoBarView extends MaxWidthLinearLayout {
 

@@ -22,7 +22,7 @@ package com.odoo.support;
 import android.app.AlertDialog;
 import android.content.Context;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public class OExceptionDialog extends AlertDialog.Builder {
 

@@ -16,7 +16,7 @@ import android.os.Handler;
 
 import com.odoo.MainActivity;
 import com.odoo.addons.note.models.NoteNote;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.support.OUser;
 import com.odoo.support.service.OSyncAdapter;

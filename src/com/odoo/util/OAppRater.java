@@ -26,7 +26,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public class OAppRater {
 	private static String app_title = "APP-NAME";

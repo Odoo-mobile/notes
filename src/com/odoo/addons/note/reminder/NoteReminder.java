@@ -20,7 +20,7 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 
 import com.odoo.addons.note.models.NoteNote;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.util.ODate;
 

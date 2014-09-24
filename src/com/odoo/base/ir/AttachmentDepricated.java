@@ -47,7 +47,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.orm.OSyncHelper;

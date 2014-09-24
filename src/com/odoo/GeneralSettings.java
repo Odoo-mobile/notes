@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.MenuItem;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public class GeneralSettings extends PreferenceActivity {
 

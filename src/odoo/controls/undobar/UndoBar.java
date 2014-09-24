@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public final class UndoBar {
 

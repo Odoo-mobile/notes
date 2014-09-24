@@ -41,7 +41,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.odoo.auth.OdooAccountManager;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.orm.OdooHelper;
 import com.odoo.support.AppScope;
 import com.odoo.support.OUser;

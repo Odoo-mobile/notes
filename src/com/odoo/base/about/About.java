@@ -24,7 +24,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public class About extends Activity {
 

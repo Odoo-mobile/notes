@@ -44,7 +44,7 @@ import android.widget.TextView;
 
 import com.odoo.MainActivity;
 import com.odoo.config.SyncWizardValues;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.support.AppScope;
 import com.odoo.support.SyncValue;
 import com.odoo.support.fragment.BaseFragment;

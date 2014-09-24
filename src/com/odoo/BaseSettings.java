@@ -33,7 +33,7 @@ import android.view.MenuItem;
 
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.about.About;
-import com.odoo.note.R;
+import com.odoo.notes.R;
 import com.odoo.support.OUser;
 import com.odoo.util.Base64Helper;
 

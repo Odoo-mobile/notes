@@ -14,7 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
-import com.odoo.note.R;
+import com.odoo.notes.R;
 
 public class NotificationBuilder {
 	private Context mContext;
