@@ -85,15 +85,20 @@ public class NoteDetailActivity extends FragmentActivity implements
 				.getInt(Note.KEY_NOTE_ID) : null;
 		initData(note_id, extra);
 		if (getIntent().getAction() != null) {
-			List<OValues> attachments = attachment
-					.handleIntentRequest(getIntent());
-			note_id = null;
-			if (attachments.size() > 0) {
-				for (OValues v : attachments) {
-					note_id = mNote.addAttachment(v, mStageId, note_id);
-				}
+			if (getIntent().getType().equals("text/plain")) {
 				initData(note_id, extra);
 				isDirty = true;
+			} else {
+				List<OValues> attachments = attachment
+						.handleIntentRequest(getIntent());
+				note_id = null;
+				if (attachments.size() > 0) {
+					for (OValues v : attachments) {
+						note_id = mNote.addAttachment(v, mStageId, note_id);
+					}
+					initData(note_id, extra);
+					isDirty = true;
+				}
 			}
 		}
 		initReminderControls();
