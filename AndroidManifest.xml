@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.odoo.notes"
-    android:versionCode="1"
-    android:versionName="1.0alpha" >
+    android:versionCode="4"
+    android:versionName="1.0.2alpha" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -184,25 +184,7 @@
         </receiver>
         <receiver android:name="com.odoo.addons.note.reminder.ReminderActionReceiver" >
         </receiver>
-        <!--
-        Contact service 
-        <service
-            android:name="com.odoo.base.res.services.ContactSyncService"
-            android:exported="true"
-            android:process=":contacts" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
 
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_contacts" />
-            <meta-data
-                android:name="android.provider.CONTACTS_STRUCTURE"
-                android:resource="@xml/contacts" />
-        </service>
-         Note Provider
-        -->
         <provider
             android:name="com.odoo.addons.note.providers.note.NoteProvider"
             android:authorities="com.odoo.addons.note.providers.note"
