@@ -5,7 +5,7 @@ Odoo Notes v1.0
 
 <article>
 <section>
-<a href="https://play.google.com/store/apps/details?id=com.odoo" target="_blank">
+<a href="https://play.google.com/store/apps/details?id=com.odoo.notes" target="_blank">
   <img alt="Android app on Google Play"
        src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
 </a>
