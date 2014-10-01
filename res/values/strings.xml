@@ -11,5 +11,6 @@
     <string name="no_connection">No internet connection</string>
     <string name="undo">UNDO</string>
     <string name="label_odoo_notes">Odoo Notes</string>
+    <string name="label_done">Done</string>
 
 </resources>

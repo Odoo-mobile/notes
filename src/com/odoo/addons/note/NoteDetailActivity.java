@@ -81,8 +81,17 @@ public class NoteDetailActivity extends FragmentActivity implements
 		attachment = new Attachments(this);
 		mStage = new NoteStage(this);
 		Bundle extra = getIntent().getExtras();
-		Integer note_id = (extra.containsKey(Note.KEY_NOTE_ID)) ? extra
-				.getInt(Note.KEY_NOTE_ID) : null;
+		Integer note_id = 0;
+		if (extra.containsKey(Note.KEY_STAGE_ID)) {
+			mStageId = extra.getInt(Note.KEY_STAGE_ID);
+		}
+		if (extra.containsKey(Note.KEY_NOTE_ID)) {
+			note_id = extra.getInt(Note.KEY_NOTE_ID);
+		} else if (extra.containsKey(OColumn.ROW_ID)) {
+			note_id = extra.getInt(OColumn.ROW_ID);
+		} else {
+			note_id = null;
+		}
 		initData(note_id, extra);
 		if (getIntent().getAction() != null) {
 			if (getIntent().getType().equals("text/plain")) {
@@ -138,7 +147,6 @@ public class NoteDetailActivity extends FragmentActivity implements
 			edited_date = ODate.getDate(this, edited_date, TimeZone
 					.getDefault().getID(), "d MMM, h:m a");
 			last_update_on.setText("Edited " + edited_date);
-
 			createView();
 		}
 

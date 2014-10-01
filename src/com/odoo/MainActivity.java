@@ -43,6 +43,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.addons.note.NoteDetailActivity;
+import com.odoo.addons.note.widgets.NotesWidget;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.account.AccountsDetail;
 import com.odoo.base.account.UserProfile;
@@ -50,11 +52,13 @@ import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
 import com.odoo.notes.R;
+import com.odoo.orm.OColumn;
 import com.odoo.support.OUser;
 import com.odoo.support.fragment.AsyncTaskListener;
 import com.odoo.support.fragment.FragmentListener;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.widgets.WidgetHelper;
 
 /**
  * The Class MainActivity.
@@ -576,7 +580,22 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 			/**
 			 * TODO: handle widget fragment requests.
 			 */
+			if (getIntent().getAction().equals(
+					NotesWidget.ACTION_NOTES_WIDGET_CALL)) {
+				String key = getIntent().getExtras().getString(
+						WidgetHelper.EXTRA_WIDGET_ITEM_KEY);
+				if (key.equals("note_detail")) {
+					Intent intent = new Intent(mContext,
+							NoteDetailActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putInt(OColumn.ROW_ID, getIntent().getExtras()
+							.getInt(WidgetHelper.EXTRA_WIDGET_DATA_VALUE));
 
+					intent.putExtras(bundle);
+					startActivity(intent);
+					return true;
+				}
+			}
 		}
 		return false;
 	}
