@@ -24,9 +24,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.odoo.addons.note.Note;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.notes.R;
+import com.odoo.orm.OColumn;
 import com.odoo.support.OUser;
 import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.util.OControls;
@@ -48,10 +50,11 @@ public class NotesWidgetConfigure extends ListActivity implements
 		mContext = this;
 
 		setContentView(R.layout.widget_note_configure_layout);
-		setTitle("Widget Configure");
+		setTitle(getString(R.string.widget_configure));
 		setResult(RESULT_CANCELED);
 		if (OUser.current(this) == null) {
-			Toast.makeText(this, "No account found", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getString(R.string.no_acct_found),
+					Toast.LENGTH_LONG).show();
 			finish();
 		}
 		note_stage = new NoteNote.NoteStage(this);
@@ -100,33 +103,43 @@ public class NotesWidgetConfigure extends ListActivity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_selection_done:
+			SparseBooleanArray checkedItems = mListView
+					.getCheckedItemPositions();
+			Set<String> selected_ids = new HashSet<String>();
+			List<String> selectedIds = new ArrayList<String>();
+			Cursor c = mAdapter.getCursor();
+			for (int i = 0; i < checkedItems.size(); i++) {
+				int position = checkedItems.keyAt(i);
+				c.moveToPosition(position);
+				selectedIds.add(c.getString(c.getColumnIndex(OColumn.ROW_ID)));
+			}
+			selected_ids.addAll(selectedIds);
+			Intent intent = getIntent();
+			Bundle extras = intent.getExtras();
+			int mAppWidgetId = 0;
+			if (extras != null) {
+				mAppWidgetId = extras.getInt(
+						AppWidgetManager.EXTRA_APPWIDGET_ID,
+						AppWidgetManager.INVALID_APPWIDGET_ID);
+			}
+			savePref(this, mAppWidgetId, Note.KEY_NOTE_FILTER, selected_ids);
+			AppWidgetManager appWidgetManager = AppWidgetManager
+					.getInstance(this);
+			NotesWidget.updateNoteWidget(this, appWidgetManager,
+					new int[] { mAppWidgetId });
+			Intent resultValue = new Intent();
+			resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+					mAppWidgetId);
+			setResult(RESULT_OK, resultValue);
+			finish();
+		case R.id.menu_select_all:
+			for (int i = 0; i < mListView.getCount(); i++) {
+				mListView.setItemChecked(i, true);
+			}
 
-		SparseBooleanArray checkedItems = mListView.getCheckedItemPositions();
-		Set<String> selected_ids = new HashSet<String>();
-		List<String> selectedIds = new ArrayList<String>();
-		Cursor c = mAdapter.getCursor();
-		for (int i = 0; i < checkedItems.size(); i++) {
-			int position = checkedItems.keyAt(i);
-			c.moveToPosition(position);
-			selectedIds.add(c.getString(c.getColumnIndex("_id")));
 		}
-		selected_ids.addAll(selectedIds);
-		Intent intent = getIntent();
-		Bundle extras = intent.getExtras();
-		int mAppWidgetId = 0;
-		if (extras != null) {
-			mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
-					AppWidgetManager.INVALID_APPWIDGET_ID);
-		}
-		savePref(this, mAppWidgetId, "note_filter", selected_ids);
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-		NotesWidget.updateNoteWidget(this, appWidgetManager,
-				new int[] { mAppWidgetId });
-		Intent resultValue = new Intent();
-		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-		setResult(RESULT_OK, resultValue);
-		finish();
-
 		return super.onOptionsItemSelected(item);
 	}
 

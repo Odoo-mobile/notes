@@ -43,6 +43,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.addons.note.Note;
 import com.odoo.addons.note.NoteDetailActivity;
 import com.odoo.addons.note.widgets.NotesWidget;
 import com.odoo.auth.OdooAccountManager;
@@ -52,7 +53,6 @@ import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
 import com.odoo.notes.R;
-import com.odoo.orm.OColumn;
 import com.odoo.support.OUser;
 import com.odoo.support.fragment.AsyncTaskListener;
 import com.odoo.support.fragment.FragmentListener;
@@ -66,6 +66,7 @@ import com.odoo.widgets.WidgetHelper;
 public class MainActivity extends BaseActivity implements FragmentListener {
 
 	private static final String TAG = "com.odoo.MainActivity";
+	public static final String DETAIL_FRAGMENT = "detail_fragment";
 	private static final int RESULT_SETTINGS = 1;
 	private Context mContext = null;
 	private boolean mNewFragment = false;
@@ -498,7 +499,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		if (isTwoPane()) {
 			findViewById(R.id.fragment_detail_container).setVisibility(
 					View.GONE);
-			Fragment detail = mFragment.findFragmentByTag("detail_fragment");
+			Fragment detail = mFragment.findFragmentByTag(DETAIL_FRAGMENT);
 			if (detail != null && !mNewFragment && !detail.isInLayout()) {
 				startDetailFragment(recreateFragment(detail));
 			}
@@ -529,7 +530,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		int container_id = (isTwoPane()) ? R.id.fragment_detail_container
 				: R.id.fragment_container;
 		FragmentTransaction tran = mFragment.beginTransaction().replace(
-				container_id, fragment, "detail_fragment");
+				container_id, fragment, DETAIL_FRAGMENT);
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		if (!isTwoPane()) {
 			tran.addToBackStack(null);
@@ -584,16 +585,16 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 					NotesWidget.ACTION_NOTES_WIDGET_CALL)) {
 				String key = getIntent().getExtras().getString(
 						WidgetHelper.EXTRA_WIDGET_ITEM_KEY);
-				if (key.equals("note_detail")) {
+				if (key.equals(NotesWidget.NOTE_DETAIL)) {
 					Intent intent = new Intent(mContext,
 							NoteDetailActivity.class);
 					Bundle bundle = new Bundle();
-					bundle.putInt(OColumn.ROW_ID, getIntent().getExtras()
+					bundle.putInt(Note.KEY_NOTE_ID, getIntent().getExtras()
 							.getInt(WidgetHelper.EXTRA_WIDGET_DATA_VALUE));
 
 					intent.putExtras(bundle);
 					startActivity(intent);
-					return true;
+					return false;
 				}
 			}
 		}

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
+import com.odoo.addons.note.Note;
 import com.odoo.addons.note.NoteUtil;
 import com.odoo.addons.note.models.NoteNote;
 import com.odoo.notes.R;
@@ -26,9 +27,6 @@ public class NotesRemoteViewFactory implements RemoteViewsFactory {
 	private int mAppWidgetId = -1;
 	Cursor mCursor = null;
 	List<Integer> ids = null;
-
-	// private int[] starred_drawables = new int[] {
-	// R.drawable.ic_action_starred };
 	int[] mFilter = null;
 
 	public NotesRemoteViewFactory(Context context, Intent intent) {
@@ -36,8 +34,8 @@ public class NotesRemoteViewFactory implements RemoteViewsFactory {
 		mContext = context;
 		mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
 				AppWidgetManager.INVALID_APPWIDGET_ID);
-		ids = NotesWidgetConfigure
-				.getPref(context, mAppWidgetId, "note_filter");
+		ids = NotesWidgetConfigure.getPref(context, mAppWidgetId,
+				Note.KEY_NOTE_FILTER);
 	}
 
 	@Override
@@ -71,6 +69,9 @@ public class NotesRemoteViewFactory implements RemoteViewsFactory {
 		mView.setInt(R.id.notesListViewItem, "setBackgroundColor", background);
 		mView.setTextViewText(R.id.note_memo,
 				mCursor.getString(mCursor.getColumnIndex("short_memo")));
+		mView.setTextViewText(R.id.stage,
+				mCursor.getString(mCursor.getColumnIndex("stage_id_name")));
+		mView.setTextColor(R.id.stage, font_color);
 		final Intent fillInIntent = new Intent();
 		fillInIntent.setAction(NotesWidget.ACTION_NOTES_WIDGET_CALL);
 		final Bundle bundle = new Bundle();
@@ -98,10 +99,11 @@ public class NotesRemoteViewFactory implements RemoteViewsFactory {
 		NoteNote note = new NoteNote(mContext);
 		String selection = "stage_id in (" + TextUtils.join(", ", ids) + ")";
 		String[] selectionArgs = {};
-		mCursor = mContext.getContentResolver()
-				.query(note.uri(),
-						new String[] { "name", "short_memo", "color", "open",
-								"trashed" }, selection, selectionArgs, null);
+		mCursor = mContext.getContentResolver().query(
+				note.uri(),
+				new String[] { "name", "short_memo", "color", "open",
+						"trashed", "stage_id.name" }, selection, selectionArgs,
+				null);
 	}
 
 	@Override

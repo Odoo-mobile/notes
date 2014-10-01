@@ -12,5 +12,25 @@
     <string name="undo">UNDO</string>
     <string name="label_odoo_notes">Odoo Notes</string>
     <string name="label_done">Done</string>
+    <string name="empty_note">Empty Note Discarded</string>
+    <string name="note_created">Note Created</string>
+    <string name="speack_now">Speak Now</string>
+    <string name="no_stage_found">Sorry No Stage Found</string>
+    <string name="restore">Restore</string>
+    <string name="no_acct_found">No Account Found</string>
+    <string name="widget_configure">Widget Configure</string>
+    <string name="label_select_all">All</string>
+    <string name="note_discarded">Empty Note Discarded</string>
+    <string name="delete_attachment">Delete attachment?</string>
+    <string name="cancel">Cancel</string>
+    <string name="attachment_removed">Attachment Removed</string>
+    <string name="unarchived">Note UnArchived</string>
+    <string name="archived">Note Archived</string>
+    <string name="note_restore">Note Restored</string>
+    <string name="move_to_trash">Note Moved To Trash</string>
+    <string name="upcoming_reminder_note">Notes with upcoming reminders appear here</string>
+    <string name="archived_note_here">Your archived notes appear here</string>
+    <string name="empty_trash">No notes in Trash</string>
+    <string name="no_audio_recoder">No audio recorder present</string>
 
 </resources>

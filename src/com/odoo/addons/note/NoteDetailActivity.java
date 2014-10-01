@@ -82,16 +82,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 		mStage = new NoteStage(this);
 		Bundle extra = getIntent().getExtras();
 		Integer note_id = 0;
-		if (extra.containsKey(Note.KEY_STAGE_ID)) {
-			mStageId = extra.getInt(Note.KEY_STAGE_ID);
-		}
-		if (extra.containsKey(Note.KEY_NOTE_ID)) {
-			note_id = extra.getInt(Note.KEY_NOTE_ID);
-		} else if (extra.containsKey(OColumn.ROW_ID)) {
-			note_id = extra.getInt(OColumn.ROW_ID);
-		} else {
-			note_id = null;
-		}
+		note_id = (extra.containsKey(Note.KEY_NOTE_ID)) ? extra
+				.getInt(Note.KEY_NOTE_ID) : null;
 		initData(note_id, extra);
 		if (getIntent().getAction() != null) {
 			if (getIntent().getType().equals("text/plain")) {
@@ -170,7 +162,7 @@ public class NoteDetailActivity extends FragmentActivity implements
 				mStageId = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
 				initControls(color);
 			} else {
-				Toast.makeText(this, "Sorry No stages found !",
+				Toast.makeText(this, getString(R.string.no_stage_found),
 						Toast.LENGTH_LONG).show();
 				finish();
 			}
@@ -222,7 +214,7 @@ public class NoteDetailActivity extends FragmentActivity implements
 			mMenu.findItem(R.id.menu_note_operation).setVisible(false);
 		}
 		if (trashed == 1) {
-			mMenu.findItem(R.id.menu_note_delete).setTitle("Restore");
+			mMenu.findItem(R.id.menu_note_delete).setTitle(getString(R.string.restore));
 		}
 		return true;
 	}
@@ -277,8 +269,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 	private boolean isDirty() {
 		if (TextUtils.isEmpty(memo.getText())) {
 			isDirty = false;
-			Toast.makeText(this, "Empty note discarded", Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, getString(R.string.note_discarded),
+					Toast.LENGTH_LONG).show();
 		} else {
 			if (note_memo.length() != memo.getText().toString().length()) {
 				isDirty = true;
@@ -416,8 +408,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 					@Override
 					public void onClick(View v) {
 						Builder dialog = new Builder(mContext);
-						dialog.setMessage("Delete attachment?");
-						dialog.setPositiveButton("Delete",
+						dialog.setMessage(getString(R.string.delete_attachment));
+						dialog.setPositiveButton(getString(R.string.delete),
 								new DialogInterface.OnClickListener() {
 
 									@Override
@@ -427,14 +419,16 @@ public class NoteDetailActivity extends FragmentActivity implements
 												mContext);
 										attachment.delete(attachment_id);
 										updateNote(note_id);
-										Toast.makeText(mContext,
-												"Attachment removed",
+										Toast.makeText(
+												mContext,
+												getString(R.string.attachment_removed),
 												Toast.LENGTH_LONG).show();
 										initData(note_id, getIntent()
 												.getExtras());
 									}
 								});
-						dialog.setNegativeButton("Cancel", null);
+						dialog.setNegativeButton(getString(R.string.cancel),
+								null);
 						dialog.show();
 					}
 				});

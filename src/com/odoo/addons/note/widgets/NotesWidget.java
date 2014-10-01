@@ -27,6 +27,7 @@ public class NotesWidget extends AppWidgetProvider {
 	public static final String ACTION_NOTES_WIDGET_CALL = "com.odoo.addons.widgets.ACTION_NOTES_WIDGET_CALL";
 	public static final int REQUEST_CODE = 112;
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
+	public static final String NOTE_DETAIL= "note_detail";
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d(TAG, "NoteWidget->onReceive()");
@@ -36,7 +37,7 @@ public class NotesWidget extends AppWidgetProvider {
 			intentMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			intentMain.putExtras(intent.getExtras());
 			intentMain.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
-					"note_detail");
+					NOTE_DETAIL);
 			context.startActivity(intentMain);
 		}
 		if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
@@ -67,7 +68,7 @@ public class NotesWidget extends AppWidgetProvider {
 		Intent svcIntent = new Intent(context, NotesRemoteViewService.class);
 		svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
 		List<Integer> filter = NotesWidgetConfigure.getPref(context, widgetId,
-				"note_filter");
+				Note.KEY_NOTE_FILTER);
 		svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_OPTIONS,
 				filter.toArray(new Integer[filter.size()]));
 		svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
@@ -81,8 +82,6 @@ public class NotesWidget extends AppWidgetProvider {
 			return;
 		for (int widget : widgetIds) {
 			// Setting title
-			List<Integer> filter = NotesWidgetConfigure.getPref(context,
-					widget, "note_filter");
 			RemoteViews mView = initNotesWidgetListView(context, widget);
 
 			final Intent onItemClick = new Intent(context, NotesWidget.class);
