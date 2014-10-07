@@ -27,7 +27,10 @@ public class NotesWidget extends AppWidgetProvider {
 	public static final String ACTION_NOTES_WIDGET_CALL = "com.odoo.addons.widgets.ACTION_NOTES_WIDGET_CALL";
 	public static final int REQUEST_CODE = 112;
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
-	public static final String NOTE_DETAIL= "note_detail";
+	public static final int REQUEST_ATTACHMENT = 209;
+	public static final String NOTE_DETAIL = "note_detail";
+	public static final String NOTES_MAIN = "note_main";
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d(TAG, "NoteWidget->onReceive()");
@@ -36,8 +39,8 @@ public class NotesWidget extends AppWidgetProvider {
 			intentMain.setAction(ACTION_NOTES_WIDGET_CALL);
 			intentMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			intentMain.putExtras(intent.getExtras());
-			intentMain.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
-					NOTE_DETAIL);
+			intentMain
+					.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY, NOTE_DETAIL);
 			context.startActivity(intentMain);
 		}
 		if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
@@ -64,7 +67,7 @@ public class NotesWidget extends AppWidgetProvider {
 		Log.d(TAG, "NoteWidget->initWidgetListView()");
 		RemoteViews mView = new RemoteViews(context.getPackageName(),
 				R.layout.widget_notes_layout);
-		
+
 		Intent svcIntent = new Intent(context, NotesRemoteViewService.class);
 		svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
 		List<Integer> filter = NotesWidgetConfigure.getPref(context, widgetId,
@@ -101,6 +104,22 @@ public class NotesWidget extends AppWidgetProvider {
 			PendingIntent pIntent = PendingIntent.getActivity(context,
 					REQUEST_CODE, intent, 0);
 			mView.setOnClickPendingIntent(R.id.imgCreateQuickNote, pIntent);
+
+			// Attachment Note
+			Intent attachmentIntent = new Intent(context, MainActivity.class);
+			attachmentIntent.setAction(ACTION_NOTES_WIDGET_CALL);
+			attachmentIntent.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
+					NOTES_MAIN);
+			attachmentIntent.putExtra("requestcode", REQUEST_ATTACHMENT);
+			PendingIntent mPendingIntent = PendingIntent.getActivity(context,
+					REQUEST_ATTACHMENT, attachmentIntent, 0);
+			mView.setOnClickPendingIntent(R.id.imgAttachImage, mPendingIntent);
+			attachmentIntent.removeExtra("requestcode");
+			attachmentIntent.putExtra("requestcode", REQUEST_SPEECH_TO_TEXT);
+			PendingIntent mrPendingIntent = PendingIntent.getActivity(context,
+					REQUEST_SPEECH_TO_TEXT, attachmentIntent, 0);
+			mView.setOnClickPendingIntent(R.id.imgAttachSpeechToText,
+					mrPendingIntent);
 
 			// Updating widget
 			manager.updateAppWidget(widget, mView);

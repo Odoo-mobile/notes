@@ -49,6 +49,8 @@ import com.odoo.addons.note.widgets.NotesWidget;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.account.AccountsDetail;
 import com.odoo.base.account.UserProfile;
+import com.odoo.base.ir.Attachments;
+import com.odoo.base.ir.Attachments.Types;
 import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
@@ -67,6 +69,8 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 	private static final String TAG = "com.odoo.MainActivity";
 	public static final String DETAIL_FRAGMENT = "detail_fragment";
+	public static final String MAIN_FRAGMENT = "main_fragment";
+	public static final String WIDGET_REQUEST = "widgetSpeechToRecord";
 	private static final int RESULT_SETTINGS = 1;
 	private Context mContext = null;
 	private boolean mNewFragment = false;
@@ -185,8 +189,8 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 	private void showUpgradeDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Uninstall required");
-		builder.setMessage("Please uninstall older version of Odoo Messaging");
+		builder.setTitle(getString(R.string.alert_title_unistall));
+		builder.setMessage(getString(R.string.alert_message_unistall));
 		builder.setCancelable(false);
 		builder.setPositiveButton("Uninstall now", new OnClickListener() {
 
@@ -259,7 +263,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 									onPostCreate(null);
 								} else {
 									Toast.makeText(mContext,
-											"Please select account",
+											getString(R.string.select_account),
 											Toast.LENGTH_LONG).show();
 								}
 								init();
@@ -505,16 +509,16 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 			}
 
 		}
-		Fragment oldFragment = mFragment.findFragmentByTag("main_fragment");
+		Fragment oldFragment = mFragment.findFragmentByTag(MAIN_FRAGMENT);
 		FragmentTransaction tran = mFragment.beginTransaction();
 		if (oldFragment != null) {
 			tran.detach(oldFragment);
-			mFragment.popBackStack("main_fragment",
+			mFragment.popBackStack(MAIN_FRAGMENT,
 					FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			mFragment.popBackStack(null,
 					FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		}
-		tran.replace(container_id, fragment, "main_fragment");
+		tran.replace(container_id, fragment, MAIN_FRAGMENT);
 		if (oldFragment != null)
 			tran.attach(fragment);
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -595,6 +599,21 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 					intent.putExtras(bundle);
 					startActivity(intent);
 					return false;
+				} else if (key.contains(NotesWidget.NOTES_MAIN)) {
+					if (getIntent().getExtras().getInt("requestcode") == NotesWidget.REQUEST_ATTACHMENT) {
+						Attachments attachments = new Attachments(this);
+						attachments.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
+					} else {
+						Note note = new Note();
+						Bundle b = new Bundle();
+						b.putInt(WIDGET_REQUEST, Note.REQUEST_SPEECH_TO_TEXT);
+						b.putInt(Note.KEY_STAGE_ID, 3);
+						note.setArguments(b);
+						mFragment.beginTransaction()
+								.replace(R.id.fragment_container, note)
+								.commit();
+
+					}
 				}
 			}
 		}

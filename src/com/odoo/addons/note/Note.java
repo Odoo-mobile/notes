@@ -35,6 +35,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
+import com.odoo.MainActivity;
 import com.odoo.addons.note.dialogs.NoteColorDialog.OnColorSelectListener;
 import com.odoo.addons.note.dialogs.NoteStagesDialog.OnStageSelectListener;
 import com.odoo.addons.note.models.NoteNote;
@@ -216,8 +217,8 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		}
 	}
 
-	private void requestSpeechToText() {
-		mPackageManager = mContext.getPackageManager();
+	public void requestSpeechToText() {
+		mPackageManager = getActivity().getPackageManager();
 		List<ResolveInfo> activities = mPackageManager.queryIntentActivities(
 				new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
 		if (activities.size() == 0) {
@@ -256,7 +257,11 @@ public class Note extends BaseFragment implements OnItemClickListener,
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		mCurrentKey = Keys.valueOf(arg.getString(KEY_NOTE_FILTER));
+		if (arg.containsKey(MainActivity.WIDGET_REQUEST)) {
+			requestSpeechToText();
+		} else {
+			mCurrentKey = Keys.valueOf(arg.getString(KEY_NOTE_FILTER));
+		}
 		mStageId = arg.getInt(KEY_STAGE_ID);
 		stage = new NoteStage(getActivity()).select(mStageId);
 	}

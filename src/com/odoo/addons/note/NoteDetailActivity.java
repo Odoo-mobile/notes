@@ -214,14 +214,15 @@ public class NoteDetailActivity extends FragmentActivity implements
 			mMenu.findItem(R.id.menu_note_operation).setVisible(false);
 		}
 		if (trashed == 1) {
-			mMenu.findItem(R.id.menu_note_delete).setTitle(getString(R.string.restore));
+			mMenu.findItem(R.id.menu_note_delete).setTitle(
+					getString(R.string.restore));
 		}
 		return true;
 	}
 
 	private void saveNote() {
 		isDirty = false;
-		String toast = "Note created";
+		String toast = getString(R.string.note_created);
 		// note_name = name.getText().toString();
 		String html_content = Html.toHtml(memo.getText());
 		note_memo = memo.getText().toString();
@@ -247,7 +248,7 @@ public class NoteDetailActivity extends FragmentActivity implements
 			}
 		} else {
 			// Updating note
-			toast = "Note updated";
+			toast =getString(R.string.note_updated);
 			int note_id = note_cr
 					.getInt(note_cr.getColumnIndex(OColumn.ROW_ID));
 			if (mReminder.hasReminder()) {
@@ -321,8 +322,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 			values.put("is_dirty", false);
 			values.put("trashed_date", ODate.getUTCDate(ODate.DEFAULT_FORMAT));
 			mNote.resolver().update(note_id, values);
-			String toast = (trashed == 1) ? "Note restored"
-					: "Note moved to trash";
+			String toast = (trashed == 1) ? getString(R.string.note_restore)
+					: getString(R.string.move_to_trash);
 			Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
 			finish();
 			break;

@@ -14,6 +14,7 @@
     <string name="label_done">Done</string>
     <string name="empty_note">Empty Note Discarded</string>
     <string name="note_created">Note Created</string>
+    <string name="note_updated">Note Updated</string>
     <string name="speack_now">Speak Now</string>
     <string name="no_stage_found">Sorry No Stage Found</string>
     <string name="restore">Restore</string>
@@ -32,5 +33,8 @@
     <string name="archived_note_here">Your archived notes appear here</string>
     <string name="empty_trash">No notes in Trash</string>
     <string name="no_audio_recoder">No audio recorder present</string>
+    <string name="select_account">Please select account</string>
+    <string name="alert_title_unistall"> Uninstall required</string>
+    <string name="alert_message_unistall"> Please uninstall older version of Odoo Messaging</string>
 
 </resources>
