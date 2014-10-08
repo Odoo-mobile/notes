@@ -43,6 +43,10 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.addons.note.Note;
+import com.odoo.addons.note.NoteDetailActivity;
+import com.odoo.addons.note.models.NoteNote.NoteStage;
+import com.odoo.addons.note.widgets.NotesWidget;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.account.AccountsDetail;
 import com.odoo.base.account.UserProfile;
@@ -55,6 +59,7 @@ import com.odoo.support.fragment.AsyncTaskListener;
 import com.odoo.support.fragment.FragmentListener;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.widgets.WidgetHelper;
 
 /**
  * The Class MainActivity.
@@ -62,6 +67,8 @@ import com.odoo.util.drawer.DrawerItem;
 public class MainActivity extends BaseActivity implements FragmentListener {
 
 	private static final String TAG = "com.odoo.MainActivity";
+	public static final String DETAIL_FRAGMENT = "detail_fragment";
+	public static final String MAIN_FRAGMENT = "main_fragment";
 	private static final int RESULT_SETTINGS = 1;
 	private Context mContext = null;
 	private boolean mNewFragment = false;
@@ -180,8 +187,8 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 	private void showUpgradeDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Uninstall required");
-		builder.setMessage("Please uninstall older version of Odoo Messaging");
+		builder.setTitle(getString(R.string.alert_title_unistall));
+		builder.setMessage(getString(R.string.alert_message_unistall));
 		builder.setCancelable(false);
 		builder.setPositiveButton("Uninstall now", new OnClickListener() {
 
@@ -254,7 +261,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 									onPostCreate(null);
 								} else {
 									Toast.makeText(mContext,
-											"Please select account",
+											getString(R.string.select_account),
 											Toast.LENGTH_LONG).show();
 								}
 								init();
@@ -494,22 +501,22 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		if (isTwoPane()) {
 			findViewById(R.id.fragment_detail_container).setVisibility(
 					View.GONE);
-			Fragment detail = mFragment.findFragmentByTag("detail_fragment");
+			Fragment detail = mFragment.findFragmentByTag(DETAIL_FRAGMENT);
 			if (detail != null && !mNewFragment && !detail.isInLayout()) {
 				startDetailFragment(recreateFragment(detail));
 			}
 
 		}
-		Fragment oldFragment = mFragment.findFragmentByTag("main_fragment");
+		Fragment oldFragment = mFragment.findFragmentByTag(MAIN_FRAGMENT);
 		FragmentTransaction tran = mFragment.beginTransaction();
 		if (oldFragment != null) {
 			tran.detach(oldFragment);
-			mFragment.popBackStack("main_fragment",
+			mFragment.popBackStack(MAIN_FRAGMENT,
 					FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			mFragment.popBackStack(null,
 					FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		}
-		tran.replace(container_id, fragment, "main_fragment");
+		tran.replace(container_id, fragment, MAIN_FRAGMENT);
 		if (oldFragment != null)
 			tran.attach(fragment);
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -525,7 +532,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		int container_id = (isTwoPane()) ? R.id.fragment_detail_container
 				: R.id.fragment_container;
 		FragmentTransaction tran = mFragment.beginTransaction().replace(
-				container_id, fragment, "detail_fragment");
+				container_id, fragment, DETAIL_FRAGMENT);
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		if (!isTwoPane()) {
 			tran.addToBackStack(null);
@@ -576,7 +583,52 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 			/**
 			 * TODO: handle widget fragment requests.
 			 */
+			if (getIntent().getAction().equals(
+					NotesWidget.ACTION_NOTES_WIDGET_CALL)) {
+				String key = getIntent().getExtras().getString(
+						WidgetHelper.EXTRA_WIDGET_ITEM_KEY);
 
+				// Requesting note detail view
+				if (key.equals(NotesWidget.KEY_NOTE_DETAIL)) {
+					Intent intent = new Intent(mContext,
+							NoteDetailActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putInt(Note.KEY_NOTE_ID, getIntent().getExtras()
+							.getInt(WidgetHelper.EXTRA_WIDGET_DATA_VALUE));
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
+
+				// Requesting new note compose
+				if (key.equals(NotesWidget.KEY_NOTE_COMPOSE)) {
+					Intent intent = new Intent(mContext,
+							NoteDetailActivity.class);
+					intent.putExtras(new Bundle());
+					startActivity(intent);
+				}
+
+				// Requesting file attachment
+				if (key.equals(NotesWidget.KEY_NOTE_FILE_ATTACH)) {
+					Intent intent = new Intent(mContext,
+							NoteDetailActivity.class);
+					intent.putExtras(new Bundle());
+					intent.setAction(NoteDetailActivity.ACTION_ATTACH_FILE);
+					startActivity(intent);
+				}
+
+				// Requesting voice to note
+				if (key.contains(NotesWidget.KEY_NOTE_VOICE_TO_TEXT)) {
+					Note note = new Note();
+					Bundle b = new Bundle();
+					b.putString(Note.KEY_NOTE_FILTER, Note.Keys.Note.toString());
+					NoteStage noteStage = new NoteStage(this);
+					b.putInt(Note.KEY_STAGE_ID,
+							noteStage.getDefaultNoteStageId());
+					b.putBoolean(Note.ACTION_SPEECH_TO_NOTE, true);
+					note.setArguments(b);
+					startMainFragment(note, false);
+				}
+			}
 		}
 		return false;
 	}

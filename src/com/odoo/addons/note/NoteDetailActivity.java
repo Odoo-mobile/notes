@@ -45,6 +45,7 @@ import com.odoo.util.ODate;
 public class NoteDetailActivity extends FragmentActivity implements
 		AttachmentViewListener {
 	public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
+	public static final String ACTION_ATTACH_FILE = "action_attach_file";
 	private NoteNote mNote;
 	private NoteStage mStage;
 	private Cursor note_cr = null;
@@ -81,10 +82,12 @@ public class NoteDetailActivity extends FragmentActivity implements
 		attachment = new Attachments(this);
 		mStage = new NoteStage(this);
 		Bundle extra = getIntent().getExtras();
-		Integer note_id = (extra.containsKey(Note.KEY_NOTE_ID)) ? extra
+		Integer note_id = 0;
+		note_id = (extra.containsKey(Note.KEY_NOTE_ID)) ? extra
 				.getInt(Note.KEY_NOTE_ID) : null;
 		initData(note_id, extra);
-		if (getIntent().getAction() != null) {
+		String action = getIntent().getAction();
+		if (action != null && !action.equals(ACTION_ATTACH_FILE)) {
 			if (getIntent().getType().equals("text/plain")) {
 				initData(note_id, extra);
 				isDirty = true;
@@ -102,6 +105,12 @@ public class NoteDetailActivity extends FragmentActivity implements
 			}
 		}
 		initReminderControls();
+
+		if (action != null) {
+			if (action.equals(ACTION_ATTACH_FILE)) {
+				attachment.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
+			}
+		}
 	}
 
 	private void initReminderControls() {
@@ -138,7 +147,6 @@ public class NoteDetailActivity extends FragmentActivity implements
 			edited_date = ODate.getDate(this, edited_date, TimeZone
 					.getDefault().getID(), "d MMM, h:m a");
 			last_update_on.setText("Edited " + edited_date);
-
 			createView();
 		}
 
@@ -157,12 +165,11 @@ public class NoteDetailActivity extends FragmentActivity implements
 			initControls(color);
 		}
 		if (mStageId == 0) {
-			Cursor cr = mStage.resolver().query(null, null, "sequence");
-			if (cr.moveToFirst()) {
-				mStageId = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+			mStageId = mStage.getDefaultNoteStageId();
+			if (mStageId != 0) {
 				initControls(color);
 			} else {
-				Toast.makeText(this, "Sorry No stages found !",
+				Toast.makeText(this, getString(R.string.no_stage_found),
 						Toast.LENGTH_LONG).show();
 				finish();
 			}
@@ -214,14 +221,15 @@ public class NoteDetailActivity extends FragmentActivity implements
 			mMenu.findItem(R.id.menu_note_operation).setVisible(false);
 		}
 		if (trashed == 1) {
-			mMenu.findItem(R.id.menu_note_delete).setTitle("Restore");
+			mMenu.findItem(R.id.menu_note_delete).setTitle(
+					getString(R.string.restore));
 		}
 		return true;
 	}
 
 	private void saveNote() {
 		isDirty = false;
-		String toast = "Note created";
+		String toast = getString(R.string.note_created);
 		// note_name = name.getText().toString();
 		String html_content = Html.toHtml(memo.getText());
 		note_memo = memo.getText().toString();
@@ -247,7 +255,7 @@ public class NoteDetailActivity extends FragmentActivity implements
 			}
 		} else {
 			// Updating note
-			toast = "Note updated";
+			toast = getString(R.string.note_updated);
 			int note_id = note_cr
 					.getInt(note_cr.getColumnIndex(OColumn.ROW_ID));
 			if (mReminder.hasReminder()) {
@@ -269,8 +277,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 	private boolean isDirty() {
 		if (TextUtils.isEmpty(memo.getText())) {
 			isDirty = false;
-			Toast.makeText(this, "Empty note discarded", Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, getString(R.string.note_discarded),
+					Toast.LENGTH_LONG).show();
 		} else {
 			if (note_memo.length() != memo.getText().toString().length()) {
 				isDirty = true;
@@ -321,8 +329,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 			values.put("is_dirty", false);
 			values.put("trashed_date", ODate.getUTCDate(ODate.DEFAULT_FORMAT));
 			mNote.resolver().update(note_id, values);
-			String toast = (trashed == 1) ? "Note restored"
-					: "Note moved to trash";
+			String toast = (trashed == 1) ? getString(R.string.note_restore)
+					: getString(R.string.move_to_trash);
 			Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
 			finish();
 			break;
@@ -408,8 +416,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 					@Override
 					public void onClick(View v) {
 						Builder dialog = new Builder(mContext);
-						dialog.setMessage("Delete attachment?");
-						dialog.setPositiveButton("Delete",
+						dialog.setMessage(getString(R.string.delete_attachment));
+						dialog.setPositiveButton(getString(R.string.delete),
 								new DialogInterface.OnClickListener() {
 
 									@Override
@@ -419,14 +427,16 @@ public class NoteDetailActivity extends FragmentActivity implements
 												mContext);
 										attachment.delete(attachment_id);
 										updateNote(note_id);
-										Toast.makeText(mContext,
-												"Attachment removed",
+										Toast.makeText(
+												mContext,
+												getString(R.string.attachment_removed),
 												Toast.LENGTH_LONG).show();
 										initData(note_id, getIntent()
 												.getExtras());
 									}
 								});
-						dialog.setNegativeButton("Cancel", null);
+						dialog.setNegativeButton(getString(R.string.cancel),
+								null);
 						dialog.show();
 					}
 				});

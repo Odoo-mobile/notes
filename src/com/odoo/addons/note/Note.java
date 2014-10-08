@@ -35,6 +35,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
+import com.odoo.MainActivity;
 import com.odoo.addons.note.dialogs.NoteColorDialog.OnColorSelectListener;
 import com.odoo.addons.note.dialogs.NoteStagesDialog.OnStageSelectListener;
 import com.odoo.addons.note.models.NoteNote;
@@ -66,6 +67,7 @@ public class Note extends BaseFragment implements OnItemClickListener,
 	public static final String KEY_STAGE_ID = "stage_id";
 	public static final String KEY_NOTE_ID = "note_id";
 	public static final String KEY_NOTE_FILTER = "note_filter";
+	public static final String ACTION_SPEECH_TO_NOTE = "action_speech_to_note";
 	public static final String TAG = Note.class.getSimpleName();
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
 	private View mView = null;
@@ -136,7 +138,6 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		// Quick note create
 		EditText edtQuickNote = (EditText) header
 				.findViewById(R.id.edtNoteQuickMemo);
-		// edtQuickNote.setImeActionLabel("Create Note", 456789);
 		edtQuickNote.setOnEditorActionListener(new OnEditorActionListener() {
 
 			@Override
@@ -145,13 +146,14 @@ public class Note extends BaseFragment implements OnItemClickListener,
 				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
 						|| (actionId == EditorInfo.IME_ACTION_DONE)) {
 					if (TextUtils.isEmpty(v.getText())) {
-						Toast.makeText(getActivity(), "Empty note discarded",
+						Toast.makeText(getActivity(), _s(R.string.empty_note),
 								Toast.LENGTH_LONG).show();
 					} else {
 						String note = v.getText().toString();
 						((NoteNote) db()).quickCreateNote(note, mStageId);
-						Toast.makeText(getActivity(), "Note created",
-								Toast.LENGTH_LONG).show();
+						Toast.makeText(getActivity(),
+								_s(R.string.note_created), Toast.LENGTH_LONG)
+								.show();
 						restartLoader();
 						v.setText("");
 					}
@@ -210,23 +212,25 @@ public class Note extends BaseFragment implements OnItemClickListener,
 						.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 				((NoteNote) db()).quickCreateNote(matches.get(0), mStageId);
 			}
-			Toast.makeText(mContext, "Note created", Toast.LENGTH_LONG).show();
+			Toast.makeText(mContext, getString(R.string.note_created),
+					Toast.LENGTH_LONG).show();
 			restartLoader();
 		}
 	}
 
-	private void requestSpeechToText() {
-		mPackageManager = mContext.getPackageManager();
+	public void requestSpeechToText() {
+		mPackageManager = getActivity().getPackageManager();
 		List<ResolveInfo> activities = mPackageManager.queryIntentActivities(
 				new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
 		if (activities.size() == 0) {
-			Toast.makeText(mContext, "No audio recorder present.",
+			Toast.makeText(mContext, getString(R.string.no_audio_recoder),
 					Toast.LENGTH_LONG).show();
 		} else {
 			Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 			intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
 					RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-			intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "speak now...");
+			intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+					_s(R.string.speack_now));
 			getActivity()
 					.startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
 		}
@@ -257,6 +261,9 @@ public class Note extends BaseFragment implements OnItemClickListener,
 		mCurrentKey = Keys.valueOf(arg.getString(KEY_NOTE_FILTER));
 		mStageId = arg.getInt(KEY_STAGE_ID);
 		stage = new NoteStage(getActivity()).select(mStageId);
+		if (arg.containsKey(ACTION_SPEECH_TO_NOTE)) {
+			requestSpeechToText();
+		}
 	}
 
 	private int count(Context context, Keys key) {
@@ -372,19 +379,19 @@ public class Note extends BaseFragment implements OnItemClickListener,
 					break;
 				case Archive:
 					OControls.setText(empty, R.id.empty_note_message,
-							"Your archived notes appear here");
+							getString(R.string.archived_note_here));
 					OControls.setImage(empty, R.id.empty_note_icon,
 							R.drawable.ic_action_archive);
 					break;
 				case Reminders:
 					OControls.setText(empty, R.id.empty_note_message,
-							"Notes with upcoming reminders appear here");
+							getString(R.string.upcoming_reminder_note));
 					OControls.setImage(empty, R.id.empty_note_icon,
 							R.drawable.ic_action_reminder);
 					break;
 				case Trash:
 					OControls.setText(empty, R.id.empty_note_message,
-							"No notes in Trash");
+							R.string.empty_trash);
 					OControls.setImage(empty, R.id.empty_note_icon,
 							R.drawable.ic_action_trash);
 					break;
@@ -543,9 +550,9 @@ public class Note extends BaseFragment implements OnItemClickListener,
 	private void showTrashUndoBar(int note_id, int trashed) {
 		UndoBar undoBar = new UndoBar(getActivity());
 		if (mCurrentKey == Keys.Trash) {
-			undoBar.setMessage("Note restored");
+			undoBar.setMessage(getString(R.string.note_restore));
 		} else {
-			undoBar.setMessage("Note moved to trash");
+			undoBar.setMessage(getString(R.string.move_to_trash));
 		}
 		undoBar.setDuration(7000);
 		undoBar.setListener(this);
@@ -561,9 +568,9 @@ public class Note extends BaseFragment implements OnItemClickListener,
 	private void showArchiveUndoBar(int note_id, String open) {
 		UndoBar undoBar = new UndoBar(getActivity());
 		if (mCurrentKey == Keys.Archive) {
-			undoBar.setMessage("Note unarchived");
+			undoBar.setMessage(getString(R.string.unarchived));
 		} else {
-			undoBar.setMessage("Note archived");
+			undoBar.setMessage(getString(R.string.archived));
 		}
 		undoBar.setDuration(7000);
 		undoBar.setListener(this);

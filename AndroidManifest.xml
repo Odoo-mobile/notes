@@ -214,11 +214,33 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_note_data" />
         </service>
-        <!-- Notification Service -->
+
+        <!-- Notes Widget -->
+        <receiver
+            android:name="com.odoo.addons.note.widgets.NotesWidget"
+            android:label="Odoo Notes" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_notes" />
+        </receiver>
+        <!-- Note widget remote view service -->
         <service
-            android:name="com.odoo.addons.note.services.NotificationService"
-            android:exported="true" >
-        </service>
+            android:name="com.odoo.addons.note.widgets.NotesRemoteViewService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <!-- Note widget configuration -->
+        <activity
+            android:name="com.odoo.addons.note.widgets.NotesWidgetConfigure"
+            android:icon="@drawable/ic_launcher"
+            android:theme="@style/PreferenceTheme" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
