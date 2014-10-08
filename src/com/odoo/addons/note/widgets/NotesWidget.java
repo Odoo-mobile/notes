@@ -25,11 +25,13 @@ public class NotesWidget extends AppWidgetProvider {
 	public static final String TAG = "com.odoo.addons.note.widgets.NotesWidget";
 	public static final String ACTION_NOTES_WIDGET_UPDATE = "com.odoo.addons.widgets.ACTION_NOTES_WIDGET_UPDATE";
 	public static final String ACTION_NOTES_WIDGET_CALL = "com.odoo.addons.widgets.ACTION_NOTES_WIDGET_CALL";
-	public static final int REQUEST_CODE = 112;
+	public static final int REQUEST_COMPOSE_NOTE = 112;
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
 	public static final int REQUEST_ATTACHMENT = 209;
-	public static final String NOTE_DETAIL = "note_detail";
-	public static final String NOTES_MAIN = "note_main";
+	public static final String KEY_NOTE_COMPOSE = "note_compose";
+	public static final String KEY_NOTE_DETAIL = "note_detail";
+	public static final String KEY_NOTE_FILE_ATTACH = "note_file_attach";
+	public static final String KEY_NOTE_VOICE_TO_TEXT = "note_voice_to_text";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -39,8 +41,8 @@ public class NotesWidget extends AppWidgetProvider {
 			intentMain.setAction(ACTION_NOTES_WIDGET_CALL);
 			intentMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			intentMain.putExtras(intent.getExtras());
-			intentMain
-					.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY, NOTE_DETAIL);
+			intentMain.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
+					KEY_NOTE_DETAIL);
 			context.startActivity(intentMain);
 		}
 		if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
@@ -99,25 +101,30 @@ public class NotesWidget extends AppWidgetProvider {
 					onClickPendingIntent);
 
 			// compose Note
-			Intent intent = new Intent(context, NoteDetailActivity.class);
-			intent.putExtra(Note.KEY_STAGE_ID, 3);
+			Intent intent = new Intent(context, MainActivity.class);
+			intent.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
+					KEY_NOTE_COMPOSE);
+			intent.setAction(ACTION_NOTES_WIDGET_CALL);
 			PendingIntent pIntent = PendingIntent.getActivity(context,
-					REQUEST_CODE, intent, 0);
+					REQUEST_COMPOSE_NOTE, intent, 0);
 			mView.setOnClickPendingIntent(R.id.imgCreateQuickNote, pIntent);
 
 			// Attachment Note
 			Intent attachmentIntent = new Intent(context, MainActivity.class);
 			attachmentIntent.setAction(ACTION_NOTES_WIDGET_CALL);
 			attachmentIntent.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
-					NOTES_MAIN);
-			attachmentIntent.putExtra("requestcode", REQUEST_ATTACHMENT);
+					KEY_NOTE_FILE_ATTACH);
 			PendingIntent mPendingIntent = PendingIntent.getActivity(context,
 					REQUEST_ATTACHMENT, attachmentIntent, 0);
 			mView.setOnClickPendingIntent(R.id.imgAttachImage, mPendingIntent);
-			attachmentIntent.removeExtra("requestcode");
-			attachmentIntent.putExtra("requestcode", REQUEST_SPEECH_TO_TEXT);
+
+			// Speech to text
+			Intent speechIntent = new Intent(context, MainActivity.class);
+			speechIntent.setAction(ACTION_NOTES_WIDGET_CALL);
+			speechIntent.putExtra(WidgetHelper.EXTRA_WIDGET_ITEM_KEY,
+					KEY_NOTE_VOICE_TO_TEXT);
 			PendingIntent mrPendingIntent = PendingIntent.getActivity(context,
-					REQUEST_SPEECH_TO_TEXT, attachmentIntent, 0);
+					REQUEST_SPEECH_TO_TEXT, speechIntent, 0);
 			mView.setOnClickPendingIntent(R.id.imgAttachSpeechToText,
 					mrPendingIntent);
 

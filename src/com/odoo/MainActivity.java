@@ -45,12 +45,11 @@ import android.widget.Toast;
 
 import com.odoo.addons.note.Note;
 import com.odoo.addons.note.NoteDetailActivity;
+import com.odoo.addons.note.models.NoteNote.NoteStage;
 import com.odoo.addons.note.widgets.NotesWidget;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.base.account.AccountsDetail;
 import com.odoo.base.account.UserProfile;
-import com.odoo.base.ir.Attachments;
-import com.odoo.base.ir.Attachments.Types;
 import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
@@ -70,7 +69,6 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	private static final String TAG = "com.odoo.MainActivity";
 	public static final String DETAIL_FRAGMENT = "detail_fragment";
 	public static final String MAIN_FRAGMENT = "main_fragment";
-	public static final String WIDGET_REQUEST = "widgetSpeechToRecord";
 	private static final int RESULT_SETTINGS = 1;
 	private Context mContext = null;
 	private boolean mNewFragment = false;
@@ -589,31 +587,46 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 					NotesWidget.ACTION_NOTES_WIDGET_CALL)) {
 				String key = getIntent().getExtras().getString(
 						WidgetHelper.EXTRA_WIDGET_ITEM_KEY);
-				if (key.equals(NotesWidget.NOTE_DETAIL)) {
+
+				// Requesting note detail view
+				if (key.equals(NotesWidget.KEY_NOTE_DETAIL)) {
 					Intent intent = new Intent(mContext,
 							NoteDetailActivity.class);
 					Bundle bundle = new Bundle();
 					bundle.putInt(Note.KEY_NOTE_ID, getIntent().getExtras()
 							.getInt(WidgetHelper.EXTRA_WIDGET_DATA_VALUE));
-
 					intent.putExtras(bundle);
 					startActivity(intent);
-					return false;
-				} else if (key.contains(NotesWidget.NOTES_MAIN)) {
-					if (getIntent().getExtras().getInt("requestcode") == NotesWidget.REQUEST_ATTACHMENT) {
-						Attachments attachments = new Attachments(this);
-						attachments.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
-					} else {
-						Note note = new Note();
-						Bundle b = new Bundle();
-						b.putInt(WIDGET_REQUEST, Note.REQUEST_SPEECH_TO_TEXT);
-						b.putInt(Note.KEY_STAGE_ID, 3);
-						note.setArguments(b);
-						mFragment.beginTransaction()
-								.replace(R.id.fragment_container, note)
-								.commit();
+				}
 
-					}
+				// Requesting new note compose
+				if (key.equals(NotesWidget.KEY_NOTE_COMPOSE)) {
+					Intent intent = new Intent(mContext,
+							NoteDetailActivity.class);
+					intent.putExtras(new Bundle());
+					startActivity(intent);
+				}
+
+				// Requesting file attachment
+				if (key.equals(NotesWidget.KEY_NOTE_FILE_ATTACH)) {
+					Intent intent = new Intent(mContext,
+							NoteDetailActivity.class);
+					intent.putExtras(new Bundle());
+					intent.setAction(NoteDetailActivity.ACTION_ATTACH_FILE);
+					startActivity(intent);
+				}
+
+				// Requesting voice to note
+				if (key.contains(NotesWidget.KEY_NOTE_VOICE_TO_TEXT)) {
+					Note note = new Note();
+					Bundle b = new Bundle();
+					b.putString(Note.KEY_NOTE_FILTER, Note.Keys.Note.toString());
+					NoteStage noteStage = new NoteStage(this);
+					b.putInt(Note.KEY_STAGE_ID,
+							noteStage.getDefaultNoteStageId());
+					b.putBoolean(Note.ACTION_SPEECH_TO_NOTE, true);
+					note.setArguments(b);
+					startMainFragment(note, false);
 				}
 			}
 		}

@@ -3,12 +3,14 @@ package com.odoo.addons.note.models;
 import odoo.ODomain;
 import android.content.Context;
 import android.database.Cursor;
+import android.widget.Toast;
 
 import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.addons.note.providers.note.NoteStageProvider;
 import com.odoo.addons.note.providers.note.NoteTagProvider;
 import com.odoo.base.ir.IrAttachment;
 import com.odoo.base.res.ResPartner;
+import com.odoo.notes.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
@@ -149,6 +151,15 @@ public class NoteNote extends OModel {
 		@Override
 		public OContentProvider getContentProvider() {
 			return new NoteStageProvider();
+		}
+
+		public int getDefaultNoteStageId() {
+			int mStageId = 0;
+			Cursor cr = resolver().query(null, null, "sequence");
+			if (cr.moveToFirst()) {
+				mStageId = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+			}
+			return mStageId;
 		}
 	}
 

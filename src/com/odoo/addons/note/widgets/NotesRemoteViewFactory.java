@@ -97,7 +97,7 @@ public class NotesRemoteViewFactory implements RemoteViewsFactory {
 		if (OUser.current(mContext) == null)
 			return;
 		NoteNote note = new NoteNote(mContext);
-		String selection = "stage_id in (" + TextUtils.join(", ", ids) + ")";
+		String selection = "stage_id in (" + TextUtils.join(", ", ids) + ") and (open = 'true' or open = 1)";
 		String[] selectionArgs = {};
 		mCursor = mContext.getContentResolver().query(
 				note.uri(),

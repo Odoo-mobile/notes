@@ -45,6 +45,7 @@ import com.odoo.util.ODate;
 public class NoteDetailActivity extends FragmentActivity implements
 		AttachmentViewListener {
 	public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
+	public static final String ACTION_ATTACH_FILE = "action_attach_file";
 	private NoteNote mNote;
 	private NoteStage mStage;
 	private Cursor note_cr = null;
@@ -85,7 +86,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 		note_id = (extra.containsKey(Note.KEY_NOTE_ID)) ? extra
 				.getInt(Note.KEY_NOTE_ID) : null;
 		initData(note_id, extra);
-		if (getIntent().getAction() != null) {
+		String action = getIntent().getAction();
+		if (action != null && !action.equals(ACTION_ATTACH_FILE)) {
 			if (getIntent().getType().equals("text/plain")) {
 				initData(note_id, extra);
 				isDirty = true;
@@ -103,6 +105,12 @@ public class NoteDetailActivity extends FragmentActivity implements
 			}
 		}
 		initReminderControls();
+
+		if (action != null) {
+			if (action.equals(ACTION_ATTACH_FILE)) {
+				attachment.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
+			}
+		}
 	}
 
 	private void initReminderControls() {
@@ -157,9 +165,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 			initControls(color);
 		}
 		if (mStageId == 0) {
-			Cursor cr = mStage.resolver().query(null, null, "sequence");
-			if (cr.moveToFirst()) {
-				mStageId = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+			mStageId = mStage.getDefaultNoteStageId();
+			if (mStageId != 0) {
 				initControls(color);
 			} else {
 				Toast.makeText(this, getString(R.string.no_stage_found),
@@ -248,7 +255,7 @@ public class NoteDetailActivity extends FragmentActivity implements
 			}
 		} else {
 			// Updating note
-			toast =getString(R.string.note_updated);
+			toast = getString(R.string.note_updated);
 			int note_id = note_cr
 					.getInt(note_cr.getColumnIndex(OColumn.ROW_ID));
 			if (mReminder.hasReminder()) {

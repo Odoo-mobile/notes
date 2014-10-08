@@ -67,6 +67,7 @@ public class Note extends BaseFragment implements OnItemClickListener,
 	public static final String KEY_STAGE_ID = "stage_id";
 	public static final String KEY_NOTE_ID = "note_id";
 	public static final String KEY_NOTE_FILTER = "note_filter";
+	public static final String ACTION_SPEECH_TO_NOTE = "action_speech_to_note";
 	public static final String TAG = Note.class.getSimpleName();
 	public static final int REQUEST_SPEECH_TO_TEXT = 333;
 	private View mView = null;
@@ -257,13 +258,12 @@ public class Note extends BaseFragment implements OnItemClickListener,
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		if (arg.containsKey(MainActivity.WIDGET_REQUEST)) {
-			requestSpeechToText();
-		} else {
-			mCurrentKey = Keys.valueOf(arg.getString(KEY_NOTE_FILTER));
-		}
+		mCurrentKey = Keys.valueOf(arg.getString(KEY_NOTE_FILTER));
 		mStageId = arg.getInt(KEY_STAGE_ID);
 		stage = new NoteStage(getActivity()).select(mStageId);
+		if (arg.containsKey(ACTION_SPEECH_TO_NOTE)) {
+			requestSpeechToText();
+		}
 	}
 
 	private int count(Context context, Keys key) {
