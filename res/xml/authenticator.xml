@@ -2,6 +2,6 @@
     android:accountType="com.odoo.auth"
     android:icon="@drawable/ic_launcher"
     android:label="@string/label_odoo"
-    android:smallIcon="@drawable/ic_launcher" >
+    android:smallIcon="@drawable/ic_launcher_odoo" >
 
 </account-authenticator>

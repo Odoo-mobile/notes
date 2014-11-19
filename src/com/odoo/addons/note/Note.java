@@ -18,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -33,9 +34,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
-import com.odoo.MainActivity;
 import com.odoo.addons.note.dialogs.NoteColorDialog.OnColorSelectListener;
 import com.odoo.addons.note.dialogs.NoteStagesDialog.OnStageSelectListener;
 import com.odoo.addons.note.models.NoteNote;
