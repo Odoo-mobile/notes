@@ -14,10 +14,12 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,7 +44,7 @@ import com.odoo.orm.OValues;
 import com.odoo.util.OControls;
 import com.odoo.util.ODate;
 
-public class NoteDetailActivity extends FragmentActivity implements
+public class NoteDetailActivity extends ActionBarActivity implements
 		AttachmentViewListener {
 	public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
 	public static final String ACTION_ATTACH_FILE = "action_attach_file";
@@ -70,11 +72,15 @@ public class NoteDetailActivity extends FragmentActivity implements
 		mContext = this;
 		setContentView(R.layout.note_detail_view);
 		setTitle("");
-		getActionBar().setHomeButtonEnabled(true);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setBackgroundDrawable(
+		getActionbar().setHomeButtonEnabled(true);
+		getActionbar().setDisplayHomeAsUpEnabled(true);
+		getActionbar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#22000000")));
 		init();
+	}
+
+	private ActionBar getActionbar() {
+		return getSupportActionBar();
 	}
 
 	private void init() {
@@ -88,7 +94,8 @@ public class NoteDetailActivity extends FragmentActivity implements
 		initData(note_id, extra);
 		String action = getIntent().getAction();
 		if (action != null && !action.equals(ACTION_ATTACH_FILE)) {
-			if (getIntent().getType().equals("text/plain")) {
+			if (getIntent().getType() != null
+					&& getIntent().getType().equals("text/plain")) {
 				initData(note_id, extra);
 				isDirty = true;
 			} else {

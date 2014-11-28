@@ -36,5 +36,7 @@
     <string name="select_account">Please select account</string>
     <string name="alert_title_unistall"> Uninstall required</string>
     <string name="alert_message_unistall"> Please uninstall older version of Odoo Messaging</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_user_profile">UserProfileActivity</string>
 
 </resources>
