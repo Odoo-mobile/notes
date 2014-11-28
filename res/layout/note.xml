@@ -4,7 +4,10 @@
     android:layout_height="fill_parent"
     android:background="#dedede"
     android:clipToPadding="false"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:paddingBottom="8dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp" >
 
     <include
         android:id="@+id/loadingProgress"
@@ -22,14 +25,13 @@
             android:id="@+id/listRecords"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
             android:horizontalSpacing="5dp"
             android:numColumns="1"
-            android:paddingTop="10dp"
+            android:paddingTop="8dp"
             android:scrollbars="none"
-            android:verticalSpacing="5dp" />
+            android:verticalSpacing="8dp" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>
