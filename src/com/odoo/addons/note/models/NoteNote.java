@@ -1,5 +1,7 @@
 package com.odoo.addons.note.models;
 
+import org.json.JSONArray;
+
 import odoo.ODomain;
 import android.content.Context;
 import android.database.Cursor;
@@ -60,7 +62,10 @@ public class NoteNote extends OModel {
 	@Override
 	public ODomain defaultDomain() {
 		ODomain domain = new ODomain();
-		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		int partner_id = OUser.current(mContext).getPartner_id();
+		if (getOdooVersion().getVersion_number() > 7)
+			domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		domain.add("message_follower_ids","in", new JSONArray().put(partner_id));
 		return domain;
 	}
 

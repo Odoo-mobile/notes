@@ -19,6 +19,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -93,7 +94,8 @@ public class NoteDetailActivity extends ActionBarActivity implements
 		initData(note_id, extra);
 		String action = getIntent().getAction();
 		if (action != null && !action.equals(ACTION_ATTACH_FILE)) {
-			if (getIntent().getType().equals("text/plain")) {
+			if (getIntent().getType() != null
+					&& getIntent().getType().equals("text/plain")) {
 				initData(note_id, extra);
 				isDirty = true;
 			} else {
