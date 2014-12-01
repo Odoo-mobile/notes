@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import odoo.controls.OControlHelper;
-import android.app.ListActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -16,6 +15,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +33,7 @@ import com.odoo.support.OUser;
 import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.util.OControls;
 
-public class NotesWidgetConfigure extends ListActivity implements
+public class NotesWidgetConfigure extends ActionBarActivity implements
 		LoaderCallbacks<Cursor> {
 
 	private static final String PREFS_NAME = "com.odoo.widgetsWidgetProvider";
@@ -58,7 +58,7 @@ public class NotesWidgetConfigure extends ListActivity implements
 			finish();
 		}
 		note_stage = new NoteNote.NoteStage(this);
-		mListView = getListView();
+		mListView = (ListView) findViewById(android.R.id.list);
 		mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		mAdapter = new OCursorListAdapter(this, null,
 				android.R.layout.simple_list_item_multiple_choice) {
