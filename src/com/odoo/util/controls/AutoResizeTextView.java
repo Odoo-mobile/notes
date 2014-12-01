@@ -9,7 +9,6 @@ import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.SparseIntArray;
 import android.util.TypedValue;
 import android.widget.TextView;
@@ -250,7 +249,6 @@ public class AutoResizeTextView extends TextView {
 		}
 		size = binarySearch(start, end, sizeTester, availableSpace);
 		mTextCachedSizes.put(key, size);
-		DisplayMetrics metrics = getResources().getDisplayMetrics();
 		return size;
 	}
 

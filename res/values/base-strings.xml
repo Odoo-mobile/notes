@@ -91,7 +91,8 @@
     <string name="title_configuration">Configuration</string>
     <string name="title_refresh_details">Refresh Details</string>
     <string name="title_add_account">Add Account</string>
-
+    <string name="title_working">Working&#8230;</string>
+    <string name="title_please_wait">Please wait&#8230;</string>
     <!-- Labels -->
     <string name="label_new">New</string>
     <string name="label_ok">OK</string>
@@ -107,6 +108,7 @@
     <string name="label_process_anyway">Process Anyway</string>
     <string name="label_read_more">Read More</string>
     <string name="label_read_less">Read Less</string>
+    <string name="label_no_records_found">No Records Found</string>
 
     <!-- Toasts -->
     <string name="toast_setting_saved">Setting saved.</string>
@@ -121,6 +123,7 @@
     <string name="toast_unable_to_reach_odoo_server">Unable to reach Odoo Server.</string>
     <string name="toast_no_database_found">No database found !</string>
     <string name="toast_user_already_exists">User already exists</string>
+    <string name="toast_network_required">Network required</string>
 
     <bool name="fit_to_window_height">false</bool>
 

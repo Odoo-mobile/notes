@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-    <issue id="ValidFragment">
+
+    <issue id="ValidFragment" >
+
         <ignore path="src/odoo/controls/OViewPager.java" />
     </issue>
+
 </lint>

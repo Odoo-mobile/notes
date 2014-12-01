@@ -1,16 +1,16 @@
 package com.odoo.addons.note.models;
 
+import org.json.JSONArray;
+
 import odoo.ODomain;
 import android.content.Context;
 import android.database.Cursor;
-import android.widget.Toast;
 
 import com.odoo.addons.note.providers.note.NoteProvider;
 import com.odoo.addons.note.providers.note.NoteStageProvider;
 import com.odoo.addons.note.providers.note.NoteTagProvider;
 import com.odoo.base.ir.IrAttachment;
 import com.odoo.base.res.ResPartner;
-import com.odoo.notes.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
@@ -62,7 +62,10 @@ public class NoteNote extends OModel {
 	@Override
 	public ODomain defaultDomain() {
 		ODomain domain = new ODomain();
-		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		int partner_id = OUser.current(mContext).getPartner_id();
+		if (getOdooVersion().getVersion_number() > 7)
+			domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		domain.add("message_follower_ids","in", new JSONArray().put(partner_id));
 		return domain;
 	}
 

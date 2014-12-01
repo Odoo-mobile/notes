@@ -207,6 +207,16 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		createFieldList();
 	}
 
+	/**
+	 * Sets model name runtime. Used when you need different model name with
+	 * different Odoo Versions
+	 * 
+	 * @param name
+	 */
+	public void setModelName(String name) {
+		_name = name;
+	}
+
 	public OModel newInstance(OModel model) {
 		try {
 			return model.getClass().newInstance();
@@ -432,6 +442,15 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 							column.setLocalColumn();
 						}
 					}
+					// Check for onChange Column
+					Method onChangeMethod = checkForOnChangeMethod(field);
+					if (onChangeMethod != null) {
+						column.setOnChangeMethod(onChangeMethod);
+						column.setOnChangeBGProcess(checkForOnChangeBGProcess(field));
+					}
+
+					// Check for domain Filter on Column
+					column.setHasDomainFilterColumn(isDomainFilterColumn(field));
 				} else
 					return null;
 			}
@@ -483,6 +502,38 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					return getClass().getMethod(method_name, OValues.class);
 				else
 					return getClass().getMethod(method_name, ODataRow.class);
+			} catch (NoSuchMethodException e) {
+				Log.e(TAG, "No Such Method: " + e.getMessage());
+			}
+		}
+		return null;
+	}
+
+	private boolean isDomainFilterColumn(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.hasDomainFilter.class);
+		if (annotation != null) {
+			Odoo.hasDomainFilter domainFilter = (Odoo.hasDomainFilter) annotation;
+			return domainFilter.checkDomainRuntime();
+		}
+		return false;
+	}
+
+	private Boolean checkForOnChangeBGProcess(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.onChange.class);
+		if (annotation != null) {
+			Odoo.onChange onChange = (Odoo.onChange) annotation;
+			return onChange.bg_process();
+		}
+		return false;
+	}
+
+	private Method checkForOnChangeMethod(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.onChange.class);
+		if (annotation != null) {
+			Odoo.onChange onChange = (Odoo.onChange) annotation;
+			String method_name = onChange.method();
+			try {
+				return getClass().getMethod(method_name, ODataRow.class);
 			} catch (NoSuchMethodException e) {
 				Log.e(TAG, "No Such Method: " + e.getMessage());
 			}
@@ -573,8 +624,11 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 							break;
 						}
 					}
-					if (annotation.annotationType().isAssignableFrom(
-							Odoo.Functional.class)) {
+					Class<? extends Annotation> type = annotation
+							.annotationType();
+					if (type.isAssignableFrom(Odoo.Functional.class)
+							|| type.isAssignableFrom(Odoo.onChange.class)
+							|| type.isAssignableFrom(Odoo.hasDomainFilter.class)) {
 						versions++;
 					}
 				}
@@ -605,6 +659,19 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			}
 		}
 		return false;
+	}
+
+	public ODataRow getOnChangeValue(OColumn column, ODataRow row) {
+		if (column.hasOnChange()) {
+			Method method = column.getOnChangeMethod();
+			OModel model = this;
+			try {
+				return (ODataRow) method.invoke(model, new Object[] { row });
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -641,6 +708,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			}
 		}
 		return projection.toArray(new String[projection.size()]);
+	}
+
+	public String[] fields() {
+		List<String> fields = new ArrayList<String>();
+		for (OColumn col : getColumns(false)) {
+			fields.add(col.getName());
+		}
+		return fields.toArray(new String[fields.size()]);
 	}
 
 	/**
@@ -1103,6 +1178,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	 * @param newId
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean updateRelationColumns(OValues values) {
 		SQLiteDatabase db = getWritableDatabase();
 		for (OColumn column : getColumns()) {
