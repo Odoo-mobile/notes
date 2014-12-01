@@ -15,7 +15,6 @@ import android.widget.RemoteViews;
 
 import com.odoo.MainActivity;
 import com.odoo.addons.note.Note;
-import com.odoo.addons.note.NoteDetailActivity;
 import com.odoo.notes.R;
 import com.odoo.support.OUser;
 import com.odoo.widgets.WidgetHelper;

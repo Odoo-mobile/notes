@@ -45,6 +45,7 @@ public class NoteService extends OSyncService implements OSyncFinishListener,
 		NoteNote note = new NoteNote(getApplicationContext());
 		Cursor cr = note.resolver().query("trashed = ? ", new String[] { "1" },
 				null);
+
 		if (cr.moveToFirst()) {
 			Date cur_date = ODate.convertToDate(
 					ODate.getUTCDate(ODate.DEFAULT_FORMAT),

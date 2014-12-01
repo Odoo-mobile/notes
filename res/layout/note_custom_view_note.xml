@@ -13,22 +13,12 @@
         android:orientation="vertical"
         android:padding="10dp" >
 
-        <!--
-        <TextView
-            android:id="@+id/note_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@string/font_fontFamily_condensed"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-        -->
-
         <com.odoo.util.controls.AutoResizeTextView
             android:id="@+id/note_memo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@string/font_fontFamily_light"
-            android:lines="5"
+            android:maxLines="5"
             android:textSize="8sp" />
 
         <TextView
@@ -44,7 +34,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="5dp"
         android:background="#33000000"
         android:orientation="horizontal" >
 

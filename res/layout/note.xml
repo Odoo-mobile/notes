@@ -4,7 +4,10 @@
     android:layout_height="fill_parent"
     android:background="#dedede"
     android:clipToPadding="false"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:paddingBottom="8dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp" >
 
     <include
         android:id="@+id/loadingProgress"
@@ -13,26 +16,22 @@
         android:paddingTop="5dp"
         android:visibility="gone" />
 
-    <android.widgets.SwipeRefreshLayout
+    <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" >
+        android:layout_height="match_parent" >
 
         <com.odoo.util.controls.HeaderGridView
             android:id="@+id/listRecords"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
             android:horizontalSpacing="5dp"
             android:numColumns="1"
-            android:paddingTop="10dp"
+            android:paddingTop="8dp"
             android:scrollbars="none"
-            android:verticalSpacing="5dp" />
-    </android.widgets.SwipeRefreshLayout>
+            android:verticalSpacing="8dp" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

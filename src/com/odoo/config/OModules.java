@@ -28,5 +28,4 @@ import com.odoo.support.OModulesHelper;
 public class OModules extends OModulesHelper {
 
 	OModule note = new OModule(NotesPager.class).setDefault();
-	// OModule partners = new OModule(PartnersCursorLoader.class).setDefault();
 }
