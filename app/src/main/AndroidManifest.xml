@@ -85,9 +85,57 @@
             android:authorities="com.odoo.notes.core.provider.content.sync.ir_model"
             android:multiprocess="true" />
 
+        <!-- Sync Provider & Service  Notes// -->
+        <provider
+            android:name=".addons.notes.providers.NoteProvider"
+            android:authorities="com.odoo.addons.notes.providers.note_note"
+            android:label="@string/sync_label_note"
+            android:multiprocess="true" />
+
+        <service
+            android:name=".addons.notes.services.NoteService"
+            android:exported="true"
+            android:process=":sync_notes">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_note_data" />
+        </service>
+
         <activity
-            android:name="com.odoo.addons.customers.CustomerDetails"
-            android:windowSoftInputMode="adjustPan" />
+            android:name=".addons.notes.NoteDetailActivity"
+            android:windowSoftInputMode="adjustPan">
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes">
+                <action android:name="android.intent.action.SEND" />
+
+                <data android:mimeType="text/plain" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes">
+                <action android:name="android.intent.action.SEND" />
+
+                <data android:mimeType="image/*" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter
+                android:icon="@drawable/ic_launcher"
+                android:label="@string/label_odoo_notes">
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <data android:mimeType="image/*" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
     </application>
 

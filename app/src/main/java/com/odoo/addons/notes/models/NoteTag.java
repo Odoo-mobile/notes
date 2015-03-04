@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 30/12/14 3:11 PM
+ * Created on 25/2/15 5:38 PM
  */
-package com.odoo.config;
+package com.odoo.addons.notes.models;
 
-import com.odoo.addons.notes.NotesPager;
-import com.odoo.core.support.addons.AddonsHelper;
-import com.odoo.core.support.addons.OAddon;
+import android.content.Context;
 
-public class Addons extends AddonsHelper {
+import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.OText;
+import com.odoo.core.support.OUser;
 
-    /**
-     * Declare your required module here
-     * NOTE: For maintain sequence use object name in asc order.
-     * Ex.:
-     * OAddon partners = new OAddon(Partners.class).setDefault();
-     */
-    OAddon notes = new OAddon(NotesPager.class).setDefault();
+public class NoteTag extends OModel {
+    OColumn name = new OColumn("Name", OText.class).setRequired();
+
+    public NoteTag(Context context, OUser user) {
+        super(context, "note.tag", user);
+    }
 }

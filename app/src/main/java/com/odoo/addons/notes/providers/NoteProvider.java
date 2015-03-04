@@ -15,21 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 30/12/14 3:11 PM
+ * Created on 25/2/15 11:48 AM
  */
-package com.odoo.config;
+package com.odoo.addons.notes.providers;
 
-import com.odoo.addons.notes.NotesPager;
-import com.odoo.core.support.addons.AddonsHelper;
-import com.odoo.core.support.addons.OAddon;
+import com.odoo.addons.notes.models.NoteNote;
+import com.odoo.core.orm.provider.BaseModelProvider;
 
-public class Addons extends AddonsHelper {
+public class NoteProvider extends BaseModelProvider {
+    public static final String TAG = NoteProvider.class.getSimpleName();
 
-    /**
-     * Declare your required module here
-     * NOTE: For maintain sequence use object name in asc order.
-     * Ex.:
-     * OAddon partners = new OAddon(Partners.class).setDefault();
-     */
-    OAddon notes = new OAddon(NotesPager.class).setDefault();
+    @Override
+    public String authority() {
+        return NoteNote.AUTHORITY;
+    }
 }

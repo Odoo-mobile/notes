@@ -6,13 +6,12 @@
 
     <LinearLayout
         android:id="@+id/data_list_container"
-        android:layout_below="@+id/customer_data_filter_container"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/customer_no_items"
+            android:id="@+id/notes_no_items"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone">
@@ -26,10 +25,10 @@
             android:layout_height="match_parent"
             android:visibility="gone">
 
-            <ListView
-                android:id="@+id/listview"
+            <GridView
+                android:id="@+id/gridview"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></ListView>
+                android:layout_height="fill_parent" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <include
