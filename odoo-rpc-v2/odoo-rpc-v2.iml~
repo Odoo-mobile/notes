@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
+<module external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="master-notes-migrate-to-studio-dpr" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+=======
+<module external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="master-framework" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+>>>>>>> 39e1de0458e1c5b4edb061e0eeef2353cb339c2f
+  <component name="FacetManager">
+    <facet type="android-gradle" name="Android-Gradle">
+      <configuration>
+        <option name="GRADLE_PROJECT_PATH" value=":odoo-rpc-v2" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
+
