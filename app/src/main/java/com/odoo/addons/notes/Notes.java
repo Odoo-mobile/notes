@@ -85,7 +85,6 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     private int listOffset = 0;
     private BottomSheet mSheet;
 
-
     public enum Type {
         Notes, Archive, Reminders, Deleted
     }
@@ -117,6 +116,8 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     private void initAdapter() {
         if (getActivity() != null) {
             mCurrentKey = Type.valueOf(getArguments().getString(KEY_NOTE_FILTER));
+            if (mCurrentKey == Type.Deleted)
+                mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
             mList = (HeaderGridView) mView.findViewById(R.id.gridView);
             setHasFloatingButton(mView, R.id.fabButton, mList, this);
             setHeaderView();
@@ -148,8 +149,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     }
 
     private void showSheet(Cursor cr) {
-        //TODO
-        final ODataRow data = OCursorUtils.toDatarow(cr);
+        ODataRow data = OCursorUtils.toDatarow(cr);
         if (mSheet != null) {
             mSheet.dismiss();
         }
