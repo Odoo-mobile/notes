@@ -35,6 +35,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.odoo.R;
@@ -68,7 +69,7 @@ import odoo.controls.HeaderGridView;
 public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         SwipeRefreshLayout.OnRefreshListener, LoaderManager.LoaderCallbacks<Cursor>,
         OCursorListAdapter.OnViewBindListener, IOnSearchViewChangeListener,
-        View.OnClickListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener {
+        View.OnClickListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener, BottomSheetListeners.OnSheetMenuCreateListener {
     public static final String TAG = Notes.class.getSimpleName();
     //    public static final String EXTRA_KEY_TYPE = "extra_key_type";
     public static final String KEY_STAGE_ID = "stage_id";
@@ -83,6 +84,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     private String mFilter = null;
     private int listOffset = 0;
     private BottomSheet mSheet;
+
 
     public enum Type {
         Notes, Archive, Reminders, Deleted
@@ -147,7 +149,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
 
     private void showSheet(Cursor cr) {
         //TODO
-        ODataRow data = OCursorUtils.toDatarow(cr);
+        final ODataRow data = OCursorUtils.toDatarow(cr);
         if (mSheet != null) {
             mSheet.dismiss();
         }
@@ -159,9 +161,21 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         builder.actionListener(this);
         builder.setActionIcon(R.drawable.ic_action_edit);
         builder.title(data.getString("short_memo"));
+        builder.setOnSheetMenuCreateListener(this);
         builder.menu(R.menu.menu_note_sheet);
         mSheet = builder.create();
         mSheet.show();
+    }
+
+    @Override
+    public void onSheetMenuCreate(Menu menu, Object o) {
+        if (mCurrentKey == Type.Deleted) {
+            menu.findItem(R.id.menu_note_archive).setIcon(R.drawable.ic_action_unarchive);
+            menu.findItem(R.id.menu_note_delete).setVisible(false);
+        }
+        if (mCurrentKey == Type.Archive) {
+            menu.findItem(R.id.menu_note_archive).setIcon(R.drawable.ic_action_unarchive);
+        }
     }
 
     /**
@@ -200,7 +214,11 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
      */
     @Override
     public void onSheetActionClick(BottomSheet bottomSheet, Object obj) {
-
+        mSheet.dismiss();
+        Cursor cr = (Cursor) obj;
+        Bundle bundle = new Bundle();
+        bundle.putInt(KEY_NOTE_ID, cr.getInt(cr.getColumnIndex(OColumn.ROW_ID)));
+        IntentUtils.startActivity(getActivity(), NoteDetail.class, bundle);
     }
 
     @Override
@@ -334,7 +352,10 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     }
 
     private void bindRowControls(final View view, final ODataRow row) {
-        view.findViewById(R.id.note_move).setOnClickListener(new View.OnClickListener() {
+        ImageView imgMove = (ImageView) view.findViewById(R.id.note_move);
+        if (mCurrentKey != Type.Notes)
+            imgMove.setVisibility(View.GONE);
+        imgMove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 moveTo(row.getInt(OColumn.ROW_ID), row);
@@ -355,6 +376,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                                 .getInt("index");
                         OValues values = new OValues();
                         values.put("color", index);
+                        values.put("trashed", 0);
                         values.put("is_dirty", true);
                         db().update(row_id, values);
                         restartLoader();
@@ -365,6 +387,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     private void showArchiveUndoBar(int row_id, String open) {
         OValues values = new OValues();
         values.put("open", open);
+        values.put("trashed", 0);
         values.put("is_dirty", true);
         db().update(row_id, values);
         restartLoader();

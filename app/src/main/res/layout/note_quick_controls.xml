@@ -3,7 +3,6 @@
     android:layout_height="wrap_content"
     android:paddingLeft="@dimen/default_8dp"
     android:paddingRight="@dimen/default_8dp"
-    android:paddingTop="@dimen/default_8dp"
     android:orientation="vertical">
 
     <LinearLayout

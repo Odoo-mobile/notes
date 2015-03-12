@@ -217,6 +217,7 @@ public class NoteDetail extends ActionBarActivity {
         values.put("stage_id", mStageId);
         values.put("short_memo", mNote.storeShortMemo(values));
         values.put("color", color);
+        values.put("trashed", 0);
         values.put("open", open + "");
         String reminder = "0";
 //        if (mReminder.hasReminder()) {
