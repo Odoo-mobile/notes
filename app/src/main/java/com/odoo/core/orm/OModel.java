@@ -40,6 +40,7 @@ import com.odoo.core.orm.provider.BaseModelProvider;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooFields;
+import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;

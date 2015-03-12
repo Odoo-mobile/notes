@@ -33,6 +33,7 @@ import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.odoo.App;
@@ -236,7 +237,7 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
         }
     };
 
-    public void setHasFloatingButton(View view, int res_id, ListView list,
+    public void setHasFloatingButton(View view, int res_id, AbsListView list,
                                      View.OnClickListener clickListener) {
         mFab = (FloatingActionButton) view.findViewById(res_id);
         if (mFab != null) {

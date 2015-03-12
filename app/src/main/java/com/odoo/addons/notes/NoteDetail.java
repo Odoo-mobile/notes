@@ -25,7 +25,7 @@ import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OActionBarUtils;
 
-public class NoteDetailActivity extends ActionBarActivity {
+public class NoteDetail extends ActionBarActivity {
     public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
     private NoteNote mNote;
     private NoteStage mStage;
@@ -65,7 +65,7 @@ public class NoteDetailActivity extends ActionBarActivity {
 //        attachment = new Attachments(this);
         mStage = new NoteStage(this, null);
         Bundle extra = getIntent().getExtras();
-        Integer note_id = 0;
+        Integer note_id;
         note_id = (extra.containsKey(Notes.KEY_NOTE_ID)) ? extra
                 .getInt(Notes.KEY_NOTE_ID) : null;
         initData(note_id, extra);
@@ -107,8 +107,7 @@ public class NoteDetailActivity extends ActionBarActivity {
         if (note_id != null) {
             note_cr = mNote.browse(note_id);
             mStageId = note_cr.getInt("stage_id");
-            open = (note_cr.getString("open")
-                    .equals("true")) ? true : false;
+            open = note_cr.getString("open").equals("true");
             trashed = note_cr.getInt("trashed");
             color = note_cr.getInt("color");
             initControls(color);
@@ -322,7 +321,7 @@ public class NoteDetailActivity extends ActionBarActivity {
                         "");
                 extras.putString(Intent.EXTRA_TEXT, Html.toHtml(memo.getText()));
                 extras.putInt(Notes.KEY_STAGE_ID, mStageId);
-                Intent intent = new Intent(this, NoteDetailActivity.class);
+                Intent intent = new Intent(this, NoteDetail.class);
                 intent.putExtras(extras);
                 startActivity(intent);
                 finish();

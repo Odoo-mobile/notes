@@ -17,7 +17,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_action_customers"
+            android:src="@drawable/ic_action_notes"
             android:tint="#aaaaaa" />
 
         <TextView
@@ -26,20 +26,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:fontFamily="@string/font_light"
-            android:text="Your day is wide open"
+            android:text="No notes found"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#aaaaaa"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/subTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="@string/font_light"
-            android:text="Tap to add meeting"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="#ababab"
-            android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>

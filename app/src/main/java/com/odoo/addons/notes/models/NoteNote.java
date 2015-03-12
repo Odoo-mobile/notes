@@ -49,8 +49,7 @@ public class NoteNote extends OModel {
     public static final String AUTHORITY = "com.odoo.addons.notes.providers.note_note";
     OColumn name = new OColumn("Title", OVarchar.class).setSize(64).setRequired();
     OColumn message_follower_ids = new OColumn("Name", ResPartner.class, OColumn.RelationType.ManyToMany);
-
-    OColumn memo = new OColumn("Desription", OHtml.class);
+    OColumn memo = new OColumn("Description", OHtml.class);
     OColumn sequence = new OColumn("Sequence", OInteger.class).setDefaultValue(0);
     OColumn stage_id = new OColumn("Select Stage", NoteStage.class,
             OColumn.RelationType.ManyToOne).setDefaultValue(1);
@@ -66,7 +65,7 @@ public class NoteNote extends OModel {
             .setLocalColumn().setDefaultValue(0);
     OColumn trashed_date = new OColumn("Trashed date", ODateTime.class)
             .setLocalColumn()
-            .setDefaultValue("false"); //.setParsePattern(ODate.DEFAULT_FORMAT)
+            .setDefaultValue("false");
     @Odoo.Functional(store = true, depends = {"memo"}, method = "storeShortMemo")
     OColumn short_memo = new OColumn("Short Memo", OVarchar.class).setDefaultValue(100)
             .setLocalColumn();

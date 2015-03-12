@@ -1,87 +1,36 @@
-<odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:odoo="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/note_bg_color"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="@dimen/default_16dp"
-    odoo:modelName="note.note">
+    android:paddingRight="@dimen/default_8dp"
+    android:paddingLeft="@dimen/default_8dp"
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/note_bg_color"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
-
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
 
         <TextView
+            android:padding="@dimen/default_8dp"
             android:id="@+id/note_memo"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:maxLines="5"
             android:fontFamily="@string/font_normal"
             android:textAppearance="?android:textAppearanceMedium" />
 
         <ImageView
-            android:id="@+id/note_overflow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:background="?android:selectableItemBackground"
-            android:src="@drawable/ic_action_overflow"
-            android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/note_memo"
-            android:layout_alignEnd="@+id/note_memo" />
-        <!--<TextView-->
-        <!--android:id="@+id/note_attachment_counter"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:singleLine="true"-->
-        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
-        <!--android:textColor="#aaaaaa" />-->
-    </RelativeLayout>
-
-    <!--<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#33000000"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/note_bg_color_selector"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:selectableItemBackground"
-            android:padding="10dp"
-            android:src="@drawable/ic_action_bg_color" />
-
-        <ImageView
-            android:id="@+id/note_archive"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:selectableItemBackground"
-            android:padding="10dp"
-            android:src="@drawable/ic_action_archive" />
-
-        <ImageView
-            android:id="@+id/note_delete"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:selectableItemBackground"
-            android:padding="10dp"
-            android:src="@drawable/ic_action_delete" />
-
-        <ImageView
             android:id="@+id/note_move"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:selectableItemBackground"
-            android:padding="10dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="@dimen/default_8dp"
+            android:tint="#414141"
+            android:background="?android:attr/selectableItemBackground"
             android:src="@drawable/ic_action_move" />
-    </LinearLayout>-->
 
+    </LinearLayout>
 
-</odoo.controls.OForm>
+    <View style="@style/ViewSeparator" />
+</LinearLayout>

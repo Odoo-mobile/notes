@@ -33,7 +33,6 @@ import java.util.List;
 import odoo.ODomain;
 
 public class NoteStage extends OModel {
-    Context mContext = null;
     OColumn name = new OColumn("Name", OText.class).setRequired();
     OColumn sequence = new OColumn("Sequence", OInteger.class).setDefaultValue(0);
 
@@ -44,14 +43,12 @@ public class NoteStage extends OModel {
     @Override
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
-        domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+        domain.add("user_id", "=", getUser().getUser_id());
         return domain;
     }
 
     public int getDefaultNoteStageId() {
-        int mStageId = 0;
         List<ODataRow> cr = select(null, null, null, "sequence");
-        mStageId = cr.get(0).getInt(OColumn.ROW_ID);
-        return mStageId;
+        return cr.get(0).getInt(OColumn.ROW_ID);
     }
 }

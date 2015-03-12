@@ -9,7 +9,7 @@ import com.odoo.addons.notes.dialogs.NoteStagesDialog;
 
 
 public class NoteUtil {
-    private static String[] background_colors = {"#ffffff", "#9fb5b3",
+    private static String[] background_colors = {"#ebebeb", "#9fb5b3",
             "#ffa600", "#fffb00", "#cfff3e", "#3eff6e", "#2affff", "#799aff",
             "#c68cff", "#ff79dd"};
     private static String[] text_colors = {"#414141", "#364645", "#4e1f00",
@@ -38,9 +38,9 @@ public class NoteUtil {
         return Color.parseColor("#000000");
     }
 
-    public static AlertDialog noteStages(Context context,
+    public static AlertDialog noteStages(Context context, int stage_id,
                                          NoteStagesDialog.OnStageSelectListener listener) {
-        NoteStagesDialog dialog = new NoteStagesDialog(context, listener);
+        NoteStagesDialog dialog = new NoteStagesDialog(context, stage_id, listener);
         return dialog.build();
     }
 

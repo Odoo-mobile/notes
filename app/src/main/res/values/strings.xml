@@ -22,4 +22,8 @@
     <string name="label_log_note">Log note</string>
     <string name="label_send_message"><u>Send a message</u></string>
     <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
+    <string name="label_color">Choose Color</string>
+    <string name="label_archive">Archive</string>
+    <string name="label_unarchive">Unarchive</string>
+    <string name="label_move">Move</string>
 </resources>

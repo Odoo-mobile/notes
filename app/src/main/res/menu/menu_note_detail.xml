@@ -18,7 +18,7 @@
         app:showAsAction="always"></item>
     <item
         android:id="@+id/menu_note_operation"
-        android:icon="@drawable/ic_action_overflow"
+        android:icon="@drawable/ic_action_more"
         android:title="More"
         app:showAsAction="always">
         <menu>

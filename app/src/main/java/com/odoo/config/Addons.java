@@ -19,7 +19,7 @@
  */
 package com.odoo.config;
 
-import com.odoo.addons.notes.NotesPager;
+import com.odoo.addons.notes.StagesPager;
 import com.odoo.core.support.addons.AddonsHelper;
 import com.odoo.core.support.addons.OAddon;
 
@@ -31,5 +31,5 @@ public class Addons extends AddonsHelper {
      * Ex.:
      * OAddon partners = new OAddon(Partners.class).setDefault();
      */
-    OAddon notes = new OAddon(NotesPager.class).setDefault();
+    OAddon notes = new OAddon(StagesPager.class).setDefault();
 }
