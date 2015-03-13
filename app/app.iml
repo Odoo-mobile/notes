@@ -9,7 +9,6 @@
     <facet type="android" name="Android">
       <configuration>
         <option name="SELECTED_BUILD_VARIANT" value="debug" />
-        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
         <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
         <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugTest" />
@@ -90,9 +89,13 @@
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="swipe_library" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
+<<<<<<< HEAD
     <orderEntry type="library" exported="" name="snackbar-lib-unspecified" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="bottom-sheet-lib-unspecified" level="project" />
+=======
+    <orderEntry type="library" exported="" name="cardview-v7-21.0.3" level="project" />
+>>>>>>> e979e67dc5018eb0b6e50a4302a39018970d0b89
     <orderEntry type="library" exported="" name="odoo-rpc-v2-unspecified" level="project" />
     <orderEntry type="library" exported="" name="parallax-effect-lib-unspecified" level="project" />
     <orderEntry type="module" module-name="intro-slider-lib" exported="" />

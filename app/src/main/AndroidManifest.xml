@@ -65,6 +65,11 @@
         <!-- Note Reminder Service -->
         <receiver android:name="com.odoo.addons.notes.reminder.ReminderReceiver" />
         <receiver android:name="com.odoo.addons.notes.reminder.ReminderActionReceiver" />
+        <receiver android:name=".news.OdooNewsReceiver">
+            <intent-filter>
+                <action android:name="odoo.Odoo.ACTION_ODOO_UPDATES" />
+            </intent-filter>
+        </receiver>
 
         <service android:name="com.odoo.core.auth.OdooAuthService">
             <intent-filter>
