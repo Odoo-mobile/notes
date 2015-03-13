@@ -19,6 +19,7 @@ import com.odoo.R;
 import com.odoo.addons.notes.dialogs.NoteColorDialog;
 import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.models.NoteStage;
+import com.odoo.addons.notes.reminder.NoteReminder;
 import com.odoo.addons.notes.utils.NoteUtil;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
@@ -29,7 +30,7 @@ public class NoteDetail extends ActionBarActivity {
     public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
     private NoteNote mNote;
     private NoteStage mStage;
-    //    private NoteReminder mReminder;
+    private NoteReminder mReminder;
     private String reminderDate = null;
     private ODataRow note_cr;
     private Menu mMenu;
@@ -88,7 +89,7 @@ public class NoteDetail extends ActionBarActivity {
 //                }
 //            }
 //        }
-//        initReminderControls();
+        initReminderControls();
 
 //        if (action != null) {
 //            if (action.equals(ACTION_ATTACH_FILE)) {
@@ -97,11 +98,11 @@ public class NoteDetail extends ActionBarActivity {
 //        }
     }
 
-//    private void initReminderControls() {
-//        mReminder = new NoteReminder(this, getSupportFragmentManager());
-//        mReminder.initControls(findViewById(R.id.reminder_controls),
-//                reminderDate);
-//    }
+    private void initReminderControls() {
+        mReminder = new NoteReminder(this, getSupportFragmentManager());
+        mReminder.initControls(findViewById(R.id.reminder_controls),
+                reminderDate);
+    }
 
     private void initData(Integer note_id, Bundle extra) {
         if (note_id != null) {
@@ -199,7 +200,7 @@ public class NoteDetail extends ActionBarActivity {
                 isDirty = true;
             }
             if (!isDirty) {
-//                isDirty = (mReminder.hasReminder() || (reminderDate != null));
+                isDirty = (mReminder.hasReminder() || (reminderDate != null));
             }
         }
         return isDirty;
@@ -220,35 +221,35 @@ public class NoteDetail extends ActionBarActivity {
         values.put("trashed", 0);
         values.put("open", open + "");
         String reminder = "0";
-//        if (mReminder.hasReminder()) {
-//            reminder = mReminder.getDateString();
-//        }
+        if (mReminder.hasReminder()) {
+            reminder = mReminder.getDateString();
+        }
         values.put("reminder", reminder);
 
         if (note_cr == null) {
             // creating new note
             values.put("sequence", 0);
             int newNote_id = mNote.insert(values);
-//            if (mReminder.hasReminder()) {
-//                mReminder.setReminder(newNote_id, mReminder.getCal());
-//            }
+            if (mReminder.hasReminder()) {
+                mReminder.setReminder(newNote_id, mReminder.getCal());
+            }
         } else {
             // Updating note
             toast = getString(R.string.note_updated);
             int note_id = note_cr
                     .getInt(OColumn.ROW_ID);
-//            if (mReminder.hasReminder()) {
-//                if (reminderDate == null) {
-//                    reminderDate = "";
-//                }
-//                if (!reminderDate.equals(mReminder.getDateString())) {
-//                    mReminder.setReminder(note_id, mReminder.getCal());
-//                }
-//            }
+            if (mReminder.hasReminder()) {
+                if (reminderDate == null) {
+                    reminderDate = "";
+                }
+                if (!reminderDate.equals(mReminder.getDateString())) {
+                    mReminder.setReminder(note_id, mReminder.getCal());
+                }
+            }
             mNote.update(note_id, values);
         }
         Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
-//        mReminder.setHasReminder(false);
+        mReminder.setHasReminder(false);
         reminderDate = null;
         onBackPressed();
     }
@@ -294,9 +295,9 @@ public class NoteDetail extends ActionBarActivity {
                     }
                 }).show();
                 break;
-            case R.id.menu_note_attachment:
+//            case R.id.menu_note_attachment:
 //                attachment.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
-                break;
+//                break;
             case R.id.menu_note_archive:
                 isDirty = true;
                 int iconRes = (open) ? R.drawable.ic_action_unarchive : R.drawable.ic_action_archive;

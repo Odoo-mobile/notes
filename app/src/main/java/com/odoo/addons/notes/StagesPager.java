@@ -233,8 +233,11 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
 
     @Override
     public boolean onBackPressed() {
-        return ((IOnBackPressListener) mFragments.get("index_" + navSpinner.getSelectedItemPosition())
-        ).onBackPressed();
+        if (mFragments.size() > 0) {
+            return ((IOnBackPressListener) mFragments.get("index_" + navSpinner.getSelectedItemPosition())
+            ).onBackPressed();
+        }
+        return true;
     }
 
     private class DataObserver extends ContentObserver {
@@ -258,6 +261,7 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
     @Override
     public void onPause() {
         super.onPause();
+        parent().setOnBackPressListener(null);
         getActivity().getContentResolver()
                 .unregisterContentObserver(dataObserver);
     }

@@ -25,16 +25,40 @@ import android.os.Bundle;
 
 import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.models.NoteStage;
+import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.ODateUtils;
+
+import java.util.Date;
+import java.util.List;
 
 public class NoteService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = NoteService.class.getSimpleName();
 
     @Override
     public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
+        NoteNote note = new NoteNote(context, null);
+        if (!note.isEmptyTable()) {
+            List<ODataRow> rows = note.select(null, "trashed = ? ", new String[]{"1"});
+            Date cur_date = ODateUtils.createDateObject(
+                    ODateUtils.getUTCDate(ODateUtils.DEFAULT_FORMAT),
+                    ODateUtils.DEFAULT_FORMAT, false);
+            for (ODataRow row : rows) {
+                String rec_date = row.getString("trashed_date");
+                if (!rec_date.equals("false")) {
+                    Date r_date = ODateUtils.createDateObject(rec_date,
+                            ODateUtils.DEFAULT_FORMAT, false);
+                    int days = ODateUtils.getDateDiff(cur_date, r_date);
+                    if (days >= 7) {
+                        note.delete(row.getInt(OColumn.ROW_ID));
+                    }
+                }
+            }
+        }
         return new OSyncAdapter(context, NoteNote.class, this, true);
     }
 

@@ -19,23 +19,32 @@
  */
 package com.odoo.addons.notes;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.R;
@@ -43,6 +52,7 @@ import com.odoo.addons.notes.dialogs.NoteColorDialog;
 import com.odoo.addons.notes.dialogs.NoteStagesDialog;
 import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.utils.NoteUtil;
+import com.odoo.base.addons.ir.feature.OFileManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -57,6 +67,7 @@ import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.StringUtils;
+import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
@@ -69,13 +80,12 @@ import odoo.controls.HeaderGridView;
 public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         SwipeRefreshLayout.OnRefreshListener, LoaderManager.LoaderCallbacks<Cursor>,
         OCursorListAdapter.OnViewBindListener, IOnSearchViewChangeListener,
-        View.OnClickListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener, BottomSheetListeners.OnSheetMenuCreateListener {
+        View.OnClickListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener, BottomSheetListeners.OnSheetMenuCreateListener, IOnActivityResultListener {
     public static final String TAG = Notes.class.getSimpleName();
     //    public static final String EXTRA_KEY_TYPE = "extra_key_type";
     public static final String KEY_STAGE_ID = "stage_id";
     public static final String KEY_NOTE_ID = "note_id";
     public static final String KEY_NOTE_FILTER = "note_filter";
-    public static final String ACTION_SPEECH_TO_NOTE = "action_speech_to_note";
     private Type mCurrentKey = Type.Notes;
     private int mStageId = 0;
     private OCursorListAdapter mAdapter = null;
@@ -84,6 +94,8 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     private String mFilter = null;
     private int listOffset = 0;
     private BottomSheet mSheet;
+    public static final int REQUEST_SPEECH_TO_TEXT = 333;
+    private OFileManager fileManager;
 
     public enum Type {
         Notes, Archive, Reminders, Deleted
@@ -109,7 +121,8 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         setHasOptionsMenu(true);
         setHasSwipeRefreshView(view, R.id.swipe_container, this);
         setHasSyncStatusObserver(TAG, this, db());
-//        parent().setOnActivityResultListener(this);
+        fileManager = new OFileManager(getActivity());
+        parent().setOnActivityResultListener(this);
         initAdapter();
     }
 
@@ -170,11 +183,11 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     @Override
     public void onSheetMenuCreate(Menu menu, Object o) {
         if (mCurrentKey == Type.Deleted) {
-            menu.findItem(R.id.menu_note_archive).setIcon(R.drawable.ic_action_unarchive);
             menu.findItem(R.id.menu_note_delete).setVisible(false);
         }
-        if (mCurrentKey == Type.Archive) {
+        if (mCurrentKey == Type.Archive || mCurrentKey == Type.Deleted) {
             menu.findItem(R.id.menu_note_archive).setIcon(R.drawable.ic_action_unarchive);
+            menu.findItem(R.id.menu_note_archive).setTitle(R.string.label_unarchive);
         }
     }
 
@@ -225,12 +238,37 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabButton:
+            case R.id.imgCreateQuickNote:
                 Bundle data = new Bundle();
                 data.putInt(KEY_STAGE_ID, mStageId);
                 IntentUtils.startActivity(getActivity(), NoteDetail.class, data);
                 break;
+//            case R.id.imgAttachImage:
+//                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
+//                break;
+            case R.id.imgAttachSpeechToText:
+                requestSpeechToText();
+                break;
         }
     }
+
+    private void requestSpeechToText() {
+        PackageManager mPackageManager = getActivity().getPackageManager();
+        List<ResolveInfo> activities = mPackageManager.queryIntentActivities(
+                new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+        if (activities.size() == 0) {
+            Toast.makeText(getActivity(), "No audio recorder present.",
+                    Toast.LENGTH_LONG).show();
+        } else {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "speak now...");
+            getActivity()
+                    .startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
+        }
+    }
+
 
     private void setHeaderView() {
         switch (mCurrentKey) {
@@ -239,6 +277,35 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                 listOffset = 1;
                 View header = LayoutInflater.from(getActivity())
                         .inflate(R.layout.note_quick_controls, mList, false);
+                header.findViewById(R.id.imgCreateQuickNote).setOnClickListener(this);
+//                header.findViewById(R.id.imgAttachImage).setOnClickListener(this);
+                header.findViewById(R.id.imgAttachSpeechToText)
+                        .setOnClickListener(this);
+                EditText edtQuickNote = (EditText) header
+                        .findViewById(R.id.edtNoteQuickMemo);
+                edtQuickNote.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId,
+                                                  KeyEvent event) {
+                        if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+                                || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                            if (TextUtils.isEmpty(v.getText())) {
+                                Toast.makeText(getActivity(), _s(R.string.note_discarded),
+                                        Toast.LENGTH_LONG).show();
+                            } else {
+                                String note = v.getText().toString();
+                                ((NoteNote) db()).quickCreateNote(note, mStageId);
+                                Toast.makeText(getActivity(),
+                                        _s(R.string.note_created), Toast.LENGTH_LONG)
+                                        .show();
+                                restartLoader();
+                                v.setText("");
+                            }
+                        }
+                        return false;
+                    }
+                });
                 mList.addHeaderView(header);
                 break;
             case Archive:
@@ -247,6 +314,27 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                 break;
         }
 
+    }
+
+    @Override
+    public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_SPEECH_TO_TEXT) {
+                ArrayList<String> matches = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                ((NoteNote) db()).quickCreateNote(matches.get(0), mStageId);
+                Toast.makeText(getActivity(), R.string.note_created, Toast.LENGTH_LONG).show();
+            }
+            OValues values = fileManager.handleResult(requestCode, resultCode, data);
+            if (values != null && !values.contains("size_limit_exceed")) {
+                //TODO
+                String newImage = values.getString("datas");
+                Toast.makeText(getActivity(), R.string.note_created, Toast.LENGTH_LONG).show();
+            } else if (values != null) {
+                Toast.makeText(getActivity(), R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
+            }
+            restartLoader();
+        }
     }
 
     @Override

@@ -69,6 +69,9 @@ public class NoteNote extends OModel {
     @Odoo.Functional(store = true, depends = {"memo"}, method = "storeShortMemo")
     OColumn short_memo = new OColumn("Short Memo", OVarchar.class).setDefaultValue(100)
             .setLocalColumn();
+    @Odoo.Functional(store = true, depends = {"stage_id"}, method = "storeStageId")
+    OColumn stage_id_name = new OColumn("Select Stage Name", OVarchar.class)
+            .setDefaultValue("false").setLocalColumn();
 
     public NoteNote(Context context, OUser user) {
         super(context, "note.note", user);
@@ -132,6 +135,18 @@ public class NoteNote extends OModel {
         String body = StringUtils.htmlToString(vals.getString("memo"));
         int end = (body.length() > 150) ? 150 : body.length();
         return body.substring(0, end);
+    }
+
+    public String storeStageId(OValues value) {
+        try {
+            if (!value.getString("stage_id").equals("false")) {
+                JSONArray stage_id = (JSONArray) value.get("stage_id");
+                return stage_id.getString(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "false";
     }
 
     public List<ODataRow> getAttachments(int note_id) {
