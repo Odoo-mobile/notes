@@ -32,6 +32,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@string/font_light"
                 android:lines="5"
+                android:minLines="3"
+                android:maxLines="5"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView

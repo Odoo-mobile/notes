@@ -141,7 +141,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <!-- //Notes Widget
+        <!--Notes Widget-->
         <receiver
             android:name="com.odoo.addons.notes.widgets.NotesWidget"
             android:label="Odoo Notes">
@@ -153,19 +153,19 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_notes" />
         </receiver>
-        &lt;!&ndash; Note widget remote view service &ndash;&gt;
+        <!--Note widget remote view service-->
         <service
             android:name="com.odoo.addons.notes.widgets.NotesRemoteViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        &lt;!&ndash; Note widget configuration &ndash;&gt;
+        <!--Note widget configuration-->
         <activity
             android:name="com.odoo.addons.notes.widgets.NotesWidgetConfigure"
             android:icon="@drawable/ic_launcher">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
-        </activity>-->
+        </activity>
     </application>
 
 </manifest>

@@ -30,4 +30,7 @@
     <string name="widget_configure">Widget Configure</string>
     <string name="no_acct_found">No Account Found</string>
     <string name="label_done">Done</string>
+    <string name="label_archived_note_here">Your archived notes appear here</string>
+    <string name="label_upcoming_reminder_note">Notes with upcoming reminders appear here</string>
+    <string name="label_empty_trash">No notes in Trash</string>
 </resources>

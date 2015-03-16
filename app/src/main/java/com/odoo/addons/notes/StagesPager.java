@@ -49,7 +49,6 @@ import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
-import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.ArrayList;
@@ -105,10 +104,10 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
             parent().sync().requestSync(NoteNote.AUTHORITY);
             parent().setHasActionBarSpinner(false);
             viewPager.setVisibility(View.GONE);
-            OControls.setVisible(mView, R.id.dashboard_no_item_view);
-            OControls.setText(mView, R.id.title, OResource.string(getActivity(),
-                    R.string.label_no_notes_found));
-            OControls.setImage(mView, R.id.icon, R.drawable.ic_action_notes);
+//            OControls.setVisible(mView, R.id.dashboard_no_item_view);
+//            OControls.setText(mView, R.id.title, OResource.string(getActivity(),
+//                    R.string.label_no_notes_found));
+//            OControls.setImage(mView, R.id.icon, R.drawable.ic_action_notes);
         } else {
             viewPager.setVisibility(View.VISIBLE);
             OControls.setGone(mView, R.id.dashboard_no_item_view);

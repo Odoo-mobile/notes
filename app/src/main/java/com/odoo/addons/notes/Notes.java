@@ -52,6 +52,8 @@ import com.odoo.addons.notes.dialogs.NoteColorDialog;
 import com.odoo.addons.notes.dialogs.NoteStagesDialog;
 import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.utils.NoteUtil;
+import com.odoo.addons.notes.widgets.NotesWidget;
+import com.odoo.addons.notes.widgets.WidgetHelper;
 import com.odoo.base.addons.ir.feature.OFileManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
@@ -116,6 +118,15 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             if (extra.containsKey(KEY_STAGE_ID)) {
                 mStageId = extra.getInt(KEY_STAGE_ID);
                 parent().setHasActionBarSpinner(true);
+            }
+            if (extra.containsKey(WidgetHelper.EXTRA_WIDGET_ITEM_KEY)) {
+                if (extra.getString(WidgetHelper.EXTRA_WIDGET_ITEM_KEY).equals(NotesWidget.KEY_NOTE_COMPOSE))
+                    quickCreateNote();
+                if (extra.getString(WidgetHelper.EXTRA_WIDGET_ITEM_KEY).equals(NotesWidget.KEY_NOTE_VOICE_TO_TEXT))
+                    requestSpeechToText();
+//                if(extra.getString(WidgetHelper.EXTRA_WIDGET_ITEM_KEY).equals(NotesWidget.KEY_NOTE_FILE_ATTACH))
+//                    fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
+
             }
         }
         setHasOptionsMenu(true);
@@ -239,9 +250,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         switch (v.getId()) {
             case R.id.fabButton:
             case R.id.imgCreateQuickNote:
-                Bundle data = new Bundle();
-                data.putInt(KEY_STAGE_ID, mStageId);
-                IntentUtils.startActivity(getActivity(), NoteDetail.class, data);
+                quickCreateNote();
                 break;
 //            case R.id.imgAttachImage:
 //                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
@@ -250,6 +259,12 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                 requestSpeechToText();
                 break;
         }
+    }
+
+    private void quickCreateNote() {
+        Bundle data = new Bundle();
+        data.putInt(KEY_STAGE_ID, mStageId);
+        IntentUtils.startActivity(getActivity(), NoteDetail.class, data);
     }
 
     private void requestSpeechToText() {
@@ -399,12 +414,39 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                     OControls.setGone(mView, R.id.notes_no_items);
                     setHasSwipeRefreshView(mView, R.id.swipe_container, Notes.this);
                 } else {
-                    if (db().isEmptyTable())
-                        onRefresh();
+//                    if (db().isEmptyTable())
+//                        onRefresh();
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setGone(mView, R.id.swipe_container);
                     OControls.setVisible(mView, R.id.notes_no_items);
                     setHasSwipeRefreshView(mView, R.id.notes_no_items, Notes.this);
+
+                    switch (mCurrentKey) {
+                        case Notes:
+                            OControls.setText(mView, R.id.title,
+                                    R.string.label_no_notes_found);
+                            OControls.setImage(mView, R.id.icon,
+                                    R.drawable.ic_action_notes);
+                            break;
+                        case Archive:
+                            OControls.setText(mView, R.id.title,
+                                    getString(R.string.label_archived_note_here));
+                            OControls.setImage(mView, R.id.icon,
+                                    R.drawable.ic_action_archive);
+                            break;
+                        case Reminders:
+                            OControls.setText(mView, R.id.title,
+                                    getString(R.string.label_upcoming_reminder_note));
+                            OControls.setImage(mView, R.id.icon,
+                                    R.drawable.ic_action_reminder);
+                            break;
+                        case Deleted:
+                            OControls.setText(mView, R.id.title,
+                                    R.string.label_empty_trash);
+                            OControls.setImage(mView, R.id.icon,
+                                    R.drawable.ic_action_trash);
+                            break;
+                    }
                 }
             }
         }, 500);

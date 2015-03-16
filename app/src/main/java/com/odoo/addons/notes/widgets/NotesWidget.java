@@ -110,7 +110,7 @@ public class NotesWidget extends AppWidgetProvider {
                     KEY_NOTE_FILE_ATTACH);
             PendingIntent mPendingIntent = PendingIntent.getActivity(context,
                     REQUEST_ATTACHMENT, attachmentIntent, 0);
-            mView.setOnClickPendingIntent(R.id.imgAttachImage, mPendingIntent);
+//            mView.setOnClickPendingIntent(R.id.imgAttachImage, mPendingIntent);
 
             // Speech to text
             Intent speechIntent = new Intent(context, OdooActivity.class);
