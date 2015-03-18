@@ -44,18 +44,18 @@
         <dex dex="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-91d5011a1b14586e9e20ab9ac83be3c139e3cb73.jar" />
     </item>
     <item
-        jar="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
-        <dex dex="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-a13fc7491d59247b8835a2c3c085a30f037d528c.jar" />
-    </item>
-    <item
         jar="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/exploded-aar/master-notes-migrate-to-studio-dpr/parallax-effect-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="d5d51df78c3099a605c78513a2868cf87fae2849">
         <dex dex="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-9c5c6803761b31c31ca70a0b6284b4f632e99d9a.jar" />
+    </item>
+    <item
+        jar="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-a13fc7491d59247b8835a2c3c085a30f037d528c.jar" />
     </item>
     <item
         jar="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/21.0.3/classes.jar"
@@ -89,7 +89,7 @@
         jar="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/exploded-aar/master-notes-migrate-to-studio-dpr/intro-slider-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="9c1d9a7b09b8194ffbcc2bf64d09fada3d27cf80">
+        sha1="8c868aa428b0ca033b1f0e696cb4fa62fae1357e">
         <dex dex="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-eba20581cf6a7bdcaba84c82b4029133c9f08ecc.jar" />
     </item>
 

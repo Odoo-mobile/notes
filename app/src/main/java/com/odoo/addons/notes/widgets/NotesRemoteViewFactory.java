@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
+import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.addons.notes.Notes;
@@ -101,6 +102,8 @@ public class NotesRemoteViewFactory implements RemoteViewsFactory {
                 new String[]{"name", "short_memo", "color", "open",
                         "trashed", "stage_id_name"}, selection, selectionArgs,
                 null);
+        if (mCursor.getCount() < 1)
+            Toast.makeText(mContext, R.string.label_no_notes_found, Toast.LENGTH_LONG).show();
     }
 
     @Override

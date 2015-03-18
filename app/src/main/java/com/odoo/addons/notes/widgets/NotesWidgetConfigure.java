@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.odoo.R;
 import com.odoo.addons.notes.Notes;
 import com.odoo.addons.notes.models.NoteStage;
+import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.list.OCursorListAdapter;
@@ -84,6 +85,8 @@ public class NotesWidgetConfigure extends ActionBarActivity implements
                         cursor.getString(cursor.getColumnIndex("name")));
             }
         };
+        if (!OdooAccountManager.anyActiveUser(getApplicationContext()))
+            finish();
         mListView.setAdapter(mAdapter);
         registerForContextMenu(mListView);
         getLoaderManager().initLoader(0, null, (LoaderCallbacks<Cursor>) this);
