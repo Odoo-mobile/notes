@@ -13,7 +13,6 @@ public class NotesRemoteViewService extends RemoteViewsService {
 		NotesRemoteViewFactory rvFactory = new NotesRemoteViewFactory(
 				getApplicationContext(), intent);
 		return rvFactory;
-
 	}
 
 }

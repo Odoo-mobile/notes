@@ -89,7 +89,7 @@
         jar="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/exploded-aar/master-notes-migrate-to-studio-dpr/intro-slider-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="8c868aa428b0ca033b1f0e696cb4fa62fae1357e">
+        sha1="940e0349a9de4b4ee67937a2bf97b920b4fb746b">
         <dex dex="/home/sla/odoo-mobile/master-notes-migrate-to-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-eba20581cf6a7bdcaba84c82b4029133c9f08ecc.jar" />
     </item>
 

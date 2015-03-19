@@ -104,13 +104,13 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
             parent().sync().requestSync(NoteNote.AUTHORITY);
             parent().setHasActionBarSpinner(false);
             viewPager.setVisibility(View.GONE);
-//            OControls.setVisible(mView, R.id.dashboard_no_item_view);
+            OControls.setVisible(mView, R.id.notes_no_items);
 //            OControls.setText(mView, R.id.title, OResource.string(getActivity(),
 //                    R.string.label_no_notes_found));
 //            OControls.setImage(mView, R.id.icon, R.drawable.ic_action_notes);
         } else {
             viewPager.setVisibility(View.VISIBLE);
-            OControls.setGone(mView, R.id.dashboard_no_item_view);
+            OControls.setGone(mView, R.id.notes_no_items);
         }
         spinnerAdapter = new OListAdapter(getActivity(),
                 R.layout.base_simple_list_item_1, spinnerItems) {
@@ -268,6 +268,10 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
     private void updateCursor() {
         stageCursor = getActivity().getContentResolver()
                 .query(db().uri(), null, null, null, "sequence");
+        if (stageCursor.getCount() > 0)
+            OControls.setGone(mView, R.id.notes_no_items);
+        else
+            OControls.setVisible(mView, R.id.notes_no_items);
         updatePager();
         updateSpinner();
         viewPager.setCurrentItem(stagePosition);

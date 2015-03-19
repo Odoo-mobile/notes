@@ -77,6 +77,7 @@ import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.Odoo;
 import odoo.controls.HeaderGridView;
 
 public class Notes extends BaseFragment implements ISyncStatusObserverListener,
@@ -113,6 +114,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
+        Odoo.DEBUG=true;
         Bundle extra = getArguments();
         if (extra != null) {
             if (extra.containsKey(KEY_STAGE_ID)) {

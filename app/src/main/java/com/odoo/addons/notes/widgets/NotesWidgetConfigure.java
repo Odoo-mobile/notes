@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.odoo.R;
 import com.odoo.addons.notes.Notes;
 import com.odoo.addons.notes.models.NoteStage;
-import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.list.OCursorListAdapter;
@@ -64,11 +63,6 @@ public class NotesWidgetConfigure extends ActionBarActivity implements
         actionBar.setBackgroundDrawable(
                 new ColorDrawable(R.color.odoo_primary));
         setResult(RESULT_CANCELED);
-        if (OUser.current(this) == null) {
-            Toast.makeText(this, getString(R.string.no_acct_found),
-                    Toast.LENGTH_LONG).show();
-            finish();
-        }
         note_stage = new NoteStage(this, null);
         mListView = (ListView) findViewById(android.R.id.list);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -85,11 +79,15 @@ public class NotesWidgetConfigure extends ActionBarActivity implements
                         cursor.getString(cursor.getColumnIndex("name")));
             }
         };
-        if (!OdooAccountManager.anyActiveUser(getApplicationContext()))
+        if (OUser.current(this) == null) {
+            Toast.makeText(this, getString(R.string.no_acct_found),
+                    Toast.LENGTH_LONG).show();
             finish();
-        mListView.setAdapter(mAdapter);
-        registerForContextMenu(mListView);
-        getLoaderManager().initLoader(0, null, (LoaderCallbacks<Cursor>) this);
+        } else {
+            mListView.setAdapter(mAdapter);
+            registerForContextMenu(mListView);
+            getLoaderManager().initLoader(0, null, (LoaderCallbacks<Cursor>) this);
+        }
     }
 
     static void savePref(Context context, int appWidgetId, String key,
@@ -109,7 +107,6 @@ public class NotesWidgetConfigure extends ActionBarActivity implements
         List<Integer> selectedIdList = new ArrayList<Integer>();
         for (String id : selectedIdSet)
             selectedIdList.add(Integer.parseInt(id));
-
         return selectedIdList;
     }
 
@@ -170,6 +167,10 @@ public class NotesWidgetConfigure extends ActionBarActivity implements
     @Override
     public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
         mAdapter.changeCursor(arg1);
+        if (mAdapter.getCount() < 1) {
+            Toast.makeText(mContext, R.string.label_no_notes_found, Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     @Override
