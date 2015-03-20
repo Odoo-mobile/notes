@@ -64,7 +64,7 @@ public class NoteService extends OSyncService implements ISyncFinishListener {
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
-        if (adapter.getModel().equals("note.note"))
+        if (adapter.getModel().getModelName().equals("note.note"))
             adapter.syncDataLimit(50).onSyncFinish(this);
     }
 

@@ -24,7 +24,6 @@ public class TimePicker extends DialogFragment implements
         int minute = c.get(Calendar.MINUTE);
         TimePickerDialog dialog = new TimePickerDialog(getActivity(), this,
                 hour, minute, false);
-        dialog.setTitle("Pick time");
         return dialog;
     }
 

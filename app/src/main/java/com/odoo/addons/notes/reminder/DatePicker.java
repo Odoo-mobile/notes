@@ -24,7 +24,6 @@ public class DatePicker extends DialogFragment implements
 		int day = c.get(Calendar.DAY_OF_MONTH);
 		Dialog dialog = new DatePickerDialog(getActivity(), this, year, month,
 				day);
-		dialog.setTitle("Pick Date");
 		return dialog;
 	}
 

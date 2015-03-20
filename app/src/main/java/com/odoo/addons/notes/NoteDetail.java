@@ -123,7 +123,7 @@ public class NoteDetail extends ActionBarActivity {
 //                mAttachmentView.setVisibility(View.VISIBLE);
 //                mAttachmentView.createView(cr);
 //            }
-            String edited_date = note_cr.getString("local_write_date");
+//            String edited_date = note_cr.getString("local_write_date");
 //            edited_date = ODate.getDate(this, edited_date, TimeZone
 //                    .getDefault().getID(), "d MMM, h:m a");
 //            last_update_on.setText("Edited " + edited_date);
@@ -321,7 +321,7 @@ public class NoteDetail extends ActionBarActivity {
                 Bundle extras = new Bundle();
                 extras.putString(Intent.EXTRA_SUBJECT, /* name.getText().toString() */
                         "");
-                extras.putString(Intent.EXTRA_TEXT, Html.toHtml(memo.getText()));
+                extras.putString(Intent.EXTRA_TEXT, memo.getText().toString());
                 extras.putInt(Notes.KEY_STAGE_ID, mStageId);
                 Intent intent = new Intent(this, NoteDetail.class);
                 intent.putExtras(extras);

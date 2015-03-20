@@ -77,7 +77,6 @@ import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.Odoo;
 import odoo.controls.HeaderGridView;
 
 public class Notes extends BaseFragment implements ISyncStatusObserverListener,
@@ -114,7 +113,6 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
-        Odoo.DEBUG=true;
         Bundle extra = getArguments();
         if (extra != null) {
             if (extra.containsKey(KEY_STAGE_ID)) {
@@ -281,8 +279,8 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                     RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "speak now...");
-            getActivity()
-                    .startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
+            intent.putExtra("stage_id", mStageId);
+            parent().startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
         }
     }
 
@@ -339,7 +337,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             if (requestCode == REQUEST_SPEECH_TO_TEXT) {
                 ArrayList<String> matches = data
                         .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                ((NoteNote) db()).quickCreateNote(matches.get(0), mStageId);
+                ((NoteNote) db()).quickCreateNote(matches.get(0), data.getIntExtra("stage_id", 0));
                 Toast.makeText(getActivity(), R.string.note_created, Toast.LENGTH_LONG).show();
             }
             OValues values = fileManager.handleResult(requestCode, resultCode, data);
@@ -422,7 +420,6 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                     OControls.setGone(mView, R.id.swipe_container);
                     OControls.setVisible(mView, R.id.notes_no_items);
                     setHasSwipeRefreshView(mView, R.id.notes_no_items, Notes.this);
-
                     switch (mCurrentKey) {
                         case Notes:
                             OControls.setText(mView, R.id.title,

@@ -40,16 +40,16 @@
                 android:src="@drawable/ic_action_notes"
                 android:tint="@color/body_text_2" />
 
-           <!-- <ImageView
-                android:id="@+id/imgAttachImage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="?android:selectableItemBackground"
-                android:clickable="true"
-                android:padding="5dp"
-                android:src="@drawable/ic_action_image_photo"
-                android:tint="@color/body_text_2" />-->
+            <!-- <ImageView
+                   android:id="@+id/imgAttachImage"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="1"
+                   android:background="?android:selectableItemBackground"
+                   android:clickable="true"
+                   android:padding="5dp"
+                   android:src="@drawable/ic_action_image_photo"
+                   android:tint="@color/body_text_2" />-->
 
             <ImageView
                 android:id="@+id/imgAttachSpeechToText"
