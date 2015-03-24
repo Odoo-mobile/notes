@@ -1,9 +1,13 @@
 package com.odoo.addons.notes;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
@@ -21,11 +25,15 @@ import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.models.NoteStage;
 import com.odoo.addons.notes.reminder.NoteReminder;
 import com.odoo.addons.notes.utils.NoteUtil;
+import com.odoo.base.addons.ir.feature.OFileManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.ODateUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NoteDetail extends ActionBarActivity {
     public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
@@ -44,6 +52,8 @@ public class NoteDetail extends ActionBarActivity {
     private String /* note_name, */note_memo;
     private EditText /* name, */memo;
     private ActionBar actionBar;
+    public static final int REQUEST_SPEECH_TO_TEXT = 333;
+    private OFileManager fileManager;
 
     //    public static final String ACTION_ATTACH_FILE = "action_attach_file";
     //    private Attachments attachment;
@@ -153,6 +163,10 @@ public class NoteDetail extends ActionBarActivity {
             }
         }
         note_memo = memo.getText().toString();
+        fileManager = new OFileManager(getApplicationContext());
+        if (extra.containsKey("type")) {
+            requestSpeechToText();
+        }
     }
 
     private void initControls(int color) {
@@ -179,6 +193,45 @@ public class NoteDetail extends ActionBarActivity {
         SpannableStringBuilder b = new SpannableStringBuilder(
                 Html.fromHtml(content));
         memo.setText(b);
+    }
+
+    private void requestSpeechToText() {
+        PackageManager mPackageManager = this.getPackageManager();
+        List<ResolveInfo> activities = mPackageManager.queryIntentActivities(
+                new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+        if (activities.size() == 0) {
+            Toast.makeText(this, "No audio recorder present.",
+                    Toast.LENGTH_LONG).show();
+        } else {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "speak now...");
+            intent.putExtra("stage_id", mStageId);
+            startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_SPEECH_TO_TEXT) {
+                ArrayList<String> matches = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                if (memo.getText() != null)
+                    memo.setText(memo.getText() + "\n" + matches.get(0));
+                else
+                    memo.setText(matches.get(0));
+            }
+            OValues values = fileManager.handleResult(requestCode, resultCode, data);
+            if (values != null && !values.contains("size_limit_exceed")) {
+                //TODO
+                String newImage = values.getString("datas");
+                Toast.makeText(this, R.string.note_created, Toast.LENGTH_LONG).show();
+            } else if (values != null) {
+                Toast.makeText(this, R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -298,6 +351,9 @@ public class NoteDetail extends ActionBarActivity {
 //            case R.id.menu_note_attachment:
 //                attachment.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
 //                break;
+            case R.id.menu_note_speech_to_text:
+                requestSpeechToText();
+                break;
             case R.id.menu_note_archive:
                 isDirty = true;
                 int iconRes = (open) ? R.drawable.ic_action_unarchive : R.drawable.ic_action_archive;

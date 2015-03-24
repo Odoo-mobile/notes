@@ -17,6 +17,11 @@
         android:title="Archive Note"
         app:showAsAction="always" />
     <item
+        android:id="@+id/menu_note_speech_to_text"
+        android:icon="@drawable/ic_action_mic"
+        android:title="Speech To Text"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/menu_note_operation"
         android:icon="@drawable/ic_action_more"
         android:title="More"
