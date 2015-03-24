@@ -219,9 +219,10 @@ public class NoteDetail extends ActionBarActivity {
                 ArrayList<String> matches = data
                         .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 if (memo.getText() != null)
-                    memo.setText(memo.getText() + "\n" + matches.get(0));
+                    memo.setText(memo.getText() + " " + matches.get(0));
                 else
                     memo.setText(matches.get(0));
+                memo.setSelection(memo.getText().length());
             }
             OValues values = fileManager.handleResult(requestCode, resultCode, data);
             if (values != null && !values.contains("size_limit_exceed")) {

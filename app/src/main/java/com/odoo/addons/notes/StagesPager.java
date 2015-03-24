@@ -295,7 +295,7 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
         public CharSequence getPageTitle(int position) {
             stageCursor.moveToPosition(position);
             int stage_id = stageCursor.getInt(stageCursor.getColumnIndex(OColumn.ROW_ID));
-            int count = noteNote.count("stage_id = ?", new String[]{stage_id + ""});
+            int count = noteNote.count("stage_id = ? and open = ? and trashed = ?", new String[]{stage_id + "","true","0"});
             String name = stageCursor.getString(stageCursor.getColumnIndex("name"));
             return (count > 0) ? name + " (" + count + ")" : name;
         }

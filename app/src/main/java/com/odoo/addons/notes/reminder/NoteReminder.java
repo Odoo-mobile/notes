@@ -64,8 +64,9 @@ public class NoteReminder implements PickerCallBack, OnClickListener,
                 .getSystemService(Context.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0,
                 myIntent, 0);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-                pendingIntent);
+        if (cal != null)
+            alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+                    pendingIntent);
     }
 
     public void setDay(QuickDayType day) {
@@ -139,11 +140,14 @@ public class NoteReminder implements PickerCallBack, OnClickListener,
 
     public Calendar getCal() {
         Calendar cal = Calendar.getInstance();
-        String date = getDateString();
-        String format = DATE_FORMAT + " yyyy " + TIME_FORMAT;
-        cal.setTime(ODateUtils.createDateObject(date, format, true));
-        cal.set(Calendar.SECOND, 0);
-        return cal;
+        if (mDate != null && mTime != null) {
+            String date = getDateString();
+            String format = DATE_FORMAT + " yyyy " + TIME_FORMAT;
+            cal.setTime(ODateUtils.createDateObject(date, format, true));
+            cal.set(Calendar.SECOND, 0);
+            return cal;
+        } else
+            return null;
     }
 
     public void initControls(View view, String defaultDateTime) {
@@ -203,7 +207,9 @@ public class NoteReminder implements PickerCallBack, OnClickListener,
                 break;
             case R.id.cancel_reminder:
                 toggleViews(false);
-                hasReminder = false;
+                hasReminder = true;
+                mDate = null;
+                mTime = null;
                 break;
             case R.id.reminder_date:
                 mDayPopup = new PopupMenu(mContext, v);
@@ -271,9 +277,12 @@ public class NoteReminder implements PickerCallBack, OnClickListener,
     }
 
     public String getDateString() {
-        String year = ODateUtils.getUTCDate("yyyy");
-        String date = mDate + " " + year + " " + mTime;
-        return date;
+        if (mDate != null && mTime != null) {
+            String year = ODateUtils.getUTCDate("yyyy");
+            String date = mDate + " " + year + " " + mTime;
+            return date;
+        } else
+            return "0";
     }
 
     public void setHasReminder(Boolean reminder) {
