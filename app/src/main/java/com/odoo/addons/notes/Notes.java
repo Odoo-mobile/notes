@@ -337,8 +337,8 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             if (requestCode == REQUEST_SPEECH_TO_TEXT) {
                 ArrayList<String> matches = data
                         .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                ((NoteNote) db()).quickCreateNote(matches.get(0), data.getIntExtra("stage_id", 0));
-                Toast.makeText(getActivity(), R.string.note_created, Toast.LENGTH_LONG).show();
+                ((NoteNote) db()).quickCreateNote(matches.get(0), mStageId);
+                Toast.makeText(getActivity(), _s(R.string.note_created), Toast.LENGTH_LONG).show();
             }
             OValues values = fileManager.handleResult(requestCode, resultCode, data);
             if (values != null && !values.contains("size_limit_exceed")) {
