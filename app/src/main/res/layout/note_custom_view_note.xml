@@ -7,6 +7,7 @@
 
     <LinearLayout
         android:id="@+id/note_bg_color"
+        android:padding="@dimen/default_8dp"
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:layout_height="wrap_content">

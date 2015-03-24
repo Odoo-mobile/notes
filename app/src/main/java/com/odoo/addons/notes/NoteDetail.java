@@ -25,6 +25,7 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.ODateUtils;
 
 public class NoteDetail extends ActionBarActivity {
     public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
@@ -57,7 +58,6 @@ public class NoteDetail extends ActionBarActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setBackgroundDrawable(
                 new ColorDrawable(Color.parseColor("#22000000")));
-//        actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
         init();
     }
 
@@ -102,6 +102,7 @@ public class NoteDetail extends ActionBarActivity {
         mReminder = new NoteReminder(this, getSupportFragmentManager());
         mReminder.initControls(findViewById(R.id.reminder_controls),
                 reminderDate);
+        mReminder.setHasReminder(false);
     }
 
     private void initData(Integer note_id, Bundle extra) {
@@ -123,10 +124,9 @@ public class NoteDetail extends ActionBarActivity {
 //                mAttachmentView.setVisibility(View.VISIBLE);
 //                mAttachmentView.createView(cr);
 //            }
-//            String edited_date = note_cr.getString("local_write_date");
-//            edited_date = ODate.getDate(this, edited_date, TimeZone
-//                    .getDefault().getID(), "d MMM, h:m a");
-//            last_update_on.setText("Edited " + edited_date);
+            String edited_date = ODateUtils.convertToDefault(note_cr.getString("_write_date"),
+                    ODateUtils.DEFAULT_FORMAT, "d MMM, hh:mm a");
+            last_update_on.setText("Edited " + edited_date);
             createView();
         }
         if (extra.containsKey(Intent.EXTRA_SUBJECT)
@@ -160,11 +160,11 @@ public class NoteDetail extends ActionBarActivity {
         last_update_on = (TextView) findViewById(R.id.last_update_on);
         findViewById(R.id.note_detail_view)
                 .setBackgroundColor(background_color);
-        // name = (EditText) findViewById(R.id.note_name);
         memo = (EditText) findViewById(R.id.note_memo);
-        // name.setTextColor(NoteUtil.getTextColor(color));
         memo.setTextColor(NoteUtil.getTextColor(color));
         last_update_on.setTextColor(NoteUtil.getTextColor(color));
+
+
 //        mAttachmentView = (ONoteAttachmentView) findViewById(R.id.note_attachments);
 //        mAttachmentView.setMaximumCols(3);
 //        mAttachmentView.setAttachmentViewListener(this);
@@ -200,7 +200,7 @@ public class NoteDetail extends ActionBarActivity {
                 isDirty = true;
             }
             if (!isDirty) {
-                isDirty = (mReminder.hasReminder() || (reminderDate != null));
+                isDirty = mReminder.hasReminder();
             }
         }
         return isDirty;

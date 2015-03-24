@@ -71,6 +71,7 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
     private StagePagerAdapter stagePagerAdapter;
     private int stagePosition = 0;
     private boolean updated = false;
+    private NoteNote noteNote;
     private HashMap<String, Fragment> mFragments = new HashMap<>();
 
     @Override
@@ -85,6 +86,7 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
         mView = view;
         parent().setOnBackPressListener(this);
         setHasOptionsMenu(true);
+        noteNote = new NoteNote(getActivity(), null);
         initHandler();
     }
 
@@ -292,7 +294,10 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
         @Override
         public CharSequence getPageTitle(int position) {
             stageCursor.moveToPosition(position);
-            return stageCursor.getString(stageCursor.getColumnIndex("name"));
+            int stage_id = stageCursor.getInt(stageCursor.getColumnIndex(OColumn.ROW_ID));
+            int count = noteNote.count("stage_id = ?", new String[]{stage_id + ""});
+            String name = stageCursor.getString(stageCursor.getColumnIndex("name"));
+            return (count > 0) ? name + " (" + count + ")" : name;
         }
 
         @Override

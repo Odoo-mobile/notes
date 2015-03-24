@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,11 +19,8 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.utils.ODateUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 
 
 public class NoteReminder implements PickerCallBack, OnClickListener,
@@ -58,6 +56,7 @@ public class NoteReminder implements PickerCallBack, OnClickListener,
     }
 
     public void setReminder(int note_id, Calendar cal) {
+        Log.d("NoteReminder", "Reminder added.");
         ODataRow note = mNote.browse(note_id);
         Intent myIntent = new Intent(mContext, ReminderReceiver.class);
         myIntent.putExtras(note.getPrimaryBundleData());
@@ -142,16 +141,9 @@ public class NoteReminder implements PickerCallBack, OnClickListener,
         Calendar cal = Calendar.getInstance();
         String date = getDateString();
         String format = DATE_FORMAT + " yyyy " + TIME_FORMAT;
-        cal.setTime(ODateUtils.createDateObject(date, format, false));
+        cal.setTime(ODateUtils.createDateObject(date, format, true));
+        cal.set(Calendar.SECOND, 0);
         return cal;
-    }
-
-    public <T> List<Object> toObjectList(HashMap<T, String> map) {
-        List<Object> list = new ArrayList<Object>();
-        for (T key : map.keySet()) {
-            list.add(map.get(key));
-        }
-        return list;
     }
 
     public void initControls(View view, String defaultDateTime) {
@@ -160,7 +152,7 @@ public class NoteReminder implements PickerCallBack, OnClickListener,
         if (defaultDateTime != null) {
             onClick(view.findViewById(R.id.reminder_label));
             Date date = ODateUtils
-                    .createDateObject(defaultDateTime, FULL_FORMAT, false);
+                    .createDateObject(defaultDateTime, FULL_FORMAT, true);
             mDate = new SimpleDateFormat(DATE_FORMAT).format(date);
             mTime = new SimpleDateFormat(TIME_FORMAT).format(date);
             dayPopup.setText(mDate);
@@ -219,8 +211,10 @@ public class NoteReminder implements PickerCallBack, OnClickListener,
                         mDayPopup.getMenu());
                 mDayPopup.setOnMenuItemClickListener(this);
                 mDayPopup.show();
+                hasReminder = true;
                 break;
             case R.id.reminder_time:
+                hasReminder = true;
                 mTimePopup = new PopupMenu(mContext, v);
                 mTimePopup.getMenuInflater().inflate(R.menu.menu_note_time_popup,
                         mTimePopup.getMenu());

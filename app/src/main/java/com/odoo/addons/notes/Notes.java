@@ -69,6 +69,7 @@ import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.StringUtils;
+import com.odoo.core.utils.logger.OLog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.widgets.bottomsheet.BottomSheet;
@@ -82,7 +83,8 @@ import odoo.controls.HeaderGridView;
 public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         SwipeRefreshLayout.OnRefreshListener, LoaderManager.LoaderCallbacks<Cursor>,
         OCursorListAdapter.OnViewBindListener, IOnSearchViewChangeListener,
-        View.OnClickListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener, BottomSheetListeners.OnSheetMenuCreateListener, IOnActivityResultListener {
+        View.OnClickListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener,
+        BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener, BottomSheetListeners.OnSheetMenuCreateListener, IOnActivityResultListener {
     public static final String TAG = Notes.class.getSimpleName();
     //    public static final String EXTRA_KEY_TYPE = "extra_key_type";
     public static final String KEY_STAGE_ID = "stage_id";
@@ -280,10 +282,10 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                     RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "speak now...");
             intent.putExtra("stage_id", mStageId);
-            parent().startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
+            startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
+//            parent().startActivityForResult(intent, REQUEST_SPEECH_TO_TEXT);
         }
     }
-
 
     private void setHeaderView() {
         switch (mCurrentKey) {
@@ -333,6 +335,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
 
     @Override
     public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
+        OLog.log("Whoooo.. What's happning android ????? I'm gone mad");
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_SPEECH_TO_TEXT) {
                 ArrayList<String> matches = data

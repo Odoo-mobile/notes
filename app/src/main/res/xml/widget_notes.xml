@@ -8,6 +8,4 @@
     android:previewImage="@drawable/note_widget_preview"
     android:resizeMode="vertical|horizontal"
     android:updatePeriodMillis="1800000"
-    android:widgetCategory="keyguard|home_screen" >
-
-</appwidget-provider>
+    android:widgetCategory="home_screen" />
