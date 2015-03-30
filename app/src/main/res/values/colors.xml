@@ -54,4 +54,5 @@
 
     <color name="base_chatter_view_background">#f3f3f3</color>
     <color name="dark_icon">#616161</color>
+    <color name="base_chatter_view_note_background">#dadada</color>
 </resources>
