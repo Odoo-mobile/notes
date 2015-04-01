@@ -9,12 +9,12 @@ import com.odoo.addons.notes.dialogs.NoteStagesDialog;
 
 
 public class NoteUtil {
-    private static String[] background_colors = {"#AC6DAD", "#6C6DEC",
-            "#EB6D6D", "#9ACD32", "#35D374", "#4ED2BE", "#FFA500", "#EBBF6D",
-            "#EBEC6D", "#6C6D6D"};
-    private static String[] text_colors = {"#270A28", "#171844", "#291010",
-            "#2F3E11", "#0A361B", "#0C352E", "#4B3A1C", "#493615", "#3D3E12",
-            "#0E1818"};
+    private static String[] background_colors = {"#c5c5c5", "#736784",
+            "#EB6D6D", "#FFA500", "#9ACD32", "#4ED2BE", "#4ed2be", "#6C6DEC",
+            "#AC6DAD", "#f75b9f"};
+    private static String[] text_colors = {"#131313", "#1d1a21", "#291010",
+            "#4B3A1C", "#2F3E11", "#0C352E", "#071a17", "#171844", "#270A28",
+            "#310217"};
 
     public static String[] getBackgroundColors() {
         return background_colors;

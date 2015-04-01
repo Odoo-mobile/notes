@@ -22,6 +22,7 @@ package com.odoo.addons.notes;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -150,7 +151,7 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
         pagerTabStrip = (PagerTabStrip) mView.findViewById(R.id.pager_title_strip);
         viewPager.setOnPageChangeListener(this);
         viewPager.setOffscreenPageLimit(2);
-        pagerTabStrip.setTabIndicatorColor(_c(R.color.theme_primary));
+        pagerTabStrip.setTabIndicatorColor(Color.WHITE);
         stagePagerAdapter = new StagePagerAdapter(getChildFragmentManager());
         viewPager.setAdapter(stagePagerAdapter);
         for (int i = 0; i < pagerTabStrip.getChildCount(); ++i) {
@@ -158,7 +159,7 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
             if (nextChild instanceof TextView) {
                 TextView textViewToConvert = (TextView) nextChild;
                 textViewToConvert.setAllCaps(true);
-                textViewToConvert.setTextColor(_c(R.color.body_text_2));
+                textViewToConvert.setTextColor(Color.WHITE);
                 textViewToConvert.setTypeface(OControlHelper.boldFont());
             }
         }
@@ -184,6 +185,22 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
                 .setIcon(R.drawable.ic_action_trash)
                 .setExtra(extra(Notes.Type.Deleted))
                 .setInstance(new Notes()));
+        //TODO: 
+        /*
+        Adding tags filters for notes. (VERSION : 2.1.0)
+         */
+//        NoteTag tags = new NoteTag(context, null);
+//        if (tags.count(null, null) > 0) {
+//            items.add(new ODrawerItem(TAG).setTitle("Tags").setGroupTitle());
+//            for (ODataRow tag : tags.select()) {
+//                Bundle extra = extra(Notes.Type.TagFilter);
+//                extra.putInt("tag_id", tag.getInt(OColumn.ROW_ID));
+//                items.add(new ODrawerItem(TAG).setTitle(tag.getString("name"))
+//                        .setIcon(R.drawable.ic_action_label)
+//                        .setInstance(new Notes())
+//                        .setExtra(extra));
+//            }
+//        }
         return items;
     }
 
@@ -295,7 +312,7 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
         public CharSequence getPageTitle(int position) {
             stageCursor.moveToPosition(position);
             int stage_id = stageCursor.getInt(stageCursor.getColumnIndex(OColumn.ROW_ID));
-            int count = noteNote.count("stage_id = ? and open = ? and trashed = ?", new String[]{stage_id + "","true","0"});
+            int count = noteNote.count("stage_id = ? and open = ? and trashed = ?", new String[]{stage_id + "", "true", "0"});
             String name = stageCursor.getString(stageCursor.getColumnIndex("name"));
             return (count > 0) ? name + " (" + count + ")" : name;
         }

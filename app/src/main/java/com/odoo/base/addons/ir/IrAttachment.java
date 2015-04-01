@@ -80,15 +80,30 @@ public class IrAttachment extends OModel {
             data.put("db_datas", value.getString("datas"));
             data.put("datas_fname", value.get("name"));
             data.put("file_size", value.get("file_size"));
-            data.put("res_model", false);
-            data.put("res_id", false);
             data.put("file_type", value.get("file_type"));
             data.put("company_id", model.getUser().getCompany_id());
+            if (value.contains("res_id"))
+                data.put("res_id", value.getInt("res_id"));
+            else
+                data.put("res_id", false);
+            if (value.contains("res_model"))
+                data.put("res_model", value.getString("res_model"));
+            else
+                data.put("res_model", false);
             return data;
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean hasAttachment(Context context, String model, int res_id) {
+        IrAttachment irAttachment = new IrAttachment(context, null);
+        if (irAttachment.count("res_model = ? and res_id = ?",
+                new String[]{model, res_id + ""}) > 0) {
+            return true;
+        }
+        return false;
     }
 
     public String getDatasFromServer(Integer row_id) {
@@ -108,5 +123,15 @@ public class IrAttachment extends OModel {
             e.printStackTrace();
         }
         return "false";
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowCreateRecordOnServer() {
+        return false; // Skipping due to create datas for attachment manually
     }
 }

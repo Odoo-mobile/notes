@@ -49,7 +49,6 @@ import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OStringColorUtil;
-import com.odoo.core.utils.logger.OLog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -169,7 +168,6 @@ public class MailChatterCompose extends ActionBarActivity implements View.OnClic
         String type = values.getString("file_type");
         ImageView imgPreview = (ImageView) attachmentView.findViewById(R.id.attachmentPreview);
         if (type.contains("image")) {
-            OLog.log(values.getString("file_uri"));
             imgPreview.setImageURI(Uri.parse(values.getString("file_uri")));
         } else if (type.contains("audio")) {
             imgPreview.setImageResource(R.drawable.audio);

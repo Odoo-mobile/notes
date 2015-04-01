@@ -19,9 +19,11 @@
  */
 package com.odoo.addons.notes;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -29,18 +31,14 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.R;
@@ -50,6 +48,7 @@ import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.utils.NoteUtil;
 import com.odoo.addons.notes.widgets.NotesWidget;
 import com.odoo.addons.notes.widgets.WidgetHelper;
+import com.odoo.base.addons.config.BaseConfigSettings;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -60,6 +59,7 @@ import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.utils.IntentUtils;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
@@ -71,29 +71,26 @@ import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.controls.HeaderGridView;
-
 public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         SwipeRefreshLayout.OnRefreshListener, LoaderManager.LoaderCallbacks<Cursor>,
         OCursorListAdapter.OnViewBindListener, IOnSearchViewChangeListener,
         View.OnClickListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener,
-        BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener, BottomSheetListeners.OnSheetMenuCreateListener {
+        BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener,
+        BottomSheetListeners.OnSheetMenuCreateListener {
     public static final String TAG = Notes.class.getSimpleName();
-    //    public static final String EXTRA_KEY_TYPE = "extra_key_type";
     public static final String KEY_STAGE_ID = "stage_id";
     public static final String KEY_NOTE_ID = "note_id";
     public static final String KEY_NOTE_FILTER = "note_filter";
     private Type mCurrentKey = Type.Notes;
     private int mStageId = 0;
     private OCursorListAdapter mAdapter = null;
-    private HeaderGridView mList = null;
+    private ListView mList = null;
     private View mView;
     private String mFilter = null;
-    private int listOffset = 0;
     private BottomSheet mSheet;
 
     public enum Type {
-        Notes, Archive, Reminders, Deleted
+        Notes, Archive, Reminders, Deleted, TagFilter
     }
 
     @Override
@@ -121,8 +118,6 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                     data.putString("type", "speechToText");
                     quickCreateNote(data);
                 }
-//                if (extra.getString(WidgetHelper.EXTRA_WIDGET_ITEM_KEY).equals(NotesWidget.KEY_NOTE_FILE_ATTACH))
-//                    quickCreateNote(data);
 
             }
         }
@@ -130,6 +125,10 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         setHasSwipeRefreshView(view, R.id.swipe_container, this);
         setHasSyncStatusObserver(TAG, this, db());
         initAdapter();
+
+        if (BaseConfigSettings.padInstalled(getActivity())) {
+            OAlert.showWarning(getActivity(), "Pad installed. Unable to work offline.");
+        }
     }
 
     private void initAdapter() {
@@ -137,9 +136,9 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             mCurrentKey = Type.valueOf(getArguments().getString(KEY_NOTE_FILTER));
             if (mCurrentKey == Type.Deleted)
                 mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
-            mList = (HeaderGridView) mView.findViewById(R.id.gridView);
+            mList = (ListView) mView.findViewById(R.id.gridView);
             setHasFloatingButton(mView, R.id.fabButton, mList, this);
-            setHeaderView();
+            //setHeaderView();
             mAdapter = new OCursorListAdapter(getActivity(), null,
                     R.layout.note_custom_view_note);
             mAdapter.setOnViewBindListener(this);
@@ -151,8 +150,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
 
     @Override
     public void onItemDoubleClick(View view, int position) {
-        Cursor cr = mAdapter.getCursor();
-        cr.moveToPosition(position - listOffset);
+        Cursor cr = (Cursor) mAdapter.getItem(position);
         Bundle bundle = new Bundle();
         bundle.putInt(KEY_NOTE_ID, cr.getInt(cr.getColumnIndex(OColumn.ROW_ID)));
         Intent intent = new Intent(getActivity(), NoteDetail.class);
@@ -162,8 +160,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
 
     @Override
     public void onItemClick(View view, int position) {
-        Cursor cr = mAdapter.getCursor();
-        cr.moveToPosition(position - listOffset);
+        Cursor cr = (Cursor) mAdapter.getItem(position);
         showSheet(cr);
     }
 
@@ -246,67 +243,87 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         data.putInt(KEY_STAGE_ID, mStageId);
         switch (v.getId()) {
             case R.id.fabButton:
-            case R.id.imgCreateQuickNote:
-                quickCreateNote(data);
+                showFabSheet();
                 break;
-//            case R.id.imgAttachImage:
-//                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
-//                break;
-            case R.id.imgAttachSpeechToText:
-                data.putString("type", "speechToText");
+        }
+    }
+
+    private void showFabSheet() {
+        if (mSheet != null) {
+            mSheet.dismiss();
+        }
+        BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
+        builder.listener(fabListeners);
+        builder.setIconColor(_c(R.color.body_text_2));
+        builder.setTextColor(_c(R.color.body_text_1));
+        builder.title("New Note");
+        builder.menu(R.menu.menu_notes_sheet);
+        mSheet = builder.create();
+        mSheet.show();
+    }
+
+    BottomSheetListeners.OnSheetItemClickListener fabListeners =
+            new BottomSheetListeners.OnSheetItemClickListener() {
+
+                @Override
+                public void onItemClick(BottomSheet bottomSheet, MenuItem menuItem, Object o) {
+                    if (mSheet != null) {
+                        mSheet.dismiss();
+                    }
+                    Bundle data = new Bundle();
+                    data.putInt(KEY_STAGE_ID, mStageId);
+                    switch (menuItem.getItemId()) {
+                        case R.id.menu_note_create:
+                            quickCreateNote(data);
+                            break;
+                        case R.id.menu_note_new_with_attachment:
+                            CheckForDocumentModule checkForDocumentModule = new CheckForDocumentModule();
+                            checkForDocumentModule.execute();
+                            break;
+                        case R.id.menu_note_speech_to_text:
+                            data.putString("type", "speechToText");
+                            quickCreateNote(data);
+                            break;
+                    }
+                }
+            };
+
+    private class CheckForDocumentModule extends AsyncTask<Void, Void, Boolean> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setTitle(R.string.title_please_wait);
+            progressDialog.setMessage(_s(R.string.title_working));
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            return db().isInstalledOnServer("document", false);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+            if (result) {
+                Bundle data = new Bundle();
+                data.putInt(KEY_STAGE_ID, mStageId);
+                data.putBoolean(NoteDetail.REQUEST_FILE_ATTACHMENT, true);
                 quickCreateNote(data);
-                break;
+            } else {
+                OAlert.showWarning(getActivity(), _s(R.string.warning_no_document_module_installed));
+            }
         }
     }
 
     private void quickCreateNote(Bundle data) {
         IntentUtils.startActivity(getActivity(), NoteDetail.class, data);
-    }
-
-    private void setHeaderView() {
-        switch (mCurrentKey) {
-            case Notes:
-            case Reminders:
-                listOffset = 1;
-                View header = LayoutInflater.from(getActivity())
-                        .inflate(R.layout.note_quick_controls, mList, false);
-                header.findViewById(R.id.imgCreateQuickNote).setOnClickListener(this);
-//                header.findViewById(R.id.imgAttachImage).setOnClickListener(this);
-                header.findViewById(R.id.imgAttachSpeechToText)
-                        .setOnClickListener(this);
-                EditText edtQuickNote = (EditText) header
-                        .findViewById(R.id.edtNoteQuickMemo);
-                edtQuickNote.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-                    @Override
-                    public boolean onEditorAction(TextView v, int actionId,
-                                                  KeyEvent event) {
-                        if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
-                                || (actionId == EditorInfo.IME_ACTION_DONE)) {
-                            if (TextUtils.isEmpty(v.getText())) {
-                                Toast.makeText(getActivity(), _s(R.string.note_discarded),
-                                        Toast.LENGTH_LONG).show();
-                            } else {
-                                String note = v.getText().toString();
-                                ((NoteNote) db()).quickCreateNote(note, mStageId);
-                                Toast.makeText(getActivity(),
-                                        _s(R.string.note_created), Toast.LENGTH_LONG)
-                                        .show();
-                                restartLoader();
-                                v.setText("");
-                            }
-                        }
-                        return false;
-                    }
-                });
-                mList.addHeaderView(header);
-                break;
-            case Archive:
-
-            case Deleted:
-                break;
-        }
-
     }
 
     @Override
@@ -349,6 +366,8 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                 selection += " trashed = ?";
                 args.add("1");
                 break;
+            case TagFilter:
+                break;
         }
         if (mFilter != null) {
             selection += " and name like ?";
@@ -371,8 +390,6 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                     OControls.setGone(mView, R.id.notes_no_items);
                     setHasSwipeRefreshView(mView, R.id.swipe_container, Notes.this);
                 } else {
-//                    if (db().isEmptyTable())
-//                        onRefresh();
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setGone(mView, R.id.swipe_container);
                     OControls.setVisible(mView, R.id.notes_no_items);
@@ -434,6 +451,28 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         OControls.setText(view, R.id.note_memo,
                 StringUtils.htmlToString(row.getString("short_memo")));
         OControls.setTextColor(view, R.id.note_memo, NoteUtil.getTextColor(color_number));
+        OControls.setTextColor(view, R.id.note_reminder_status, NoteUtil.getTextColor(color_number));
+        ImageView attachment = (ImageView) view.findViewById(R.id.noteHasAttachment);
+        attachment.setColorFilter(NoteUtil.getTextColor(color_number));
+        boolean showContainer = true;
+        if (((NoteNote) db()).hasAttachment(row.getInt(OColumn.ROW_ID))) {
+            attachment.setVisibility(View.VISIBLE);
+        } else {
+            showContainer = false;
+            attachment.setVisibility(View.GONE);
+        }
+        ImageView reminderClock = (ImageView) view.findViewById(R.id.reminderClock);
+        reminderClock.setColorFilter(NoteUtil.getTextColor(color_number));
+        if (!row.getString("reminder").equals("0")) {
+            view.findViewById(R.id.reminderClock).setVisibility(View.VISIBLE);
+            OControls.setText(view, R.id.note_reminder_status, row.getString("reminder"));
+        } else {
+            if (!showContainer)
+                showContainer = false;
+            view.findViewById(R.id.reminderClock).setVisibility(View.GONE);
+            OControls.setText(view, R.id.note_reminder_status, "");
+        }
+        view.findViewById(R.id.note_info_container).setVisibility((!showContainer) ? View.GONE : View.VISIBLE);
         bindRowControls(view, row);
     }
 

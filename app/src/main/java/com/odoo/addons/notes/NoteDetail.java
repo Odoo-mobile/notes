@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.ActionBar;
@@ -13,9 +14,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,18 +30,28 @@ import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.models.NoteStage;
 import com.odoo.addons.notes.reminder.NoteReminder;
 import com.odoo.addons.notes.utils.NoteUtil;
+import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.ir.feature.OFileManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAlert;
+import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OResource;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NoteDetail extends ActionBarActivity {
+import odoo.controls.OForm;
+import odoo.controls.misc.ONoteAttachmentView;
+
+public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView.AttachmentViewListener {
     public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
+    public static final String REQUEST_FILE_ATTACHMENT = "request_file_attachment";
+    public static final int REQUEST_SPEECH_TO_TEXT = 333;
     private NoteNote mNote;
     private NoteStage mStage;
     private NoteReminder mReminder;
@@ -49,63 +64,140 @@ public class NoteDetail extends ActionBarActivity {
     private Boolean isDirty = false;
     private Integer mStageId = 0;
     private Integer color = 0;
-    private String /* note_name, */note_memo;
-    private EditText /* name, */memo;
+    private String note_memo;
+    private EditText memo;
     private ActionBar actionBar;
-    public static final int REQUEST_SPEECH_TO_TEXT = 333;
     private OFileManager fileManager;
+    private Bundle extra;
+    private List<OValues> attachments = new ArrayList<>();
+    private List<ODataRow> attachmentLists = new ArrayList<>();
+    private int dbAttachments = 0;
+    private OForm mNoteForm;
+    private ONoteAttachmentView attachmentView;
+    private IrAttachment irAttachment;
 
-    //    public static final String ACTION_ATTACH_FILE = "action_attach_file";
-    //    private Attachments attachment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_detail_view);
         OActionBarUtils.setActionBar(this, false);
         actionBar = getSupportActionBar();
-        actionBar.setTitle("Notes");
+        actionBar.setTitle("");
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setBackgroundDrawable(
                 new ColorDrawable(Color.parseColor("#22000000")));
+        fileManager = new OFileManager(this);
+        irAttachment = new IrAttachment(this, null);
+        mNoteForm = (OForm) findViewById(R.id.noteForm);
         init();
     }
 
     private void init() {
         mNote = new NoteNote(this, null);
-//        attachment = new Attachments(this);
         mStage = new NoteStage(this, null);
-        Bundle extra = getIntent().getExtras();
-        Integer note_id;
-        note_id = (extra.containsKey(Notes.KEY_NOTE_ID)) ? extra
+        extra = getIntent().getExtras();
+        Integer note_id = (extra.containsKey(Notes.KEY_NOTE_ID)) ? extra
                 .getInt(Notes.KEY_NOTE_ID) : null;
+        if (OUser.current(this) == null) {
+            Toast.makeText(this, "No active account found", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+        String action = getIntent().getAction();
+        if (action != null && (action.equals(Intent.ACTION_SEND) ||
+                action.equals(Intent.ACTION_SEND_MULTIPLE))) {
+            if (action.equals(Intent.ACTION_SEND)) {
+                OValues singleAttachment = fileManager.handleResult(OFileManager.SINGLE_ATTACHMENT_STREAM,
+                        RESULT_OK, getIntent());
+                attachments.add(singleAttachment);
+            } else {
+                List<OValues> attachmentList = fileManager.handleMultipleRequest(getIntent());
+                attachments.addAll(attachmentList);
+            }
+        }
         initData(note_id, extra);
-//        String action = getIntent().getAction();
-//        if (action != null && !action.equals(ACTION_ATTACH_FILE)) {
-//            if (getIntent().getType() != null
-//                    && getIntent().getType().equals("text/plain")) {
-//                initData(note_id, extra);
-//                isDirty = true;
-//            } else {
-//                List<OValues> attachments = attachment
-//                        .handleIntentRequest(getIntent());
-//                note_id = null;
-//                if (attachments.size() > 0) {
-//                    for (OValues v : attachments) {
-//                        note_id = mNote.addAttachment(v, mStageId, note_id);
-//                    }
-//                    initData(note_id, extra);
-//                    isDirty = true;
-//                }
-//            }
-//        }
-        initReminderControls();
 
-//        if (action != null) {
-//            if (action.equals(ACTION_ATTACH_FILE)) {
-//                attachment.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
-//            }
-//        }
+        if (extra.containsKey(REQUEST_FILE_ATTACHMENT)) {
+            fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
+        }
+
+        initAttachmentView();
+        initReminderControls();
+    }
+
+    private void initAttachmentView() {
+        attachmentLists.clear();
+        attachmentView = (ONoteAttachmentView) findViewById(R.id.note_attachments);
+        attachmentView.setMaximumCols(3);
+        attachmentView.setAttachmentViewListener(this);
+        attachmentView.removeAllViews();
+        attachmentView.setVisibility(View.GONE);
+        for (OValues value : attachments) {
+            attachmentLists.add(value.toDataRow());
+        }
+        if (note_cr != null) {
+            List<ODataRow> cr = mNote.getAttachments(note_cr.getInt(OColumn.ROW_ID));
+            dbAttachments = cr.size();
+            attachmentLists.addAll(cr);
+        }
+        if (attachmentLists.size() > 0) {
+            attachmentView.setVisibility(View.VISIBLE);
+            attachmentView.createView(attachmentLists);
+        }
+    }
+
+    @Override
+    public View getView(final ODataRow attachment, final int position, ViewGroup parent) {
+        View view = LayoutInflater.from(this)
+                .inflate(R.layout.note_detail_attachment_item, parent, false);
+        view.setTag(attachment);
+        OControls.setText(view, R.id.file_name, attachment.getString("name"));
+        String type = attachment.getString("file_type");
+        String file_uri = attachment.getString("file_uri");
+        ImageView img = (ImageView) view.findViewById(R.id.attachment_image);
+        if (type.contains("image")) {
+            if (!file_uri.equals("false")) {
+                img.setImageURI(Uri.parse(file_uri));
+            } else {
+                img.setImageResource(R.drawable.image);
+            }
+        } else {
+            img.setImageResource(R.drawable.file);
+        }
+        img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (attachment.contains(OColumn.ROW_ID))
+                    fileManager.downloadAttachment(attachment.getInt(OColumn.ROW_ID));
+                else
+                    fileManager.downloadAttachment(attachment);
+            }
+        });
+        view.findViewById(R.id.remove_attachment).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OAlert.showConfirm(NoteDetail.this,
+                        OResource.string(NoteDetail.this, R.string.toast_delete_attachment),
+                        new OAlert.OnAlertConfirmListener() {
+                            @Override
+                            public void onConfirmChoiceSelect(OAlert.ConfirmType type) {
+                                switch (type) {
+                                    case POSITIVE:
+                                        if (attachment.contains(OColumn.ROW_ID))
+                                            irAttachment.delete(attachment.getInt(OColumn.ROW_ID));
+                                        else
+                                            attachmentLists.remove(position);
+                                        initAttachmentView();
+                                        break;
+                                    case NEGATIVE:
+                                        break;
+                                }
+                            }
+                        });
+            }
+        });
+        return view;
     }
 
     private void initReminderControls() {
@@ -118,6 +210,7 @@ public class NoteDetail extends ActionBarActivity {
     private void initData(Integer note_id, Bundle extra) {
         if (note_id != null) {
             note_cr = mNote.browse(note_id);
+            mNoteForm.initForm(note_cr);
             mStageId = note_cr.getInt("stage_id");
             open = note_cr.getString("open").equals("true");
             trashed = note_cr.getInt("trashed");
@@ -127,25 +220,14 @@ public class NoteDetail extends ActionBarActivity {
             String reminder = note_cr.getString("reminder");
             if (!reminder.equals("0"))
                 reminderDate = reminder;
-//            Cursor cr = mNote.getAttachments(note_cr.get(0).getInt(OColumn.ROW_ID+""));
-//            mAttachmentView.removeAllViews();
-//            mAttachmentView.setVisibility(View.GONE);
-//            if (cr.getCount() > 0) {
-//                mAttachmentView.setVisibility(View.VISIBLE);
-//                mAttachmentView.createView(cr);
-//            }
             String edited_date = ODateUtils.convertToDefault(note_cr.getString("_write_date"),
                     ODateUtils.DEFAULT_FORMAT, "d MMM, hh:mm a");
             last_update_on.setText("Edited " + edited_date);
             createView();
         }
-        if (extra.containsKey(Intent.EXTRA_SUBJECT)
-                || extra.containsKey(Intent.EXTRA_TEXT)) {
+        if (extra.containsKey(Intent.EXTRA_TEXT)) {
             initControls(color);
-            String content = "";
-            if (extra.containsKey(Intent.EXTRA_SUBJECT))
-                content = extra.getString(Intent.EXTRA_SUBJECT);
-            memo.setText(content + "\n" + extra.getString(Intent.EXTRA_TEXT));
+            memo.setText(extra.getString(Intent.EXTRA_TEXT));
             isDirty = true;
         }
         if (extra.containsKey(Notes.KEY_STAGE_ID)) {
@@ -163,7 +245,6 @@ public class NoteDetail extends ActionBarActivity {
             }
         }
         note_memo = memo.getText().toString();
-        fileManager = new OFileManager(getApplicationContext());
         if (extra.containsKey("type")) {
             requestSpeechToText();
         }
@@ -177,18 +258,9 @@ public class NoteDetail extends ActionBarActivity {
         memo = (EditText) findViewById(R.id.note_memo);
         memo.setTextColor(NoteUtil.getTextColor(color));
         last_update_on.setTextColor(NoteUtil.getTextColor(color));
-
-
-//        mAttachmentView = (ONoteAttachmentView) findViewById(R.id.note_attachments);
-//        mAttachmentView.setMaximumCols(3);
-//        mAttachmentView.setAttachmentViewListener(this);
     }
 
     private void createView() {
-        /*
-         * OControls.setText(findViewById(R.id.note_detail_view),
-		 * R.id.note_name, note_cr.getString(note_cr.getColumnIndex("name")));
-		 */
         String content = note_cr.getString("memo");
         SpannableStringBuilder b = new SpannableStringBuilder(
                 Html.fromHtml(content));
@@ -218,19 +290,19 @@ public class NoteDetail extends ActionBarActivity {
             if (requestCode == REQUEST_SPEECH_TO_TEXT) {
                 ArrayList<String> matches = data
                         .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                if (memo.getText() != null)
+                if (!TextUtils.isEmpty(memo.getText()))
                     memo.setText(memo.getText() + " " + matches.get(0));
                 else
                     memo.setText(matches.get(0));
                 memo.setSelection(memo.getText().length());
-            }
-            OValues values = fileManager.handleResult(requestCode, resultCode, data);
-            if (values != null && !values.contains("size_limit_exceed")) {
-                //TODO
-                String newImage = values.getString("datas");
-                Toast.makeText(this, R.string.note_created, Toast.LENGTH_LONG).show();
-            } else if (values != null) {
-                Toast.makeText(this, R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
+            } else {
+                OValues values = fileManager.handleResult(requestCode, resultCode, data);
+                if (values != null && !values.contains("size_limit_exceed")) {
+                    attachments.add(values);
+                    initAttachmentView();
+                } else if (values != null) {
+                    Toast.makeText(this, R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
+                }
             }
         }
     }
@@ -253,6 +325,9 @@ public class NoteDetail extends ActionBarActivity {
             if (note_memo.length() != memo.getText().toString().length()) {
                 isDirty = true;
             }
+            if (dbAttachments != attachmentLists.size()) {
+                isDirty = true;
+            }
             if (!isDirty) {
                 isDirty = mReminder.hasReminder();
             }
@@ -262,6 +337,7 @@ public class NoteDetail extends ActionBarActivity {
 
     private void saveNote() {
         isDirty = false;
+        dbAttachments = attachmentLists.size();
         String toast = getString(R.string.note_created);
         // note_name = name.getText().toString();
         String html_content = Html.toHtml(memo.getText());
@@ -279,19 +355,18 @@ public class NoteDetail extends ActionBarActivity {
             reminder = mReminder.getDateString();
         }
         values.put("reminder", reminder);
-
+        int note_id;
         if (note_cr == null) {
             // creating new note
             values.put("sequence", 0);
-            int newNote_id = mNote.insert(values);
+            note_id = mNote.insert(values);
             if (mReminder.hasReminder()) {
-                mReminder.setReminder(newNote_id, mReminder.getCal());
+                mReminder.setReminder(note_id, mReminder.getCal());
             }
         } else {
             // Updating note
             toast = getString(R.string.note_updated);
-            int note_id = note_cr
-                    .getInt(OColumn.ROW_ID);
+            note_id = note_cr.getInt(OColumn.ROW_ID);
             if (mReminder.hasReminder()) {
                 if (reminderDate == null) {
                     reminderDate = "";
@@ -300,7 +375,16 @@ public class NoteDetail extends ActionBarActivity {
                     mReminder.setReminder(note_id, mReminder.getCal());
                 }
             }
+            if (!mReminder.hasReminder() && reminderDate != null) {
+                values.put("reminder", reminderDate);
+            }
             mNote.update(note_id, values);
+        }
+        if (!attachments.isEmpty()) {
+            IrAttachment irAttachment = new IrAttachment(this, null);
+            for (OValues attachment : attachments) {
+                irAttachment.createAttachment(attachment, mNote.getModelName(), note_id);
+            }
         }
         Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
         mReminder.setHasReminder(false);
@@ -349,9 +433,9 @@ public class NoteDetail extends ActionBarActivity {
                     }
                 }).show();
                 break;
-//            case R.id.menu_note_attachment:
-//                attachment.newAttachment(Types.IMAGE_OR_CAPTURE_IMAGE);
-//                break;
+            case R.id.menu_note_attachment:
+                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
+                break;
             case R.id.menu_note_speech_to_text:
                 requestSpeechToText();
                 break;
@@ -401,4 +485,5 @@ public class NoteDetail extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

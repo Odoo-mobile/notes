@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:paddingLeft="16dp"
-            android:background="@android:color/transparent"
+            android:background="@color/theme_primary"
             android:paddingBottom="@dimen/default_8dp"
             android:paddingRight="16dp" />
 

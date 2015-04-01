@@ -35,6 +35,9 @@ public class OStringColorUtil {
         Resources res = context.getResources();
         TypedArray mColors = res.obtainTypedArray(R.array.letter_tile_colors);
         int MAX_COLORS = mColors.length();
+        if (content.isEmpty()) {
+            content = "0";
+        }
         int firstCharAsc = content.toUpperCase(Locale.getDefault()).charAt(0);
         int index = (firstCharAsc % MAX_COLORS);
         if (index > MAX_COLORS - 1) {

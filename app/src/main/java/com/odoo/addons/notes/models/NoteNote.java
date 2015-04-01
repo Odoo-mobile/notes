@@ -76,6 +76,7 @@ public class NoteNote extends OModel {
     public NoteNote(Context context, OUser user) {
         super(context, "note.note", user);
         mContext = context;
+        setHasMailChatter(true);
     }
 
     @Override
@@ -151,8 +152,8 @@ public class NoteNote extends OModel {
 
     public List<ODataRow> getAttachments(int note_id) {
         IrAttachment attachment = new IrAttachment(mContext, null);
-        List<ODataRow> cr = attachment.select(null, "res_model = ? and res_id = ?",
-                new String[]{getModelName(), note_id + ""}, "id DESC");
+        List<ODataRow> cr = attachment.select(null, "res_model = ? and (res_id = ? or res_id = ?) and res_id != ?",
+                new String[]{getModelName(), note_id + "", selectServerId(note_id) + "", "0"}, "id DESC");
         return cr;
     }
 

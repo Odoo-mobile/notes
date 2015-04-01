@@ -24,20 +24,23 @@
         android:layout_height="wrap_content"
         android:clipToPadding="false">
 
-        <LinearLayout
+        <odoo.controls.OForm
+            android:id="@+id/noteForm"
+            app:modelName="note.note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!--<odoo.controls.misc.ONoteAttachmentView
+            <odoo.controls.misc.ONoteAttachmentView
                 android:id="@+id/note_attachments"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:visibility="gone"/>-->
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/default_8dp"
                 android:orientation="vertical"
                 android:padding="@dimen/default_16dp">
 
@@ -70,7 +73,7 @@
                     android:gravity="right"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
             </LinearLayout>
-        </LinearLayout>
+        </odoo.controls.OForm>
 
     </ScrollView>
 </LinearLayout>

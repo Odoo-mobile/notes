@@ -40,7 +40,6 @@ import com.odoo.core.orm.provider.BaseModelProvider;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooFields;
-import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
@@ -865,6 +864,11 @@ public class OModel {
         return query(query, null);
     }
 
+    public Cursor executeQuery(String query, String[] args) {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.rawQuery(query, args);
+    }
+
     public List<ODataRow> query(String query, String[] args) {
         List<ODataRow> rows = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -1022,18 +1026,24 @@ public class OModel {
         }
     }
 
-    public boolean isInstalledOnServer(String module_name) {
+    public boolean isInstalledOnServer(String module_name, Boolean checkLive) {
         try {
             App app = (App) mContext.getApplicationContext();
             IrModel model = new IrModel(mContext, getUser());
-            List<ODataRow> modules = model.select(null, "name = ?", new String[]{module_name.trim()});
-            if (modules.size() > 0) {
-                if (modules.get(0).getString("state").equals("installed")) {
-                    return true;
+            if (!app.inNetwork() || !checkLive) {
+                List<ODataRow> modules = model.select(null, "name = ?", new String[]{module_name.trim()});
+                if (modules.size() > 0) {
+                    if (modules.get(0).getString("state").equals("installed")) {
+                        return true;
+                    }
                 }
             }
             if (app.inNetwork()) {
                 odoo.Odoo odoo = app.getOdoo(getUser());
+                if (odoo == null) {
+                    odoo = OSyncAdapter.createOdooInstance(mContext, getUser());
+                }
+
                 OdooFields fields = new OdooFields(new String[]{"state", "name"});
                 ODomain domain = new ODomain();
                 domain.add("name", "=", module_name);
@@ -1041,16 +1051,13 @@ public class OModel {
                         .getJSONArray("records");
                 if (result.length() > 0) {
                     JSONObject record = result.getJSONObject(0);
-                    if (record.getString("state").equals("installed")) {
-                        OValues values = new OValues();
-                        values.put("id", record.getInt("id"));
-                        values.put("name", record.getString("name"));
-                        values.put("state", record.getString("state"));
-                        model.insertOrUpdate(record.getInt("id"), values);
-                        return true;
-                    }
+                    OValues values = new OValues();
+                    values.put("id", record.getInt("id"));
+                    values.put("name", record.getString("name"));
+                    values.put("state", record.getString("state"));
+                    model.insertOrUpdate(record.getInt("id"), values);
+                    return (record.getString("state").equals("installed"));
                 }
-
             }
         } catch (Exception e) {
             e.printStackTrace();

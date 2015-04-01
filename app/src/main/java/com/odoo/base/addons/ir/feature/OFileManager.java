@@ -33,6 +33,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Parcelable;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -58,6 +59,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -69,12 +72,12 @@ public class OFileManager implements DialogInterface.OnClickListener {
     public static final int REQUEST_AUDIO = 113;
     public static final int REQUEST_FILE = 114;
     public static final int REQUEST_ALL_FILE = 115;
-    private static final int SINGLE_ATTACHMENT_STREAM = 115;
+    public static final int SINGLE_ATTACHMENT_STREAM = 116;
     private static final long IMAGE_MAX_SIZE = 1000000; // 1 MB
     private Context mContext = null;
     private String[] mOptions = null;
     private RequestType requestType = null;
-    private Uri newImageUri = null;
+    private static Uri newImageUri = null;
     private IrAttachment irAttachment = null;
     private App mApp;
 
@@ -85,11 +88,15 @@ public class OFileManager implements DialogInterface.OnClickListener {
     public OFileManager(Context context) {
         mContext = context;
         irAttachment = new IrAttachment(context, null);
-        mApp = (App) mContext.getApplicationContext();
+        mApp = (App) context.getApplicationContext();
     }
 
     public void downloadAttachment(int attachment_id) {
         ODataRow attachment = irAttachment.browse(attachment_id);
+        downloadAttachment(attachment);
+    }
+
+    public void downloadAttachment(ODataRow attachment) {
         if (attachment != null) {
             String uri = attachment.getString("file_uri");
             if (uri.equals("false")) {
@@ -252,8 +259,14 @@ public class OFileManager implements DialogInterface.OnClickListener {
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public String getDocPath(Uri uri) {
-        String wholeID = DocumentsContract.getDocumentId(uri);
-        String id = wholeID.split(":")[1];
+        boolean isDocumentURI = DocumentsContract.isDocumentUri(mContext, uri);
+        String id;
+        if (isDocumentURI) {
+            String wholeID = DocumentsContract.getDocumentId(uri);
+            id = wholeID.split(":")[1];
+        } else {
+            id = uri.getLastPathSegment();
+        }
         String[] column = {MediaStore.Images.Media.DATA};
         String sel = MediaStore.Images.Media._ID + "=?";
         Cursor cursor = mContext.getContentResolver().query(
@@ -361,6 +374,17 @@ public class OFileManager implements DialogInterface.OnClickListener {
         return s;
     }
 
+    public List<OValues> handleMultipleRequest(Intent data) {
+        List<OValues> values = new ArrayList<>();
+
+        for (Parcelable attach : data
+                .getParcelableArrayListExtra(Intent.EXTRA_STREAM)) {
+            Uri uriFile = (Uri) attach;
+            values.add(getURIDetails(uriFile));
+        }
+        return values;
+    }
+
     public OValues handleResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
@@ -368,12 +392,16 @@ public class OFileManager implements DialogInterface.OnClickListener {
                     OValues values = getURIDetails(newImageUri);
                     values.put("datas", BitmapUtils.uriToBase64(newImageUri,
                             mContext.getContentResolver(), true));
+                    newImageUri = null;
                     return values;
                 case REQUEST_IMAGE:
                     values = getURIDetails(data.getData());
                     values.put("datas", BitmapUtils.uriToBase64(data.getData(),
                             mContext.getContentResolver(), true));
                     return values;
+                case SINGLE_ATTACHMENT_STREAM:
+                    Uri uri = data.getParcelableExtra(Intent.EXTRA_STREAM);
+                    return getURIDetails(uri);
                 case REQUEST_ALL_FILE:
                 default:
                     return getURIDetails(data.getData());
@@ -400,7 +428,7 @@ public class OFileManager implements DialogInterface.OnClickListener {
                 break;
         }
         builder.setSingleChoiceItems(mOptions, -1, this);
-        builder.create().show();
+        builder.show();
     }
 
     @Override
