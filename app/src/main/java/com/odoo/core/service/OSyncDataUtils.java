@@ -301,8 +301,9 @@ public class OSyncDataUtils {
                 for (ODataRow record : model.select(null,
                         "id IN ( " + StringUtils.repeat("?, ", ids.size() - 1) + " ?)",
                         ids.toArray(new String[ids.size()]))) {
-                    mOdoo.updateValues(model.getModelName(),
-                            JSONUtils.createJSONValues(model, record), record.getInt("id"));
+                    JSONObject values = JSONUtils.createJSONValues(model, record);
+                    values.remove("id"); //FIXME: KeyError "id" if passing id to OpenERP v7 RPC
+                    mOdoo.updateValues(model.getModelName(), values, record.getInt("id"));
                     OValues value = new OValues();
                     value.put("_is_dirty", "false");
                     value.put("_write_date", ODateUtils.getUTCDate());
