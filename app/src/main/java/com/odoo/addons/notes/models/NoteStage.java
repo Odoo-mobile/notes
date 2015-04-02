@@ -51,4 +51,9 @@ public class NoteStage extends OModel {
         List<ODataRow> cr = select(null, null, null, "sequence");
         return cr.get(0).getInt(OColumn.ROW_ID);
     }
+
+    @Override
+    public boolean checkForCreateDate() {
+        return false;
+    }
 }
