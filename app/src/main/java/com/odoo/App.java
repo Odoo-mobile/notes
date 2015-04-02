@@ -42,6 +42,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Odoo.DEBUG_DEBUG = 15032007;
     }
 
     public Odoo getOdoo(OUser user) {
