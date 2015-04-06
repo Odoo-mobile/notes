@@ -43,6 +43,7 @@ import android.widget.TextView;
 import com.odoo.R;
 import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.models.NoteStage;
+import com.odoo.addons.notes.models.NoteTag;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.addons.fragment.BaseFragment;
@@ -169,13 +170,16 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
     @Override
     public List<ODrawerItem> drawerMenus(Context context) {
         List<ODrawerItem> items = new ArrayList<>();
+        NoteNote notes = new NoteNote(context, null);
         items.add(new ODrawerItem(TAG).setTitle("Notes")
                 .setIcon(R.drawable.ic_action_notes)
                 .setExtra(extra(Notes.Type.Notes))
+                .setCounter(count(notes, Notes.Type.Notes))
                 .setInstance(new StagesPager()));
         items.add(new ODrawerItem(TAG).setTitle("Reminders")
                 .setIcon(R.drawable.ic_action_reminder)
                 .setExtra(extra(Notes.Type.Reminders))
+                .setCounter(count(notes, Notes.Type.Reminders))
                 .setInstance(new Notes()));
         items.add(new ODrawerItem(TAG).setTitle("Archive")
                 .setIcon(R.drawable.ic_action_archive)
@@ -185,23 +189,37 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
                 .setIcon(R.drawable.ic_action_trash)
                 .setExtra(extra(Notes.Type.Deleted))
                 .setInstance(new Notes()));
-        //TODO: 
-        /*
-        Adding tags filters for notes. (VERSION : 2.1.0)
-         */
-//        NoteTag tags = new NoteTag(context, null);
-//        if (tags.count(null, null) > 0) {
-//            items.add(new ODrawerItem(TAG).setTitle("Tags").setGroupTitle());
-//            for (ODataRow tag : tags.select()) {
-//                Bundle extra = extra(Notes.Type.TagFilter);
-//                extra.putInt("tag_id", tag.getInt(OColumn.ROW_ID));
-//                items.add(new ODrawerItem(TAG).setTitle(tag.getString("name"))
-//                        .setIcon(R.drawable.ic_action_label)
-//                        .setInstance(new Notes())
-//                        .setExtra(extra));
-//            }
-//        }
+        NoteTag tags = new NoteTag(context, null);
+        if (tags.count(null, null) > 0) {
+            items.add(new ODrawerItem(TAG).setTitle("Tags").setGroupTitle());
+            for (ODataRow tag : tags.select(null, null, null, "name")) {
+                Bundle extra = extra(Notes.Type.TagFilter);
+                extra.putInt("tag_id", tag.getInt(OColumn.ROW_ID));
+                items.add(new ODrawerItem(TAG).setTitle(tag.getString("name"))
+                        .setIcon(R.drawable.ic_action_label)
+                        .setCounter(notes.tagCount(tag.getInt(OColumn.ROW_ID)))
+                        .setInstance(new Notes())
+                        .setExtra(extra));
+            }
+        }
         return items;
+    }
+
+    public int count(NoteNote notes, Notes.Type type) {
+        String selection;
+        List<String> args = new ArrayList<>();
+        switch (type) {
+            case Notes:
+                selection = "open = ? and trashed = ?";
+                args.add("true");
+                args.add("0");
+                return notes.count(selection, args.toArray(new String[args.size()]));
+            case Reminders:
+                selection = " reminder != ?";
+                args.add("0");
+                return notes.count(selection, args.toArray(new String[args.size()]));
+        }
+        return 0;
     }
 
     public Bundle extra(Notes.Type type) {
@@ -312,7 +330,8 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
         public CharSequence getPageTitle(int position) {
             stageCursor.moveToPosition(position);
             int stage_id = stageCursor.getInt(stageCursor.getColumnIndex(OColumn.ROW_ID));
-            int count = noteNote.count("stage_id = ? and open = ? and trashed = ?", new String[]{stage_id + "", "true", "0"});
+            String stage_filter = "stage_id = ?";
+            int count = noteNote.count(stage_filter + " and open = ? and trashed = ?", new String[]{stage_id + "", "true", "0"});
             String name = stageCursor.getString(stageCursor.getColumnIndex("name"));
             return (count > 0) ? name + " (" + count + ")" : name;
         }
@@ -323,6 +342,9 @@ public class StagesPager extends BaseFragment implements AdapterView.OnItemSelec
             stageCursor.moveToPosition(i);
             int stage_id = stageCursor.getInt(stageCursor.getColumnIndex(OColumn.ROW_ID));
             Bundle bundle = new Bundle();
+            if (i == 0) {
+                bundle.putBoolean("default_stage", true);
+            }
             bundle.putInt(Notes.KEY_STAGE_ID, stage_id);
             bundle.putString(Notes.KEY_NOTE_FILTER, Notes.Type.Notes.toString());
             notes.setArguments(bundle);

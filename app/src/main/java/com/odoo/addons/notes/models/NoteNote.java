@@ -20,6 +20,7 @@
 package com.odoo.addons.notes.models;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 
 import com.odoo.base.addons.ir.IrAttachment;
@@ -73,6 +74,9 @@ public class NoteNote extends OModel {
     OColumn stage_id_name = new OColumn("Select Stage Name", OVarchar.class)
             .setDefaultValue("false").setLocalColumn();
 
+    @Odoo.Functional(store = true, depends = {"message_follower_ids"}, method = "isSharedNote")
+    OColumn shared_note = new OColumn("Is Shared", OBoolean.class).setDefaultValue(false).setLocalColumn();
+
     public NoteNote(Context context, OUser user) {
         super(context, "note.note", user);
         mContext = context;
@@ -84,11 +88,56 @@ public class NoteNote extends OModel {
         return buildURI(AUTHORITY);
     }
 
+    public Uri filterTag() {
+        return uri().buildUpon().appendPath("tag_filter").build();
+    }
+
+    public Cursor getTagNotes(int tag_id) {
+        NoteTag tags = new NoteTag(mContext, getUser());
+        String rel_table = getTableName() + "_" + tags.getTableName() + "_rel as rel ";
+        StringBuffer query = new StringBuffer();
+        query.append("SELECT notes.* FROM ");
+        query.append(getTableName() + " as notes ");
+        query.append("LEFT JOIN " + rel_table);
+        query.append("ON rel.note_note_id = notes." + OColumn.ROW_ID);
+        query.append(" WHERE rel.note_tag_id = " + tag_id);
+        query.append(" and notes._is_active = 'true' and trashed = '0'");
+        return executeQuery(query.toString(), null);
+
+    }
+
+    public int tagCount(int tag_id) {
+        NoteTag tags = new NoteTag(mContext, getUser());
+        String rel_table = getTableName() + "_" + tags.getTableName() + "_rel as rel ";
+        StringBuffer query = new StringBuffer();
+        query.append("SELECT count(id) FROM ");
+        query.append(getTableName() + " as notes ");
+        query.append("LEFT JOIN " + rel_table);
+        query.append("ON rel.note_note_id = notes." + OColumn.ROW_ID);
+        query.append(" WHERE rel.note_tag_id = " + tag_id);
+        query.append(" and notes._is_active = 'true' and trashed = '0'");
+        Cursor cr = executeQuery(query.toString(), null);
+        if (cr.moveToFirst()) {
+            return cr.getInt(0);
+        }
+        return 0;
+    }
+
     @Override
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
         domain.add("message_follower_ids", "in", new JSONArray().put(getUser().getPartner_id()));
         return domain;
+    }
+
+    public boolean isSharedNote(OValues values) {
+        try {
+            JSONArray message_follower_ids = (JSONArray) values.get("message_follower_ids");
+            return (message_follower_ids.length() > 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public int quickCreateNote(String note, int stage_id) {

@@ -560,7 +560,7 @@ public class OUser {
     }
 
     public String getDBName() {
-        String db_name = "OdooSQLite";
+        String db_name = "OdooSQLite_notes";
         db_name += "_" + getUsername();
         db_name += "_" + getDatabase();
         return db_name + ".db";

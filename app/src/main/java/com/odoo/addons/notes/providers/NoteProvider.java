@@ -19,11 +19,41 @@
  */
 package com.odoo.addons.notes.providers;
 
+import android.database.Cursor;
+import android.net.Uri;
+
 import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.core.orm.provider.BaseModelProvider;
 
+import java.util.Locale;
+
 public class NoteProvider extends BaseModelProvider {
     public static final String TAG = NoteProvider.class.getSimpleName();
+    public static final int TAG_FILTER = 159;
+
+    @Override
+    public boolean onCreate() {
+        String path = new NoteNote(getContext(), null).getModelName().toLowerCase(Locale.getDefault());
+        matcher.addURI(authority(), path + "/tag_filter", TAG_FILTER);
+        return super.onCreate();
+    }
+
+    @Override
+    public void setModel(Uri uri) {
+        super.setModel(uri);
+        mModel = new NoteNote(getContext(), getUser(uri));
+    }
+
+    @Override
+    public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs, String sortOrder) {
+        int match = matcher.match(uri);
+        if (match != TAG_FILTER) {
+            return super.query(uri, base_projection, selection, selectionArgs, sortOrder);
+        } else {
+            NoteNote note = new NoteNote(getContext(), getUser(uri));
+            return note.getTagNotes(Integer.parseInt(selectionArgs[0]));
+        }
+    }
 
     @Override
     public String authority() {

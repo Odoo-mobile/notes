@@ -184,8 +184,8 @@ public class OFileManager implements DialogInterface.OnClickListener {
         @Override
         protected void onPostExecute(ODataRow row) {
             super.onPostExecute(row);
-            ONotificationBuilder.cancelNotification(mContext, row.getInt(OColumn.ROW_ID));
             if (row != null) {
+                ONotificationBuilder.cancelNotification(mContext, row.getInt(OColumn.ROW_ID));
                 ONotificationBuilder builder = new ONotificationBuilder(mContext,
                         row.getInt(OColumn.ROW_ID));
                 builder.allowVibrate(true);

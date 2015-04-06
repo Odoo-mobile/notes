@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.odoo.R;
 import com.odoo.addons.notes.models.NoteNote;
 import com.odoo.addons.notes.models.NoteStage;
 import com.odoo.base.addons.config.BaseConfigSettings;
@@ -79,6 +80,27 @@ public class NoteService extends OSyncService implements ISyncFinishListener {
         if (adapter.getModel().getModelName().equals("note.note")) {
             adapter.syncDataLimit(50).onSyncFinish(this);
         } else if (adapter.getModel().getModelName().equals(noteStage.getModelName())) {
+
+            // Checking for stages on server
+            // If no stages found on server creating default stages
+            if (adapter.getModel().isEmptyTable()) {
+                try {
+                    Log.d(TAG, "Creating stages to server");
+                    String[] defaultStages = getApplicationContext().getResources()
+                            .getStringArray(R.array.default_stages);
+                    int i = 0;
+                    for (String stage : defaultStages) {
+                        JSONObject record = new JSONObject();
+                        record.put("name", stage);
+                        record.put("sequence", i++);
+                        record.put("user_id", user.getUser_id());
+                        adapter.getModel().getServerDataHelper().createOnServer(record);
+                    }
+                    adapter.getModel().quickSyncRecords(new ODomain());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             adapter.onSyncFinish(finishListener);
         } else if (adapter.getModel().getModelName().equals(configSettings.getModelName())) {
             // Updating attachment's res_id for notes

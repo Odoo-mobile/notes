@@ -47,11 +47,13 @@ import java.util.List;
 
 import odoo.controls.OForm;
 import odoo.controls.misc.ONoteAttachmentView;
+import odoo.controls.misc.OTagsFlowView;
 
-public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView.AttachmentViewListener {
+public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView.AttachmentViewListener, View.OnClickListener {
     public static final String ACTION_REMINDER_CALL = "com.odoo.addons.note.NoteDetailActivity.REMINDER_CALL";
     public static final String REQUEST_FILE_ATTACHMENT = "request_file_attachment";
     public static final int REQUEST_SPEECH_TO_TEXT = 333;
+    public static final int REQUEST_MANAGE_TAGS = 444;
     private NoteNote mNote;
     private NoteStage mStage;
     private NoteReminder mReminder;
@@ -75,6 +77,7 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
     private OForm mNoteForm;
     private ONoteAttachmentView attachmentView;
     private IrAttachment irAttachment;
+    private OTagsFlowView tagsFlowView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +93,7 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
         fileManager = new OFileManager(this);
         irAttachment = new IrAttachment(this, null);
         mNoteForm = (OForm) findViewById(R.id.noteForm);
+        tagsFlowView = (OTagsFlowView) findViewById(R.id.noteTags);
         init();
     }
 
@@ -210,6 +214,7 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
     private void initData(Integer note_id, Bundle extra) {
         if (note_id != null) {
             note_cr = mNote.browse(note_id);
+
             mNoteForm.initForm(note_cr);
             mStageId = note_cr.getInt("stage_id");
             open = note_cr.getString("open").equals("true");
@@ -224,6 +229,7 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
                     ODateUtils.DEFAULT_FORMAT, "d MMM, hh:mm a");
             last_update_on.setText("Edited " + edited_date);
             createView();
+            updateTagView();
         }
         if (extra.containsKey(Intent.EXTRA_TEXT)) {
             initControls(color);
@@ -248,6 +254,16 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
         if (extra.containsKey("type")) {
             requestSpeechToText();
         }
+    }
+
+    private void updateTagView() {
+        List<String> tags = new ArrayList<>();
+        for (ODataRow tag : note_cr.getM2MRecord("tag_ids").browseEach()) {
+            tags.add(tag.getString("name"));
+        }
+        tagsFlowView.notifyTagsChange(this, tags);
+        tagsFlowView.setOnClickListener(this);
+
     }
 
     private void initControls(int color) {
@@ -295,6 +311,8 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
                 else
                     memo.setText(matches.get(0));
                 memo.setSelection(memo.getText().length());
+            } else if (requestCode == REQUEST_MANAGE_TAGS) {
+                updateTagView();
             } else {
                 OValues values = fileManager.handleResult(requestCode, resultCode, data);
                 if (values != null && !values.contains("size_limit_exceed")) {
@@ -350,6 +368,11 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
         values.put("color", color);
         values.put("trashed", 0);
         values.put("open", open + "");
+        if (extra.containsKey("tag_id")) {
+            List<Integer> tag_ids = new ArrayList<>();
+            tag_ids.add(extra.getInt("tag_id"));
+            values.put("tag_ids", tag_ids);
+        }
         String reminder = "0";
         if (mReminder.hasReminder()) {
             reminder = mReminder.getDateString();
@@ -399,6 +422,10 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
         if (note_cr == null) {
             mMenu.findItem(R.id.menu_note_archive).setVisible(false);
             mMenu.findItem(R.id.menu_note_operation).setVisible(false);
+        } else {
+            if (note_cr.getM2MRecord("tag_ids").getRelIds().size() > 0) {
+                mMenu.findItem(R.id.menu_manage_tags).setTitle("Manage tags");
+            }
         }
         if (trashed == 1) {
             mMenu.findItem(R.id.menu_note_delete).setTitle(
@@ -412,12 +439,23 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
         return true;
     }
 
+    private void manageTags() {
+        Bundle extra = new Bundle();
+        extra.putInt("note_id", note_cr.getInt(OColumn.ROW_ID));
+        Intent intent = new Intent(this, ManageTags.class);
+        intent.putExtras(extra);
+        startActivityForResult(intent, REQUEST_MANAGE_TAGS);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
+            case R.id.menu_manage_tags:
+                manageTags();
+                break;
             case R.id.menu_note_color:
                 String selected = NoteUtil.getBackgroundColors()[color];
                 NoteUtil.colorDialog(this, selected, new NoteColorDialog.OnColorSelectListener() {
@@ -464,6 +502,7 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
                         "");
                 extras.putString(Intent.EXTRA_TEXT, memo.getText().toString());
                 extras.putInt(Notes.KEY_STAGE_ID, mStageId);
+
                 Intent intent = new Intent(this, NoteDetail.class);
                 intent.putExtras(extras);
                 startActivity(intent);
@@ -486,4 +525,10 @@ public class NoteDetail extends ActionBarActivity implements ONoteAttachmentView
         return super.onOptionsItemSelected(item);
     }
 
+
+    @Override
+    public void onClick(View v) {
+        if (note_cr != null)
+            manageTags();
+    }
 }

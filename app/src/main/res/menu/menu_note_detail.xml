@@ -29,13 +29,16 @@
         <menu>
             <item
                 android:id="@+id/menu_note_delete"
-                android:title="Delete"></item>
+                android:title="Delete note" />
+            <item
+                android:id="@+id/menu_manage_tags"
+                android:title="Add tag" />
             <item
                 android:id="@+id/menu_note_make_copy"
-                android:title="Make a copy"></item>
+                android:title="Make a copy" />
             <item
                 android:id="@+id/menu_note_share"
-                android:title="Share"></item>
+                android:title="Share" />
             <!--
                  <item
                 android:id="@+id/menu_note_followers"

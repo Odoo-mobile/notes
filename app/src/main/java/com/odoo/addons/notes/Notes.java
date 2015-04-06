@@ -23,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -67,6 +68,10 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
+import com.odoo.widgets.snackbar.SnackBar;
+import com.odoo.widgets.snackbar.SnackbarBuilder;
+import com.odoo.widgets.snackbar.listeners.ActionClickListener;
+import com.odoo.widgets.snackbar.listeners.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +81,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
         OCursorListAdapter.OnViewBindListener, IOnSearchViewChangeListener,
         View.OnClickListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener,
         BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener,
-        BottomSheetListeners.OnSheetMenuCreateListener {
+        BottomSheetListeners.OnSheetMenuCreateListener, EventListener {
     public static final String TAG = Notes.class.getSimpleName();
     public static final String KEY_STAGE_ID = "stage_id";
     public static final String KEY_NOTE_ID = "note_id";
@@ -88,6 +93,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     private View mView;
     private String mFilter = null;
     private BottomSheet mSheet;
+    private Bundle extra;
 
     public enum Type {
         Notes, Archive, Reminders, Deleted, TagFilter
@@ -103,7 +109,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
-        Bundle extra = getArguments();
+        extra = getArguments();
         if (extra != null) {
             if (extra.containsKey(KEY_STAGE_ID)) {
                 mStageId = extra.getInt(KEY_STAGE_ID);
@@ -212,7 +218,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             case R.id.menu_note_archive:
                 String open = (row.getString("open").equals("false")) ? "true"
                         : "false";
-                showArchiveUndoBar(row_id, open);
+                showArchiveUndoBar(row_id, open, row.getString("trashed").equals("1"));
                 break;
             case R.id.menu_note_delete:
                 int trashed = (row.getInt("trashed") == 1) ? 0 : 1;
@@ -272,6 +278,9 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                     }
                     Bundle data = new Bundle();
                     data.putInt(KEY_STAGE_ID, mStageId);
+                    if (extra.containsKey("tag_id")) {
+                        data.putInt("tag_id", extra.getInt("tag_id"));
+                    }
                     switch (menuItem.getItemId()) {
                         case R.id.menu_note_create:
                             quickCreateNote(data);
@@ -314,10 +323,14 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             if (result) {
                 Bundle data = new Bundle();
                 data.putInt(KEY_STAGE_ID, mStageId);
+                if (extra.containsKey("tag_id")) {
+                    data.putInt("tag_id", extra.getInt("tag_id"));
+                }
                 data.putBoolean(NoteDetail.REQUEST_FILE_ATTACHMENT, true);
                 quickCreateNote(data);
             } else {
-                OAlert.showWarning(getActivity(), _s(R.string.warning_no_document_module_installed));
+                OAlert.showWarning(getActivity(),
+                        _s(R.string.warning_no_document_module_installed));
             }
         }
     }
@@ -346,6 +359,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
         String selection = "";
         List<String> args = new ArrayList<>();
+        Uri uri = db().uri();
         switch (mCurrentKey) {
             case Notes:
                 args.add(mStageId + "");
@@ -367,6 +381,8 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                 args.add("1");
                 break;
             case TagFilter:
+                uri = ((NoteNote) db()).filterTag();
+                args.add(extra.getInt("tag_id") + "");
                 break;
         }
         if (mFilter != null) {
@@ -374,7 +390,7 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             args.add("%" + mFilter + "%");
         }
         String[] arguments = args.toArray(new String[args.size()]);
-        return new CursorLoader(getActivity(), db().uri(), null, selection,
+        return new CursorLoader(getActivity(), uri, null, selection,
                 arguments, " sequence");
     }
 
@@ -418,6 +434,12 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                                     R.string.label_empty_trash);
                             OControls.setImage(mView, R.id.icon,
                                     R.drawable.ic_action_trash);
+                            break;
+                        case TagFilter:
+                            OControls.setText(mView, R.id.title,
+                                    R.string.label_empty_tag_list);
+                            OControls.setImage(mView, R.id.icon,
+                                    R.drawable.ic_action_label);
                             break;
                     }
                 }
@@ -509,25 +531,62 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                 }).show();
     }
 
-    private void showArchiveUndoBar(int row_id, String open) {
+    private void showArchiveUndoBar(final int row_id, final String open, final boolean fromTrash) {
         OValues values = new OValues();
         values.put("open", open);
         values.put("trashed", 0);
-        values.put("is_dirty", true);
         db().update(row_id, values);
         restartLoader();
+        String toast = (open.equals("true")) ? _s(R.string.snack_note_unarchived) :
+                _s(R.string.snack_note_archived);
+        if (fromTrash) {
+            toast = _s(R.string.snack_note_restored);
+        }
+        SnackBar.get(getActivity())
+                .text(toast)
+                .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
+                .actionColor(_c(R.color.theme_secondary_light))
+                .withAction(R.string.undo,
+                        new ActionClickListener() {
+                            @Override
+                            public void onActionClicked(SnackbarBuilder snackbarBuilder) {
+                                OValues value = new OValues();
+                                if (!fromTrash) {
+                                    value.put("open", (open.equals("true")) ? "false" : "true");
+                                }
+                                value.put("trashed", (fromTrash) ? 1 : 0);
+                                db().update(row_id, value);
+                            }
+                        })
+                .withEventListener(this).show();
     }
 
-    private void showTrashUndoBar(int row_id, int trashed) {
-        OValues values = new OValues();
+    private void showTrashUndoBar(final int row_id, final int trashed) {
+        final OValues values = new OValues();
         values.put("trashed", trashed);
-        values.put("is_dirty", false);
+        values.put("_is_dirty", false);
         values.put("trashed_date", ODateUtils.getUTCDate());
         if (mCurrentKey == Type.Deleted) {
             values.put("open", "false");
         }
         db().update(row_id, values);
         restartLoader();
+        SnackBar.get(getActivity())
+                .text(R.string.snack_note_moved_to_recycle_bin)
+                .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
+                .actionColor(_c(R.color.theme_secondary_light))
+                .withAction(R.string.undo,
+                        new ActionClickListener() {
+                            @Override
+                            public void onActionClicked(SnackbarBuilder snackbarBuilder) {
+                                OValues value = new OValues();
+                                value.put("trashed", 0);
+                                value.put("_is_dirty", false);
+                                db().update(row_id, value);
+                            }
+                        })
+                
+                .withEventListener(this).show();
     }
 
     private void moveTo(final int row_id, ODataRow row) {
@@ -542,6 +601,10 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
                         values.put("is_dirty", true);
                         db().update(row_id, values);
                         restartLoader();
+                        String toast = String.format(_s(R.string.snack_note_moved_to),
+                                row.getString("name"));
+                        Toast.makeText(getActivity(), toast
+                                , Toast.LENGTH_LONG).show();
                     }
                 }).show();
     }
@@ -584,5 +647,16 @@ public class Notes extends BaseFragment implements ISyncStatusObserverListener,
             return false;
         }
         return true;
+    }
+
+    // Snack bar listeners
+    @Override
+    public void onShow(int i) {
+        hideFab();
+    }
+
+    @Override
+    public void onDismiss(int i) {
+        showFab();
     }
 }

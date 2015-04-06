@@ -32,10 +32,20 @@
     <string name="label_done">Done</string>
     <string name="label_archived_note_here">Your archived notes appear here</string>
     <string name="label_upcoming_reminder_note">Notes with upcoming reminders appear here</string>
-    <string name="label_empty_trash">No notes in Trash</string>
+    <string name="label_empty_trash">No notes in Recycle Bin</string>
     <string name="toast_delete_attachment">Delete attachment ?</string>
     <string name="label_text_note">Text</string>
     <string name="label_with_attachment">Attachments</string>
     <string name="label_speak">Speak</string>
     <string name="warning_no_document_module_installed">Required Document Management System module installed on your server. Please contact your administrator and try again.</string>
+    <string name="label_empty_tag_list">No notes with this tag yet</string>
+    <string name="snack_note_moved_to_recycle_bin">Note moved to Recycle Bin</string>
+    <string name="snack_note_restored">Note restored</string>
+    <string name="snack_note_archived">Note archived</string>
+    <string name="snack_note_unarchived">Note unarchived</string>
+    <string name="snack_note_moved_to">Note moved to %s</string>
+
+    <string-array name="default_stages">
+        <item>New</item>
+    </string-array>
 </resources>

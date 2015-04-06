@@ -66,6 +66,16 @@
                     android:id="@+id/reminder_controls"
                     layout="@layout/note_reminder_controls" />
 
+
+                <odoo.controls.misc.OTagsFlowView
+                    android:id="@+id/noteTags"
+                    android:layout_marginTop="@dimen/default_8dp"
+                    android:layout_marginBottom="@dimen/default_8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </odoo.controls.misc.OTagsFlowView>
+
                 <TextView
                     android:id="@+id/last_update_on"
                     android:layout_width="match_parent"

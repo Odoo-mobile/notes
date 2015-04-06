@@ -165,7 +165,6 @@ public class BaseModelProvider extends ContentProvider {
                 if (values[1].size() > 0) {
                     storeUpdateRelationRecords(values[1], OColumn.ROW_ID + "  = ?", new String[]{new_id + ""});
                 }
-
                 return uri.withAppendedPath(uri, new_id + "");
             case SINGLE_ROW:
                 throw new UnsupportedOperationException(

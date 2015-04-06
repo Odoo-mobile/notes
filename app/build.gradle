@@ -9,8 +9,8 @@ android {
         applicationId "com.odoo.notes"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 3
-        versionName "2.0.1"
+        versionCode 5
+        versionName "2.0.0"
     }
     buildTypes {
         release {

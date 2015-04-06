@@ -23,6 +23,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.odoo.base.addons.BaseModels;
 import com.odoo.config.Addons;
@@ -134,6 +135,8 @@ public class OSQLite extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.i(TAG, "upgrading database.");
+        Toast.makeText(mContext,"Database upgraged", Toast.LENGTH_LONG).show();
+
         OSQLHelper sqlHelper = new OSQLHelper(mContext);
         for (OModel model : getModels()) {
             sqlHelper.createDropStatements(model);
