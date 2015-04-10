@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:gravity="center_vertical"
+    android:paddingLeft="@dimen/default_16dp"
+    android:paddingRight="@dimen/default_16dp"
+    android:paddingTop="@dimen/default_8dp"
+    android:paddingBottom="@dimen/default_8dp"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:tint="#cecece"
+        android:src="@drawable/ic_action_label"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:layout_marginLeft="@dimen/default_8dp"
+        android:id="@+id/tagName"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:fontFamily="@string/font_normal"
+        android:textColor="@color/body_text_2"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_marginRight="@dimen/default_4dp"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/tagChecked"
+        android:padding="@dimen/default_4dp"
+        android:src="@drawable/ic_action_action_done_all"
+        android:background="@drawable/circle_mask_primary"
+        android:layout_width="26dp"
+        android:layout_height="26dp" />
+</LinearLayout>

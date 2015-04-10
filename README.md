@@ -1,7 +1,9 @@
-Odoo Notes v1.0
+Odoo Notes v2.0
 ===============
 
 **Getting Things Done with Notes**
+
+<img alt="Android Studio Project" src="https://dharmangsoni.odoo.com/website/image/ir.attachment/71/datas"/>
 
 <article>
 <section>
@@ -12,7 +14,7 @@ Odoo Notes v1.0
 </section>
 <section>
 <a href="https://www.odoo.com/start" target="_blank">
-<img alt="Odoo Instace" src="https://dharmangsoni.odoo.com/website/image?max_height=768&field=datas&model=ir.attachment&id=42&max_width=150" style="height:50px; width:auto" />
+<img alt="Odoo Instance" src="https://dharmangsoni.odoo.com/website/image?max_height=768&field=datas&model=ir.attachment&id=42&max_width=150" style="height:50px; width:auto" />
 </a>
 </section>
 </article>

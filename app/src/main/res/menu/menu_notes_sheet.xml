@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_note_create"
+        android:icon="@drawable/ic_action_notes"
+        android:title="@string/label_text_note" />
+    <item
+        android:id="@+id/menu_note_new_with_attachment"
+        android:icon="@drawable/ic_action_image_photo"
+        android:title="@string/label_with_attachment" />
+    <item
+        android:id="@+id/menu_note_speech_to_text"
+        android:icon="@drawable/ic_action_mic"
+        android:title="@string/label_speak" />
+</menu>

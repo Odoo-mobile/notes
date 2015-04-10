@@ -1,0 +1,51 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_note_color"
+        android:icon="@drawable/ic_action_color_palette"
+        android:title="Color"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_note_attachment"
+        android:icon="@drawable/ic_action_image_photo"
+        android:title="Attach Image"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_note_speech_to_text"
+        android:icon="@drawable/ic_action_mic"
+        android:title="Speech To Text"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_note_archive"
+        android:icon="@drawable/ic_action_archive"
+        android:title="Archive Note"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_note_operation"
+        android:icon="@drawable/ic_action_more"
+        android:title="More"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menu_note_delete"
+                android:title="Delete note" />
+            <item
+                android:id="@+id/menu_manage_tags"
+                android:title="Add tag" />
+            <item
+                android:id="@+id/menu_note_make_copy"
+                android:title="Make a copy" />
+            <item
+                android:id="@+id/menu_note_share"
+                android:title="Share" />
+            <!--
+                 <item
+                android:id="@+id/menu_note_followers"
+                android:title="Followers">
+            </item>
+            -->
+        </menu>
+    </item>
+
+</menu>

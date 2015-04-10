@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="message_to">Message to %s</string>
+    <string name="add_internal_note">Add and internal note</string>
+    <string name="internal_note_hint">Add an internal note that will not be sent to the followers</string>
+    <string name="label_odoo_notes">Odoo Notes</string>
+    <string name="sync_label_customers">Customers</string>
+    <string name="sync_label_note">Notes</string>
+    <string name="toast_information_saved">Information Saved</string>
+    <string name="toast_image_size_too_large">Image size too large !</string>
+    <string name="label_no_customer_found">No Customer Found !</string>
+    <string name="title_activity_note_detail">NoteDetailActivity</string>
+    <string name="label_no_stage_found">Sorry No Stage Found</string>
+    <string name="label_no_notes_found">No Notes Found !</string>
+    <string name="restore">Restore</string>
+    <string name="note_restore">Note Restored</string>
+    <string name="move_to_trash">Note Moved To Trash</string>
+    <string name="note_discarded">Empty Note Discarded</string>
+    <string name="note_created">Note Created</string>
+    <string name="note_updated">Note Updated</string>
+    <string name="label_log_note">Log note</string>
+    <string name="label_send_message"><u>Send a message</u></string>
+    <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
+    <string name="label_color">Choose Color</string>
+    <string name="label_archive">Archive</string>
+    <string name="label_unarchive">Unarchive</string>
+    <string name="label_move">Move</string>
+    <string name="label_select_all">All</string>
+    <string name="widget_configure">Choose Stage</string>
+    <string name="no_acct_found">No Account Found</string>
+    <string name="label_done">Done</string>
+    <string name="label_archived_note_here">Your archived notes appear here</string>
+    <string name="label_upcoming_reminder_note">Notes with upcoming reminders appear here</string>
+    <string name="label_empty_trash">No notes in Recycle Bin</string>
+    <string name="toast_delete_attachment">Delete attachment ?</string>
+    <string name="label_text_note">Text</string>
+    <string name="label_with_attachment">Attachments</string>
+    <string name="label_speak">Speak</string>
+    <string name="warning_no_document_module_installed">Required Document Management System module installed on your server. Please contact your administrator and try again.</string>
+    <string name="label_empty_tag_list">No notes with this tag yet</string>
+    <string name="snack_note_moved_to_recycle_bin">Note moved to Recycle Bin</string>
+    <string name="snack_note_restored">Note restored</string>
+    <string name="snack_note_archived">Note archived</string>
+    <string name="snack_note_unarchived">Note unarchived</string>
+    <string name="snack_note_moved_to">Note moved to %s</string>
+
+    <string-array name="default_stages">
+        <item>New</item>
+    </string-array>
+</resources>
