@@ -73,12 +73,6 @@
         
         <receiver android:name=".server.notifications.OdooServerNotificationReceiver">
             <intent-filter>
-                <action android:name="com.odoo.odoo.mobile.SERVER_NOTIFICATION" />
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".server.notifications.OdooServerNotificationReceiver">
-            <intent-filter>
                 <action android:name="com.odoo.notes.odoo.mobile.SERVER_NOTIFICATION" />
             </intent-filter>
         </receiver>
